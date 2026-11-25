@@ -1,0 +1,17 @@
+header .wallet-button {
+  background: #0000ff;
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font: 700 14px/1.35 system-ui, sans-serif;
+  margin: 0;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+header .wallet-button:hover { background: #003ec1; }
+header .wallet-button:focus-visible { outline: 3px solid #4684ff; outline-offset: 3px; }
+header .wallet-button:disabled { opacity: .65; cursor: wait; }
+.wallet-header-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.wallet-feedback { font-size: 14px; }
+.wallet-feedback:empty { display: none; }

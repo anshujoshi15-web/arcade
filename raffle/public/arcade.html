@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Play House Raffle and Puzzle Print at House Arcade, from The House of Joshi.">
 <title>House Arcade · The House of Joshi</title>
+<link rel="stylesheet" href="/wallet-button.css">
 <style>
 :root{color-scheme:light;--blue:#0000ff;--ink:#00184d;--muted:#405577;--line:#d3e1ff}
 *{box-sizing:border-box}
@@ -32,7 +33,7 @@ footer{background:white;border-top:1px solid var(--line);color:var(--muted);font
 </style>
 </head>
 <body>
-<header><div class="wrap bar"><a class="brand" href="/">The House of Joshi</a><nav aria-label="Main navigation"><a href="#games">Games</a></nav></div></header>
+<header><div class="wrap bar"><a class="brand" href="/">The House of Joshi</a><nav class="wallet-header-actions" aria-label="Main navigation"><a href="#games">Games</a><button type="button" class="wallet-button" id="connect" data-wallet-header disabled>Connect wallet</button><span class="wallet-feedback" id="wallet-feedback" role="status"></span></nav></div></header>
 <main>
 <section class="hero"><div class="wrap"><h1>House Arcade</h1><p>Collect raffle tickets or piece together a print. Choose a game to get started.</p></div></section>
 <section class="wrap games" id="games" aria-labelledby="games-title">
@@ -50,5 +51,5 @@ footer{background:white;border-top:1px solid var(--line);color:var(--muted);font
 </section>
 </main>
 <footer><div class="wrap">The House of Joshi</div></footer>
-</body>
+<script type="module" src="/wallet-button.js"></script></body>
 </html>

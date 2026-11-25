@@ -1,3 +1,4 @@
+import {setupWalletButton} from '/wallet-button.js';
 import {BrowserProvider,Contract,JsonRpcProvider,formatUnits} from '/ethers.js';
 const $=id=>document.getElementById(id);
 const fmt=n=>Number(formatUnits(n,6)).toLocaleString('en-US',{style:'currency',currency:'USD'});
@@ -32,26 +33,26 @@ async function loadHistory(){
   historyLoaded=true;
 }
 function report(error){$('status').textContent=error.shortMessage||error.message;}
-async function connect(){
+async function connect(authorizedAddress){
   if(cfg.local && !window.ethereum){
     provider=new JsonRpcProvider(cfg.rpc);signer=await provider.getSigner(1);account=await signer.getAddress();
     contract=new Contract(cfg.address,abi,signer);historyLoaded=false;
-    $('connect').textContent='Practice wallet connected';await refresh();return;
+    await refresh();return account;
   }
   if(!window.ethereum)throw Error('Open this page in a browser with an Ethereum wallet.');
-  if(cfg.local){
+  if(cfg.local && !authorizedAddress){
     try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x7a69'}]})}
     catch(e){if(e.code!==4902)throw e;await window.ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:'0x7a69',chainName:'House Raffle Local',nativeCurrency:{name:'Practice Ether',symbol:'ETH',decimals:18},rpcUrls:[cfg.rpc]}]})}
   }
   provider=new BrowserProvider(window.ethereum);
-  await provider.send('eth_requestAccounts',[]);
+  if(!authorizedAddress) await provider.send('eth_requestAccounts',[]);
   if(Number((await provider.getNetwork()).chainId)!==cfg.chainId)throw Error('Switch your wallet to chain '+cfg.chainId+' and reconnect.');
-  signer=await provider.getSigner();account=await signer.getAddress();
+  signer=await provider.getSigner(authorizedAddress);account=await signer.getAddress();
   if(cfg.local){
     const response=await fetch('/local-enroll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address:account})});
     if(!response.ok)throw Error('Local test wallet enrollment failed.');
   }
-  historyLoaded=false;contract=new Contract(cfg.address,abi,signer);$('connect').textContent=account.slice(0,6)+'…'+account.slice(-4);await refresh();
+  historyLoaded=false;contract=new Contract(cfg.address,abi,signer);await refresh();return account;
 }
 async function refresh(){
   const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity()]);
@@ -83,10 +84,27 @@ async function refresh(){
   $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+new Date(Number(deadline)*1000).toLocaleString():closed?'Entries closed.':'Draw pending.';
 }
 async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
-$('connect').onclick=()=>connect().catch(report);
 $('buy').onclick=()=>act(async()=>{const n=Number($('qty').value);if(!Number.isInteger(n)||n<1||n>25)throw Error('Enter 1–25 tickets.');const c=await contract.config();const token=new Contract(c.currency,['function allowance(address,address) view returns(uint256)','function approve(address,uint256) returns(bool)'],signer);if(await token.allowance(account,cfg.address)<BigInt(n)*1000000n)await(await token.approve(cfg.address,BigInt(n)*1000000n)).wait();return contract.buy(n,Number($('nominee').value))});
 $('bonus').onclick=()=>act(()=>contract.claimBonus(Number($('nominee').value)));$('free').onclick=()=>act(()=>contract.claimFree(Number($('nominee').value)));
 window.ethereum?.on?.('accountsChanged',()=>location.reload());window.ethereum?.on?.('chainChanged',()=>location.reload());
-if(cfg.local&&!window.ethereum)$('connect').textContent='Use practice wallet';
-if(!cfg.address){$('status').textContent=cfg.error||'No raffle round is open yet. Check back for the next round.';$('connect').disabled=true}
-else{try{provider=new JsonRpcProvider(cfg.rpc);if(Number((await provider.getNetwork()).chainId)!==cfg.chainId)throw Error('Round RPC network mismatch.');contract=new Contract(cfg.address,abi,provider);await refresh();$('status').textContent='Round loaded.';setInterval(()=>{if(!busy)refresh().catch(report)},20000)}catch(e){report(e)}}
+if (!cfg.address) {
+  $('status').textContent = cfg.error || 'No raffle round is open yet. Check back for the next round.';
+  setupWalletButton();
+} else {
+  try {
+    provider = new JsonRpcProvider(cfg.rpc);
+    if (Number((await provider.getNetwork()).chainId) !== cfg.chainId) throw Error('Round RPC network mismatch.');
+    contract = new Contract(cfg.address, abi, provider);
+    await refresh();
+    $('status').textContent = 'Round loaded.';
+    setupWalletButton({
+      onConnect: () => connect(),
+      onRestore: cfg.local ? undefined : address => connect(address),
+      disconnectedLabel: cfg.local && !window.ethereum ? 'Use practice wallet' : 'Connect wallet'
+    });
+    setInterval(() => { if (!busy) refresh().catch(report); }, 20000);
+  } catch (error) {
+    report(error);
+    setupWalletButton();
+  }
+}
