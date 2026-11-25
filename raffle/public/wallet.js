@@ -2,7 +2,7 @@ import {BrowserProvider,Contract,JsonRpcProvider,formatUnits} from '/ethers.js';
 const $=id=>document.getElementById(id);
 const fmt=n=>Number(formatUnits(n,6)).toLocaleString('en-US',{style:'currency',currency:'USD'});
 const abi=await fetch('/abi.json').then(r=>r.json());
-const cfg=await fetch('/round.json').then(r=>r.json());
+const cfg=await fetch('/round.json').then(r=>r.json()).catch(()=>({error:'Unable to load the raffle round. Please refresh and try again.'}));
 let provider,contract,signer,account,busy=false,historyLoaded=false;
 let targetTime=0,drawFinished=false;
 function tick(){
@@ -55,7 +55,7 @@ async function connect(){
 }
 async function refresh(){
   const [c,sold,minted,closed,deadline,places]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places()]);
-  $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':'Chain '+cfg.chainId;
+  $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':cfg.chainId===84532?'Base Sepolia · testnet':'Chain '+cfg.chainId;
   targetTime=Number(c.drawAt);drawFinished=deadline>0n;tick();
   $('escrow').textContent='Round escrow '+cfg.address;
   if(cfg.chainId===84532){const link=document.createElement('a');link.href='https://sepolia.basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
@@ -82,5 +82,5 @@ $('buy').onclick=()=>act(async()=>{const n=Number($('qty').value);if(!Number.isI
 $('bonus').onclick=()=>act(()=>contract.claimBonus(Number($('nominee').value)));$('free').onclick=()=>act(()=>contract.claimFree(Number($('nominee').value)));$('refund').onclick=()=>act(()=>contract.refund());
 window.ethereum?.on?.('accountsChanged',()=>location.reload());window.ethereum?.on?.('chainChanged',()=>location.reload());
 if(cfg.local&&!window.ethereum)$('connect').textContent='Use practice wallet';
-if(!cfg.address){$('status').textContent='Waiting for a configured round. The practice edition is available from the original game page.';$('connect').disabled=true}
+if(!cfg.address){$('status').textContent=cfg.error||'No raffle round is open yet. Check back for the next round.';$('connect').disabled=true}
 else{try{provider=new JsonRpcProvider(cfg.rpc);if(Number((await provider.getNetwork()).chainId)!==cfg.chainId)throw Error('Round RPC network mismatch.');contract=new Contract(cfg.address,abi,provider);await refresh();$('status').textContent='Round loaded.';setInterval(()=>{if(!busy)refresh().catch(report)},20000)}catch(e){report(e)}}
