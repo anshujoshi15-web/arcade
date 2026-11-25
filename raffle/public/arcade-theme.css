@@ -1,0 +1,65 @@
+:root {
+  color-scheme: light;
+  --arcade-blue: #0000ff;
+  --arcade-ink: #00184d;
+  --arcade-muted: #34517c;
+  --arcade-paper: #f5f8ff;
+  --arcade-line: #d3e1ff;
+}
+* { box-sizing: border-box; }
+html { min-width: 0; }
+body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; background: var(--arcade-paper); color: var(--arcade-ink); }
+body > main { flex: 1 0 auto; width: 100%; min-width: 0; }
+[hidden] { display: none !important; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 3px solid #4684ff;
+  outline-offset: 3px;
+}
+.arcade-header, .arcade-footer {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: var(--arcade-ink);
+}
+.arcade-header { display: block; border-bottom: 1px solid var(--arcade-line); }
+.arcade-footer { border-top: 1px solid var(--arcade-line); }
+.arcade-chrome {
+  width: min(1120px, 92%);
+  margin: auto;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+.arcade-brand { font-weight: 750; color: var(--arcade-ink); text-decoration: none; }
+.arcade-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+.arcade-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--arcade-ink);
+  font-size: 14px;
+  text-decoration: none;
+}
+.arcade-nav a:hover, .arcade-nav a[aria-current="page"] { background: #eef1ff; color: var(--arcade-blue); }
+.arcade-header .wallet-button { min-height: 44px; }
+.wallet-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.wallet-feedback { overflow-wrap: anywhere; color: var(--arcade-muted); }
+.arcade-footer small { color: var(--arcade-muted); }
+main button, main select, main input { min-height: 44px; max-width: 100%; }
+main button { touch-action: manipulation; }
+@media (max-width: 640px) {
+  .arcade-header .arcade-nav { order: 3; width: 100%; }
+  .arcade-header .wallet-feedback { flex-basis: 100%; }
+  .arcade-chrome { padding-bottom: 10px; }
+  main button, main select, main input { font-size: 16px; }
+}
+@media (max-width: 350px) {
+  .arcade-nav a { padding-inline: 7px; }
+}

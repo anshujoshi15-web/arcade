@@ -1,0 +1,7 @@
+body { font: 16px/1.6 system-ui, sans-serif; }
+.info { width: min(900px, 90%); margin: auto; padding: 36px 0 56px; }
+.info h1 { font: clamp(42px, 8vw, 76px)/1 Georgia, serif; margin: 0 0 24px; }
+.info section { margin-top: 20px; padding: 20px; background: white; border: 1px solid var(--arcade-line); border-radius: 12px; }
+.info h2 { margin: 0; font-size: 21px; }
+.info p:last-child { margin-bottom: 0; }
+.info a { color: #0000cc; }

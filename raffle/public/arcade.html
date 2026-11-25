@@ -31,9 +31,9 @@ h3{font-size:34px;margin:0}article p{color:var(--muted);margin:10px 0 20px}
 .play:hover{background:#003ec1}
 footer{background:white;border-top:1px solid var(--line);color:var(--muted);font-size:14px;padding:18px 0}
 </style>
-</head>
+<link rel="stylesheet" href="/arcade-theme.css"></head>
 <body>
-<header><div class="wrap bar"><a class="brand" href="/">The House of Joshi</a><nav class="wallet-header-actions" aria-label="Main navigation"><a href="#games">Games</a><button type="button" class="wallet-button" id="connect" data-wallet-header disabled>Connect wallet</button><span class="wallet-feedback" id="wallet-feedback" role="status"></span></nav></div></header>
+<header class="arcade-header"><div class="arcade-chrome"><a href="/" class="arcade-brand">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/" aria-current="page">Games</a><a href="/raffle">House Raffle</a><a href="/puzzle-print">Puzzle Print</a><a href="/help">Help</a></nav><div class="wallet-actions"><button type="button" class="wallet-button" id="connect" data-wallet-header disabled>Connect wallet</button><span class="wallet-feedback" id="wallet-feedback" role="status"></span></div></div></header>
 <main>
 <section class="hero"><div class="wrap"><h1>House Arcade</h1><p>Collect raffle tickets or piece together a print. Choose a game to get started.</p></div></section>
 <section class="wrap games" id="games" aria-labelledby="games-title">
@@ -50,6 +50,6 @@ footer{background:white;border-top:1px solid var(--line);color:var(--muted);font
 </div>
 </section>
 </main>
-<footer><div class="wrap">The House of Joshi</div></footer>
+<footer class="arcade-footer"><div class="arcade-chrome"><small>The House of Joshi</small><nav class="arcade-nav" aria-label="Footer navigation"><a href="/how-it-works">Raffle rules</a><a href="/help">Help</a><a href="/privacy">Privacy & wallet data</a></nav></div></footer>
 <script type="module" src="/wallet-button.js"></script></body>
 </html>

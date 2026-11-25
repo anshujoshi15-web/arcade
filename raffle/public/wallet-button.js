@@ -18,7 +18,7 @@ export function setupWalletButton({onConnect, onRestore, disconnectedLabel = 'Co
     button.disabled = true;
     feedback.textContent = '';
     try {
-      if (!onConnect && !ethereum) throw new Error('Open this page in a browser with an Ethereum wallet.');
+      if (!onConnect && !ethereum) throw new Error('Open House Arcade in your Ethereum wallet app’s browser, or use a wallet extension on desktop.');
       const address = onConnect ? await onConnect() :
         (await ethereum.request({method:'eth_requestAccounts'}))[0];
       if (!address) throw new Error('No wallet account was selected.');

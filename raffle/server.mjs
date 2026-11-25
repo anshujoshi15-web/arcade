@@ -13,6 +13,10 @@ const publicFile = path => new URL('./public/' + path, import.meta.url);
 const arcadeFile = path => new URL('../' + path, import.meta.url);
 const roundFile = publicFile('round.json');
 const routes = new Map([
+  ['/help', ['text/html', publicFile('help.html')]],
+  ['/privacy', ['text/html', publicFile('privacy.html')]],
+  ['/arcade-theme.css', ['text/css', publicFile('arcade-theme.css')]],
+  ['/info.css', ['text/css', publicFile('info.css')]],
   ['/wallet-button.js', ['text/javascript', publicFile('wallet-button.js')]],
   ['/wallet-button.css', ['text/css', publicFile('wallet-button.css')]],
   ['/puzzle-print', ['text/html', publicFile('puzzle.html')]],
