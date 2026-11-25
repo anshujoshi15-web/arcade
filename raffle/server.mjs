@@ -13,6 +13,9 @@ const publicFile = path => new URL('./public/' + path, import.meta.url);
 const arcadeFile = path => new URL('../' + path, import.meta.url);
 const roundFile = publicFile('round.json');
 const routes = new Map([
+  ['/puzzle-print', ['text/html', publicFile('puzzle.html')]],
+  ['/puzzle.js', ['text/javascript', publicFile('puzzle.js')]],
+  ['/puzzle-art.jpg', ['image/jpeg', publicFile('puzzle-art.jpg')]],
   ['/admin', ['text/html', publicFile('admin.html')]],
   ['/admin.js', ['text/javascript', publicFile('admin.js')]],
   ['/how-it-works', ['text/html', publicFile('how-it-works.html')]],
