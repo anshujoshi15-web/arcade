@@ -24,7 +24,7 @@ if (hosted) {
   }
 }
 
-http.createServer((req, res) => {
+export function handleRequest(req, res) {
   const path = req.url.split('?')[0];
   if (!hosted && path === '/local-enroll') {
     void enroll(req, res);
@@ -47,4 +47,8 @@ http.createServer((req, res) => {
   const content = fs.readFileSync(file);
   const isHostedDemo = hosted && (path === '/' || path === '/house-raffle.html' || path === '/how-it-works.html');
   res.end(isHostedDemo ? content.toString().replaceAll('http://127.0.0.1:14173/', '/wallet') : content);
-}).listen(Number(process.env.PORT || 14173), hosted ? '0.0.0.0' : '127.0.0.1');
+}
+
+if (!hosted) {
+  http.createServer(handleRequest).listen(Number(process.env.PORT || 14173), '127.0.0.1');
+}
