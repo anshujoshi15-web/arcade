@@ -19,6 +19,7 @@ const roundFile = publicFile('round.json');
 const upcoming = new Set(['/puzzle-print', '/spin-wheel', '/weekly-bingo', '/treasure-hunt']);
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
 const routes = new Map([
+  ['/appkit.js', ['text/javascript', publicFile('generated/appkit.js')]],
   ['/spin-wheel', ['text/html', publicFile('game-preview.html')]],
   ['/weekly-bingo', ['text/html', publicFile('game-preview.html')]],
   ['/treasure-hunt', ['text/html', publicFile('game-preview.html')]],
@@ -107,6 +108,7 @@ export function handleRequest(req, res) {
     return;
   }
   const [type, file] = route;
+  if (path === '/appkit.js' && !fs.existsSync(file)) { res.writeHead(404).end(); return; }
   res.setHeader('Content-Type', type);
   res.end(type === 'text/html' ? pageContent(file) : fs.readFileSync(file));
 }

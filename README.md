@@ -15,3 +15,9 @@ The wallet-backed raffle is available at `/raffle` and `/wallet`. To configure a
 The [File Manager ZIP](downloads/House-Arcade-File-Manager.zip) contains the play-credit demo and How It Works page. Extract its two HTML files into the subdomain’s document root. The package runs as static HTML and contains no wallet integration.
 
 See the [Remix deployment and admin guide](DEPLOY.md) for constructor inputs and instructions for opening `/admin`.
+
+### Reown wallet connections
+
+Run `npm ci` and `npm run build` before `npm start`. The build bundles the AppKit Ethers adapter into the browser asset served at `/appkit.js`. AppKit offers wallet extensions, mobile wallets, and WalletConnect QR codes on public pages. The House-only admin signature flow uses its existing browser-wallet connection.
+
+In the Reown project dashboard, allow `https://arcade.thehouseofjoshi.com` for the configured project. If the modal falls back to the browser extension, check that `/appkit.js` returns JavaScript and that the Hostinger build ran. If the modal opens but pairing fails, check the project's domain allowlist. Raffle transactions require Base or Base Sepolia, matching the deployed round.

@@ -84,9 +84,59 @@ async function refresh(){
   $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+new Date(Number(deadline)*1000).toLocaleString():closed?'Entries closed.':'Draw pending.';
 }
 async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
-$('buy').onclick=()=>act(async()=>{const n=Number($('qty').value);if(!Number.isInteger(n)||n<1||n>25)throw Error('Enter 1–25 tickets.');const c=await contract.config();const token=new Contract(c.currency,['function allowance(address,address) view returns(uint256)','function approve(address,uint256) returns(bool)'],signer);if(await token.allowance(account,cfg.address)<BigInt(n)*1000000n)await(await token.approve(cfg.address,BigInt(n)*1000000n)).wait();return contract.buy(n,Number($('nominee').value))});
+$('buy').onclick = () => act(async () => {
+  const quantity = Number($('qty').value);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 25) throw Error('Enter 1–25 tickets.');
+  const nominee = Number($('nominee').value);
+  const buyer = account;
+  const buyerSigner = signer;
+  const raffle = contract;
+  const session = walletUpdate;
+  if (!buyer || !buyerSigner) throw Error('Connect a wallet first.');
+  const {currency} = await raffle.config();
+  const token = new Contract(currency, ['function allowance(address,address) view returns(uint256)',
+    'function approve(address,uint256) returns(bool)'], buyerSigner);
+  const price = BigInt(quantity) * 1000000n;
+  if (await token.allowance(buyer, cfg.address) < price) await (await token.approve(cfg.address, price)).wait();
+  if (session !== walletUpdate) throw Error('Your wallet changed. Reconnect and try again.');
+  return raffle.buy(quantity, nominee);
+});
 $('bonus').onclick=()=>act(()=>contract.claimBonus(Number($('nominee').value)));$('free').onclick=()=>act(()=>contract.claimFree(Number($('nominee').value)));
-window.ethereum?.on?.('accountsChanged',()=>location.reload());window.ethereum?.on?.('chainChanged',()=>location.reload());
+if (cfg.local) {
+  window.ethereum?.on?.('accountsChanged',()=>location.reload());
+  window.ethereum?.on?.('chainChanged',()=>location.reload());
+}
+let walletUpdate = 0;
+async function useAppKitWallet(connection, readProvider) {
+  const update = ++walletUpdate;
+  signer = undefined;
+  account = undefined;
+  contract = new Contract(cfg.address, abi, readProvider);
+  historyLoaded = false;
+  for (const id of ['buy', 'free', 'bonus']) $(id).disabled = true;
+  $('tickets').textContent = '';
+  let nextSigner;
+  let nextAddress;
+  let walletError;
+  try {
+    if (connection) {
+      const browser = new BrowserProvider(connection.provider);
+      if (Number((await browser.getNetwork()).chainId) !== cfg.chainId) {
+        throw Error('Switch to ' + (cfg.chainId === 84532 ? 'Base Sepolia' : 'Base') + ' to enter this round.');
+      }
+      nextSigner = await browser.getSigner(connection.address);
+      nextAddress = await nextSigner.getAddress();
+    }
+  } catch (error) { walletError = error; }
+  if (update !== walletUpdate) return;
+  if (nextAddress) {
+    signer = nextSigner;
+    account = nextAddress;
+    contract = new Contract(cfg.address, abi, signer);
+  }
+  await refresh();
+  if (walletError && update === walletUpdate) throw walletError;
+}
 if (!cfg.address) {
   $('status').textContent = cfg.error || 'No raffle round is open yet. Check back for the next round.';
   setupWalletButton();
@@ -98,8 +148,9 @@ if (!cfg.address) {
     await refresh();
     $('status').textContent = 'Round loaded.';
     setupWalletButton({
-      onConnect: () => connect(),
-      onRestore: cfg.local ? undefined : address => connect(address),
+      local: Boolean(cfg.local),
+      onConnect: cfg.local ? () => connect() : undefined,
+      onWalletChange: cfg.local ? undefined : connection => useAppKitWallet(connection, provider),
       disconnectedLabel: cfg.local && !window.ethereum ? 'Use practice wallet' : 'Connect wallet'
     });
     setInterval(() => { if (!busy) refresh().catch(report); }, 20000);

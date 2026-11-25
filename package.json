@@ -5,12 +5,15 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "node --check server.js && node --check raffle/server.mjs && node --check raffle/public/wallet.js && node --check raffle/public/admin.js"
+    "build": "node --check server.js && node --check raffle/server.mjs && node --check raffle/public/wallet.js && node --check raffle/public/admin.js && esbuild raffle/browser/appkit.mjs --bundle --minify --format=esm --target=safari16,chrome108 --outfile=raffle/public/generated/appkit.js"
   },
   "engines": {
     "node": "22.x"
   },
   "dependencies": {
+    "@reown/appkit": "2.0.0",
+    "@reown/appkit-adapter-ethers": "2.0.0",
+    "esbuild": "0.28.2",
     "ethers": "6.13.5",
     "express": "5.3.0"
   }
