@@ -96,7 +96,11 @@ async function initialize() {
       await browser.send('eth_requestAccounts', []);
       if ((await browser.getNetwork()).chainId !== chainId) throw new Error('Switch your wallet to chain ' + chainId + ' and reconnect.');
       const signer = await browser.getSigner();
-      walletAddress = await signer.getAddress();
+      const address = await signer.getAddress();
+      if (address.toLowerCase() !== '0x6736d2ea9807297f0e56967361b9410854b86a5f') {
+        throw new Error('Switch to the House wallet to manage this round.');
+      }
+      walletAddress = address;
       walletRound = round.connect(signer);
       await refresh();
       status('Operator wallet connected.');

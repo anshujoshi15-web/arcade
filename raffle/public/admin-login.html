@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin sign-in · House Arcade</title>
+<style>
+body{margin:0;background:#f5f8ff;color:#00184d;font:16px/1.5 system-ui,sans-serif}main{max-width:520px;margin:10vh auto;padding:24px}section{background:white;border:1px solid #d3e1ff;border-radius:12px;padding:24px}a{color:#0000cc}button{background:#0000ff;color:white;border:0;border-radius:6px;padding:12px;font:inherit;cursor:pointer}button:disabled{opacity:.6}
+</style>
+</head>
+<body><main><a href="/">House Arcade</a><h1>Raffle Admin</h1><section><p>Sign in with the House wallet.</p><button id="sign">Connect and sign in</button><p id="status" role="status"></p></section></main>
+<script type="module">
+import { BrowserProvider } from '/ethers.js';
+const button = document.getElementById('sign');
+const status = document.getElementById('status');
+async function post(path, body) {
+  const response = await fetch(path, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error);
+  return result;
+}
+button.onclick = async () => {
+  button.disabled = true;
+  try {
+    if (!window.ethereum) throw new Error('Open this page in a browser with an Ethereum wallet.');
+    const provider = new BrowserProvider(window.ethereum);
+    await provider.send('eth_requestAccounts', []);
+    const signer = await provider.getSigner();
+    if ((await signer.getAddress()).toLowerCase() !== '0x6736d2ea9807297f0e56967361b9410854b86a5f') {
+      throw new Error('Switch to the House wallet to sign in.');
+    }
+    const {nonce,message} = await post('/admin/challenge', {});
+    status.textContent = 'Approve the sign-in message in your wallet.';
+    await post('/admin/verify', {nonce,signature:await signer.signMessage(message)});
+    location.reload();
+  } catch (error) {
+    status.textContent = error.shortMessage || error.message;
+    button.disabled = false;
+  }
+};
+</script></body></html>

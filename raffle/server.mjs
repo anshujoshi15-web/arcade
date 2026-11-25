@@ -1,3 +1,4 @@
+import { adminAuth, isAdmin } from './admin-auth.mjs';
 import { enroll } from './local-enroll.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -28,6 +29,19 @@ if (hosted) {
 
 export function handleRequest(req, res) {
   const path = req.url.split('?')[0];
+  if (path === '/admin/challenge' || path === '/admin/verify') {
+    void adminAuth(req, res, path, hosted);
+    return;
+  }
+  if (path === '/admin' || path === '/admin.js') {
+    res.setHeader('Cache-Control', 'no-store');
+    if (!isAdmin(req)) {
+      if (path === '/admin.js') { res.writeHead(401).end(); return; }
+      res.setHeader('Content-Type', 'text/html');
+      res.end(fs.readFileSync(publicFile('admin-login.html')));
+      return;
+    }
+  }
   if (!hosted && path === '/local-enroll') {
     void enroll(req, res);
     return;

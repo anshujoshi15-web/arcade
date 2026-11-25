@@ -25,3 +25,5 @@ Verify network-specific addresses before signing. [Circle USDC addresses](https:
 7. Open `/admin` and connect the registrar wallet. Grant eligibility to a separate player wallet with an expiry after the test entry. Open `/wallet` as that player and claim a free ticket. Check serial 00001 and its Gold artwork. The House treasury and registrar wallets cannot enter.
 
 The admin page reads round status and submits transactions through the connected wallet. The contract restricts eligibility changes to the registrar and permits anyone to request, finalize, or sweep when the relevant conditions are met. A draw requires at least 6,000 paid entries. The static File Manager demo is a separate package. Serve the Node.js app to use `/admin`.
+
+Admin sign-in is restricted to House wallet `0x6736d2eA9807297F0e56967361B9410854B86a5f`. The server verifies a one-time signed message and issues a 15-minute session. For the House wallet to manage player eligibility from the dashboard, set it as both `house` and `registrar` when deploying the round. Use the HTTPS arcade domain for hosted sign-in. Direct on-chain permissions follow the deployed contract.
