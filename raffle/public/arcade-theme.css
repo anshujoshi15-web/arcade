@@ -64,11 +64,6 @@ main button { touch-action: manipulation; }
   .arcade-nav a { padding-inline: 7px; }
 }
 
-.arcade-network { justify-content: flex-start; border-top: 1px solid var(--arcade-line); }
-
-.arcade-contact a { display: grid; align-content: center; max-width: 100%; text-align: left; }
-.arcade-contact span { overflow-wrap: anywhere; color: var(--arcade-muted); }
-
 .arcade-footer.joshi-footer {
   background: radial-gradient(ellipse at 12% 0, #20190d 0, transparent 46%), #0b0b0d;
   border-top: 1px solid #715725;
@@ -81,9 +76,17 @@ main button { touch-action: manipulation; }
 .joshi-footer-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.65fr) repeat(3, minmax(0, 1fr));
-  gap: 28px;
-  padding: 44px 0 38px;
+  grid-template-areas: "brand ecosystem discover community";
+  align-items: start;
+  column-gap: clamp(18px, 4vw, 56px);
+  row-gap: 24px;
+  padding: 36px 0 28px;
 }
+.joshi-footer-brand { grid-area: brand; }
+.joshi-footer-ecosystem { grid-area: ecosystem; }
+.joshi-footer-discover { grid-area: discover; }
+.joshi-footer-community { grid-area: community; }
+.joshi-footer-grid > * { min-width: 0; }
 .joshi-footer h2, .joshi-footer .joshi-footer-tagline {
   margin: 0 0 12px;
   color: #e8bd55;
@@ -95,13 +98,27 @@ main button { touch-action: manipulation; }
 .joshi-footer a { text-decoration: none; overflow-wrap: anywhere; }
 .joshi-footer a:hover { color: #ffda78; text-decoration: underline; text-underline-offset: .24em; }
 .joshi-footer a:focus-visible { outline-color: #e8bd55; }
-.joshi-footer nav a { display: flex; flex-wrap: wrap; align-content: center; gap: 0 .35em; min-height: 44px; padding: 5px 0; }
+.joshi-footer nav a { display: block; min-height: 44px; line-height: 1.45; padding: 10px 0; }
 .joshi-footer .joshi-wordmark { color: #ffda78; font: 400 clamp(24px, 3vw, 36px)/1.2 Georgia, serif; text-transform: uppercase; }
 .joshi-footer-tagline { margin-top: 8px !important; }
 .joshi-footer-brand p { max-width: 32ch; }
 .joshi-footer .joshi-join { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 7px 16px; border: 1px solid #b68b38; border-radius: 999px; color: #ffda78; }
-.joshi-email { flex-basis: 100%; font-size: .8rem; }
+.joshi-email { display: block; margin-top: 2px; font-size: .8rem; }
 .joshi-footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid #55421e; padding: 15px 0; }
 .joshi-footer-bottom a { display: inline-flex; align-items: center; min-height: 44px; }
-@media (max-width: 850px) { .joshi-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 450px) { .joshi-footer-grid { grid-template-columns: 1fr; padding-top: 28px; } }
+@media (max-width: 850px) {
+  .joshi-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas: "brand brand brand" "ecosystem discover community";
+  }
+}
+@media (max-width: 620px) {
+  .joshi-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "brand brand" "ecosystem discover" "ecosystem community";
+    padding-top: 28px;
+  }
+}
+@media (max-width: 340px) {
+  .joshi-footer-grid { grid-template-columns: 1fr; grid-template-areas: "brand" "ecosystem" "discover" "community"; }
+}
