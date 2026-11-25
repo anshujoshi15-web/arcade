@@ -11,6 +11,10 @@ const ethersBundle = resolve(dirname(require.resolve('ethers')), '../dist/ethers
 const artifact = JSON.parse(fs.readFileSync(new URL('./HouseRaffle.json', import.meta.url)));
 const publicFile = path => new URL('./public/' + path, import.meta.url);
 const arcadeFile = path => new URL('../' + path, import.meta.url);
+const footer = fs.readFileSync(publicFile('footer.html'), 'utf8');
+function pageContent(file) {
+  return fs.readFileSync(file, 'utf8').replace('<!-- arcade-footer -->', footer);
+}
 const roundFile = publicFile('round.json');
 const upcoming = new Set(['/puzzle-print', '/spin-wheel', '/weekly-bingo', '/treasure-hunt']);
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
@@ -54,7 +58,7 @@ export function handleRequest(req, res) {
     if (!isAdmin(req)) {
       if (previewAssets.has(path)) { res.writeHead(404).end(); return; }
       res.setHeader('Content-Type', 'text/html');
-      res.end(fs.readFileSync(publicFile('coming-soon.html')));
+      res.end(pageContent(publicFile('coming-soon.html')));
       return;
     }
   }
@@ -104,7 +108,7 @@ export function handleRequest(req, res) {
   }
   const [type, file] = route;
   res.setHeader('Content-Type', type);
-  res.end(fs.readFileSync(file));
+  res.end(type === 'text/html' ? pageContent(file) : fs.readFileSync(file));
 }
 
 if (!hosted) {

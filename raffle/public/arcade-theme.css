@@ -68,3 +68,40 @@ main button { touch-action: manipulation; }
 
 .arcade-contact a { display: grid; align-content: center; max-width: 100%; text-align: left; }
 .arcade-contact span { overflow-wrap: anywhere; color: var(--arcade-muted); }
+
+.arcade-footer.joshi-footer {
+  background: radial-gradient(ellipse at 12% 0, #20190d 0, transparent 46%), #0b0b0d;
+  border-top: 1px solid #715725;
+  color: #ded9cf;
+}
+.joshi-footer-grid, .joshi-footer-bottom {
+  width: min(1280px, 92%);
+  margin-inline: auto;
+}
+.joshi-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  padding: 44px 0 38px;
+}
+.joshi-footer h2, .joshi-footer .joshi-footer-tagline {
+  margin: 0 0 12px;
+  color: #e8bd55;
+  font: 600 .75rem/1.5 system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .19em;
+}
+.joshi-footer a, .joshi-footer small { color: #ded9cf; }
+.joshi-footer a { text-decoration: none; overflow-wrap: anywhere; }
+.joshi-footer a:hover { color: #ffda78; text-decoration: underline; text-underline-offset: .24em; }
+.joshi-footer a:focus-visible { outline-color: #e8bd55; }
+.joshi-footer nav a { display: flex; flex-wrap: wrap; align-content: center; gap: 0 .35em; min-height: 44px; padding: 5px 0; }
+.joshi-footer .joshi-wordmark { color: #ffda78; font: 400 clamp(24px, 3vw, 36px)/1.2 Georgia, serif; text-transform: uppercase; }
+.joshi-footer-tagline { margin-top: 8px !important; }
+.joshi-footer-brand p { max-width: 32ch; }
+.joshi-footer .joshi-join { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 7px 16px; border: 1px solid #b68b38; border-radius: 999px; color: #ffda78; }
+.joshi-email { flex-basis: 100%; font-size: .8rem; }
+.joshi-footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid #55421e; padding: 15px 0; }
+.joshi-footer-bottom a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 850px) { .joshi-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 450px) { .joshi-footer-grid { grid-template-columns: 1fr; padding-top: 28px; } }
