@@ -12,7 +12,13 @@ const artifact = JSON.parse(fs.readFileSync(new URL('./HouseRaffle.json', import
 const publicFile = path => new URL('./public/' + path, import.meta.url);
 const arcadeFile = path => new URL('../' + path, import.meta.url);
 const roundFile = publicFile('round.json');
+const upcoming = new Set(['/puzzle-print', '/spin-wheel', '/weekly-bingo', '/treasure-hunt']);
+const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
 const routes = new Map([
+  ['/spin-wheel', ['text/html', publicFile('game-preview.html')]],
+  ['/weekly-bingo', ['text/html', publicFile('game-preview.html')]],
+  ['/treasure-hunt', ['text/html', publicFile('game-preview.html')]],
+  ['/game-preview.js', ['text/javascript', publicFile('game-preview.js')]],
   ['/help', ['text/html', publicFile('help.html')]],
   ['/privacy', ['text/html', publicFile('privacy.html')]],
   ['/arcade-theme.css', ['text/css', publicFile('arcade-theme.css')]],
@@ -42,6 +48,15 @@ export function handleRequest(req, res) {
   if (path === '/admin/challenge' || path === '/admin/verify') {
     void adminAuth(req, res, path, hosted);
     return;
+  }
+  if (upcoming.has(path) || previewAssets.has(path)) {
+    res.setHeader('Cache-Control', 'private, no-store');
+    if (!isAdmin(req)) {
+      if (previewAssets.has(path)) { res.writeHead(404).end(); return; }
+      res.setHeader('Content-Type', 'text/html');
+      res.end(fs.readFileSync(publicFile('coming-soon.html')));
+      return;
+    }
   }
   if (path === '/admin' || path === '/admin.js') {
     res.setHeader('Cache-Control', 'no-store');

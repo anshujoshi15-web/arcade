@@ -28,6 +28,7 @@ article{display:flex;flex-direction:column;overflow:hidden;background:white;bord
 .card{display:flex;flex-direction:column;align-items:flex-start;flex:1;padding:22px}
 h3{font-size:34px;margin:0}article p{color:var(--muted);margin:10px 0 20px}
 .play{margin-top:auto;display:inline-block;background:var(--blue);color:white;padding:10px 16px;border-radius:6px;font-weight:700;text-decoration:none}
+.upcoming{margin-top:auto;color:var(--muted);font-weight:700;text-underline-offset:3px}
 .play:hover{background:#003ec1}
 footer{background:white;border-top:1px solid var(--line);color:var(--muted);font-size:14px;padding:18px 0}
 </style>
@@ -35,7 +36,7 @@ footer{background:white;border-top:1px solid var(--line);color:var(--muted);font
 <body>
 <header class="arcade-header"><div class="arcade-chrome"><a href="/" class="arcade-brand">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/" aria-current="page">Games</a><a href="/raffle">House Raffle</a><a href="/puzzle-print">Puzzle Print</a><a href="/help">Help</a></nav><div class="wallet-actions"><button type="button" class="wallet-button" id="connect" data-wallet-header disabled>Connect wallet</button><span class="wallet-feedback" id="wallet-feedback" role="status"></span></div></div></header>
 <main>
-<section class="hero"><div class="wrap"><h1>House Arcade</h1><p>Collect raffle tickets or piece together a print. Choose a game to get started.</p></div></section>
+<section class="hero"><div class="wrap"><h1>House Arcade</h1><p>Play House Raffle and see what’s coming next.</p></div></section>
 <section class="wrap games" id="games" aria-labelledby="games-title">
 <h2 id="games-title">Games</h2>
 <div class="grid">
@@ -43,10 +44,10 @@ footer{background:white;border-top:1px solid var(--line);color:var(--muted);font
 <img class="art raffle-art" src="/house-raffle-ticket-gold.svg" alt="Gold House Raffle ticket with a perforated stub" width="800" height="400">
 <div class="card"><h3>House Raffle</h3><p>A weekly raffle on Base with collectible NFT tickets and a free entry option.</p><a class="play" href="/raffle">Open House Raffle</a></div>
 </article>
-<article>
-<img class="art" src="/puzzle-art.jpg" alt="Pearlescent neon Puzzle Print artwork">
-<div class="card"><h3>Puzzle Print</h3><p>Collect 25 pieces and trade duplicates to complete the artwork in this practice game.</p><a class="play" href="/puzzle-print">Play Puzzle Print</a></div>
-</article>
+<article><div class="card"><h3>Puzzle Print</h3><p>Collect 25 pieces and trade duplicates to complete the artwork.</p><a class="upcoming" href="/puzzle-print">Coming Soon</a></div></article>
+<article><div class="card"><h3>Spin Wheel</h3><p>Spin for instant results and a chance to enter the weekly jackpot draw.</p><a class="upcoming" href="/spin-wheel">Coming Soon</a></div></article>
+<article><div class="card"><h3>Weekly Bingo</h3><p>Complete a full 75-ball bingo card in a weekly draw.</p><a class="upcoming" href="/weekly-bingo">Coming Soon</a></div></article>
+<article><div class="card"><h3>Treasure Hunt</h3><p>Collect and trade 20 map pieces to uncover the hidden spot.</p><a class="upcoming" href="/treasure-hunt">Coming Soon</a></div></article>
 </div>
 </section>
 </main>
