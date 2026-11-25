@@ -6,9 +6,9 @@ The [wallet edition](raffle/README.md) includes local blockchain setup, tests, a
 
 ## Deploy on Hostinger
 
-Use the repository root as the Node.js application directory and select Node.js 22. Select Express if prompted, use `npm run build` as the build command, and use `server.js` as the startup file or `npm start` as the start command. Upload archives with `package.json` at the top level and omit `node_modules`. The app listens on the port supplied by Hostinger. The homepage serves the wallet-backed raffle.
+Use the repository root as the Node.js application directory and select Node.js 22. Select Express if prompted, use `npm run build` as the build command, and use `server.js` as the startup file or `npm start` as the start command. Upload archives with `package.json` at the top level and omit `node_modules`. The app listens on the port supplied by Hostinger. The homepage serves the House Arcade game hub.
 
-The wallet-backed raffle is available at `/` and `/wallet`. To configure a deployed round, set `PUBLIC_ROUND` to a JSON object with the public raffle `address`, numeric Base `chainId` (8453 or 84532), browser-safe HTTPS `rpc`, and optional charity `labels`. Keep operator credentials outside this public configuration.
+The wallet-backed raffle is available at `/raffle` and `/wallet`. To configure a deployed round, set `PUBLIC_ROUND` to a JSON object with the public raffle `address`, numeric Base `chainId` (8453 or 84532), browser-safe HTTPS `rpc`, and optional charity `labels`. Keep operator credentials outside this public configuration.
 
 ### File Manager upload
 

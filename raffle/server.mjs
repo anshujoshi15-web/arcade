@@ -16,7 +16,8 @@ const routes = new Map([
   ['/admin', ['text/html', publicFile('admin.html')]],
   ['/admin.js', ['text/javascript', publicFile('admin.js')]],
   ['/how-it-works', ['text/html', publicFile('how-it-works.html')]],
-  ['/', ['text/html', publicFile('index.html')]],
+  ['/', ['text/html', publicFile(hosted ? 'arcade.html' : 'index.html')]],
+  ['/raffle', ['text/html', publicFile('index.html')]],
   ['/wallet', ['text/html', publicFile('index.html')]],
   ['/wallet.js', ['text/javascript', publicFile('wallet.js')]],
   ['/ethers.js', ['text/javascript', ethersBundle]]
@@ -47,7 +48,7 @@ export function handleRequest(req, res) {
     return;
   }
   if (hosted && (path === '/house-raffle.html' || path === '/how-it-works.html')) {
-    res.writeHead(302, {Location: path === '/house-raffle.html' ? '/' : '/how-it-works'}).end();
+    res.writeHead(302, {Location: path === '/house-raffle.html' ? '/raffle' : '/how-it-works'}).end();
     return;
   }
   if (path === '/abi.json' || path === '/round.json') {
