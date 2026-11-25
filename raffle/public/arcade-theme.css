@@ -64,61 +64,81 @@ main button { touch-action: manipulation; }
   .arcade-nav a { padding-inline: 7px; }
 }
 
+/* Shared House Arcade footer */
 .arcade-footer.joshi-footer {
-  background: radial-gradient(ellipse at 12% 0, #20190d 0, transparent 46%), #0b0b0d;
-  border-top: 1px solid #715725;
-  color: #ded9cf;
+  background: #0b1733;
+  border-top: 1px solid #243858;
+  color: #c7d3ea;
+  font: 14px/1.5 system-ui, sans-serif;
 }
 .joshi-footer-grid, .joshi-footer-bottom {
-  width: min(1280px, 92%);
+  width: min(1120px, 92%);
   margin-inline: auto;
 }
 .joshi-footer-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.7fr) minmax(0, .85fr) minmax(0, 1.05fr);
   grid-template-areas: "brand ecosystem discover community";
+  gap: 28px clamp(16px, 3vw, 40px);
+  padding: 40px 0 30px;
   align-items: start;
-  column-gap: clamp(18px, 4vw, 56px);
-  row-gap: 24px;
-  padding: 36px 0 28px;
 }
 .joshi-footer-brand { grid-area: brand; }
 .joshi-footer-ecosystem { grid-area: ecosystem; }
 .joshi-footer-discover { grid-area: discover; }
 .joshi-footer-community { grid-area: community; }
 .joshi-footer-grid > * { min-width: 0; }
-.joshi-footer h2, .joshi-footer .joshi-footer-tagline {
-  margin: 0 0 12px;
-  color: #e8bd55;
-  font: 600 .75rem/1.5 system-ui, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: .19em;
+.joshi-footer h2 {
+  margin: 0 0 8px;
+  color: #f5f8ff;
+  font: 700 14px/1.5 system-ui, sans-serif;
 }
-.joshi-footer a, .joshi-footer small { color: #ded9cf; }
-.joshi-footer a { text-decoration: none; overflow-wrap: anywhere; }
-.joshi-footer a:hover { color: #ffda78; text-decoration: underline; text-underline-offset: .24em; }
-.joshi-footer a:focus-visible { outline-color: #e8bd55; }
-.joshi-footer nav a { display: block; min-height: 44px; line-height: 1.45; padding: 10px 0; }
-.joshi-footer .joshi-wordmark { color: #ffda78; font: 400 clamp(24px, 3vw, 36px)/1.2 Georgia, serif; text-transform: uppercase; }
-.joshi-footer-tagline { margin-top: 8px !important; }
-.joshi-footer-brand p { max-width: 32ch; }
-.joshi-footer .joshi-join { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 7px 16px; border: 1px solid #b68b38; border-radius: 999px; color: #ffda78; }
-.joshi-email { display: block; margin-top: 2px; font-size: .8rem; }
-.joshi-footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid #55421e; padding: 15px 0; }
+.joshi-footer a, .joshi-footer a:hover, .joshi-footer a:focus-visible {
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.joshi-footer a:hover, .joshi-footer a:focus-visible { color: #fff; }
+.joshi-footer a:focus-visible { outline: 2px solid #92b6ff; outline-offset: 3px; }
+.joshi-footer nav a { display: flex; align-items: center; gap: 5px; min-height: 44px; padding: 5px 0; }
+.joshi-footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 12px; }
+.joshi-footer .joshi-wordmark { display: inline-block; color: #fff; font: 400 32px/1.12 Georgia, serif; }
+.joshi-footer-brand p { max-width: 27ch; margin: 9px 0 15px; }
+.joshi-footer .joshi-join {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #253d78;
+  color: #fff;
+  font-weight: 650;
+}
+.joshi-footer .joshi-join:hover, .joshi-footer .joshi-join:focus-visible { background: #36549a; }
+.joshi-footer nav .joshi-support { display: block; padding-top: 11px; }
+.joshi-email { display: block; margin-top: 2px; font-size: .78rem; }
+.joshi-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  border-top: 1px solid #334461;
+  padding: 8px 0;
+}
+.joshi-footer-bottom small { color: #c7d3ea; }
 .joshi-footer-bottom a { display: inline-flex; align-items: center; min-height: 44px; }
-@media (max-width: 850px) {
+@media (max-width: 880px) {
   .joshi-footer-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-areas: "brand brand brand" "ecosystem discover community";
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-areas: "brand discover" "ecosystem community";
   }
 }
-@media (max-width: 620px) {
+@media (max-width: 480px) {
   .joshi-footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-areas: "brand brand" "ecosystem discover" "ecosystem community";
+    grid-template-areas: "brand brand" "ecosystem ecosystem" "discover community";
     padding-top: 28px;
   }
-}
-@media (max-width: 340px) {
-  .joshi-footer-grid { grid-template-columns: 1fr; grid-template-areas: "brand" "ecosystem" "discover" "community"; }
 }
