@@ -16,13 +16,13 @@ Replace the placeholders. Times are Unix seconds and must satisfy `OPENS < CLOSE
 Verify network-specific addresses before signing. [Circle USDC addresses](https://developers.circle.com/stablecoins/usdc-contract-addresses) · [Chainlink supported networks](https://docs.chain.link/vrf/v2-5/supported-networks#base-sepolia-testnet)
 
 5. Deploy, copy the HouseRaffle address, and add it as a consumer on the funded VRF subscription.
-6. On the Node.js host, set `PUBLIC_ROUND` to the public connection details below and restart the app.
+6. For local testing only, use the connection details below in `raffle/public/round.json`. The hosted app accepts Base mainnet (8453).
 
 ```json
 {"address":"YOUR_DEPLOYED_HOUSE_RAFFLE_ADDRESS","chainId":84532,"rpc":"YOUR_BROWSER_SAFE_BASE_SEPOLIA_RPC_URL"}
 ```
 
-7. Open `/admin` and connect the registrar wallet. Grant eligibility to a separate player wallet with an expiry after the test entry. Open `/wallet` as that player and claim a free ticket. Check serial 00001 and its Gold artwork. The House treasury and registrar wallets cannot enter.
+7. For a testnet rehearsal, run the app locally, open `/admin` and connect the registrar wallet. Grant eligibility to a separate player wallet with an expiry after the test entry. Open `/wallet` as that player and claim a free ticket. Check serial 00001 and its Gold artwork. The House treasury and registrar wallets cannot enter.
 
 The admin page reads round status and submits transactions through the connected wallet. The contract restricts eligibility changes to the registrar and permits anyone to request, finalize, or sweep when the relevant conditions are met. A draw requires at least 6,000 paid entries. The static File Manager demo is a separate package. Serve the Node.js app to use `/admin`.
 

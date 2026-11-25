@@ -26,7 +26,7 @@ async function loadHistory(){
       list.append(item);
     }
     if(count)sections.push(list);else{let message=document.createElement('p');message.textContent='No winning serials published.';sections.push(message)}
-    let receipt=document.createElement('p');receipt.textContent='Round escrow '+addr;if(cfg.chainId===84532){let a=document.createElement('a');a.href='https://sepolia.basescan.org/address/'+addr+'#tokentxns';a.textContent=' View transfers';receipt.append(a)}sections.push(receipt);
+    let receipt=document.createElement('p');receipt.textContent='Round escrow '+addr;if(cfg.chainId===8453){let a=document.createElement('a');a.href='https://basescan.org/address/'+addr+'#tokentxns';a.textContent=' View transfers';receipt.append(a)}sections.push(receipt);
     addr=await past.previous();
   }
   box.replaceChildren(...sections);if(!sections.length)box.textContent='This is the first linked round.';
@@ -56,14 +56,14 @@ async function connect(authorizedAddress){
 }
 async function refresh(){
   const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity()]);
-  $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':cfg.chainId===84532?'Base Sepolia · testnet':'Chain '+cfg.chainId;
+  $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':'Chain '+cfg.chainId;
   awaitingThreshold=sold<6000n;
   targetTime=Number(awaitingThreshold?salesClose:drawTime);drawFinished=deadline>0n;
   $('time-label').textContent=awaitingThreshold?'Next sales checkpoint':minted===10000n&&!drawFinished?'Sold out · draw can start':'Draw time';
   if(minted===10000n&&!drawFinished){targetTime=0;$('countdown').textContent=''}
   tick();
   $('escrow').textContent='Round escrow '+cfg.address;
-  if(cfg.chainId===84532){const link=document.createElement('a');link.href='https://sepolia.basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
+  if(cfg.chainId===8453){const link=document.createElement('a');link.href='https://basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
   $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=targetTime?new Date(targetTime*1000).toLocaleString():'';
   $('ladder').replaceChildren(...[150000n,80000n,50000n,30000n,20000n].map(rate=>{let li=document.createElement('li');li.textContent=fmt(sold*rate);return li}));
   if(!$('nominee').length){for(let i=0;i<Number(await contract.charityCount());i++){
@@ -122,7 +122,7 @@ async function useAppKitWallet(connection, readProvider) {
     if (connection) {
       const browser = new BrowserProvider(connection.provider);
       if (Number((await browser.getNetwork()).chainId) !== cfg.chainId) {
-        throw Error('Switch to ' + (cfg.chainId === 84532 ? 'Base Sepolia' : 'Base') + ' to enter this round.');
+        throw Error('Switch to Base to enter this round.');
       }
       nextSigner = await browser.getSigner(connection.address);
       nextAddress = await nextSigner.getAddress();

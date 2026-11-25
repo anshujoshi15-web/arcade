@@ -90,8 +90,9 @@ export function handleRequest(req, res) {
     if (hosted) {
       try {
         const {address, chainId, rpc, labels} = JSON.parse(process.env.PUBLIC_ROUND || '{}');
+        if (chainId === 84532) { res.end('{}'); return; }
         if (address && (!/^0x[0-9a-f]{40}$/i.test(address) ||
-            /^0x0{40}$/i.test(address) || ![8453, 84532].includes(chainId) ||
+            /^0x0{40}$/i.test(address) || chainId !== 8453 ||
             new URL(rpc).protocol !== 'https:')) throw new Error('Invalid PUBLIC_ROUND');
         res.end(JSON.stringify(address ? {address, chainId, rpc, labels} : {}));
       } catch {

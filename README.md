@@ -8,7 +8,7 @@ The [wallet edition](raffle/README.md) includes local blockchain setup, tests, a
 
 Use the repository root as the Node.js application directory and select Node.js 22. Select Express if prompted, use `npm run build` as the build command, and use `server.js` as the startup file or `npm start` as the start command. Upload archives with `package.json` at the top level and omit `node_modules`. The app listens on the port supplied by Hostinger. The homepage serves the House Arcade game hub.
 
-The wallet-backed raffle is available at `/raffle` and `/wallet`. To configure a deployed round, set `PUBLIC_ROUND` to a JSON object with the public raffle `address`, numeric Base `chainId` (8453 or 84532), browser-safe HTTPS `rpc`, and optional charity `labels`. Keep operator credentials outside this public configuration.
+The wallet-backed raffle is available at `/raffle` and `/wallet`. To configure a deployed round, set `PUBLIC_ROUND` to a JSON object with the public raffle `address`, numeric Base mainnet `chainId` (8453), browser-safe HTTPS `rpc`, and optional charity `labels`. Keep operator credentials outside this public configuration.
 
 ### File Manager upload
 
@@ -20,4 +20,4 @@ See the [Remix deployment and admin guide](DEPLOY.md) for constructor inputs and
 
 Run `npm ci` and `npm run build` before `npm start`. The build bundles the AppKit Ethers adapter into the browser asset served at `/appkit.js`. AppKit offers wallet extensions, mobile wallets, and WalletConnect QR codes on public pages. The House-only admin signature flow uses its existing browser-wallet connection.
 
-In the Reown project dashboard, allow `https://arcade.thehouseofjoshi.com` for the configured project. If the modal falls back to the browser extension, check that `/appkit.js` returns JavaScript and that the Hostinger build ran. If the modal opens but pairing fails, check the project's domain allowlist. Raffle transactions require Base or Base Sepolia, matching the deployed round.
+In the Reown project dashboard, allow `https://arcade.thehouseofjoshi.com` for the configured project. If the modal falls back to the browser extension, check that `/appkit.js` returns JavaScript and that the Hostinger build ran. If the modal opens but pairing fails, check the project's domain allowlist. The hosted raffle uses Base mainnet (8453).

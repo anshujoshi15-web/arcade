@@ -1,10 +1,10 @@
 import { createAppKit } from '@reown/appkit';
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
-import { base, baseSepolia } from '@reown/appkit/networks';
+import { base } from '@reown/appkit/networks';
 
 export const appkit = createAppKit({
   adapters: [new EthersAdapter()],
-  networks: [base, baseSepolia],
+  networks: [base],
   defaultNetwork: base,
   projectId: '22cd96c9c57e98f9aa3475083ba4dbb1',
   metadata: {
