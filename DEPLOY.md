@@ -27,3 +27,9 @@ Verify network-specific addresses before signing. [Circle USDC addresses](https:
 The admin page reads round status and submits transactions through the connected wallet. The contract restricts eligibility changes to the registrar and permits anyone to request, finalize, or sweep when the relevant conditions are met. A draw requires at least 6,000 paid entries. The static File Manager demo is a separate package. Serve the Node.js app to use `/admin`.
 
 Admin sign-in is restricted to House wallet `0x6736d2eA9807297F0e56967361B9410854B86a5f`. The server verifies a one-time signed message and issues a 15-minute session. For the House wallet to manage player eligibility from the dashboard, set it as both `house` and `registrar` when deploying the round. Use the HTTPS arcade domain for hosted sign-in. Direct on-chain permissions follow the deployed contract.
+
+## Revised carry-forward rules
+
+Deploy the revised HouseRaffle bytecode for these rules. A previously deployed raffle retains its original contract rules. When sales are below 6,000 paid tickets, the on-chain checkpoint advances automatically by seven days and tickets and escrow remain in the same round. After the threshold is reached, the current sales checkpoint and draw time are fixed. Free and bonus entries share a 4,000-entry cap so paid sales can always reach the draw threshold. Each wallet may claim one free entry per seven-day period from the opening time, within its 100-entry round cap.
+
+Rollover uses exact seven-day UTC intervals. A round spanning a Mountain Time daylight-saving transition retains its UTC cadence and can shift by one hour in local time.

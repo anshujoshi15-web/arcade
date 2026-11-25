@@ -4,11 +4,11 @@ const fmt=n=>Number(formatUnits(n,6)).toLocaleString('en-US',{style:'currency',c
 const abi=await fetch('/abi.json').then(r=>r.json());
 const cfg=await fetch('/round.json').then(r=>r.json()).catch(()=>({error:'Unable to load the raffle round. Please refresh and try again.'}));
 let provider,contract,signer,account,busy=false,historyLoaded=false;
-let targetTime=0,drawFinished=false;
+let targetTime=0,drawFinished=false,awaitingThreshold=false;
 function tick(){
   if(!targetTime)return;
   const left=Math.max(0,targetTime-Math.floor(Date.now()/1000));
-  $('countdown').textContent=drawFinished?'Draw settled':left?Math.floor(left/86400)+'d '+Math.floor(left%86400/3600)+'h '+Math.floor(left%3600/60)+'m '+left%60+'s':'Draw due';
+  $('countdown').textContent=drawFinished?'Draw settled':left?Math.floor(left/86400)+'d '+Math.floor(left%86400/3600)+'h '+Math.floor(left%3600/60)+'m '+left%60+'s':awaitingThreshold?'Checkpoint due':'Draw due';
 }
 setInterval(tick,1000);
 const zero='0x'+'00'.repeat(20);
@@ -54,12 +54,16 @@ async function connect(){
   historyLoaded=false;contract=new Contract(cfg.address,abi,signer);$('connect').textContent=account.slice(0,6)+'…'+account.slice(-4);await refresh();
 }
 async function refresh(){
-  const [c,sold,minted,closed,deadline,places]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places()]);
+  const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity()]);
   $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':cfg.chainId===84532?'Base Sepolia · testnet':'Chain '+cfg.chainId;
-  targetTime=Number(c.drawAt);drawFinished=deadline>0n;tick();
+  awaitingThreshold=sold<6000n;
+  targetTime=Number(awaitingThreshold?salesClose:drawTime);drawFinished=deadline>0n;
+  $('time-label').textContent=awaitingThreshold?'Next sales checkpoint':minted===10000n&&!drawFinished?'Sold out · draw can start':'Draw time';
+  if(minted===10000n&&!drawFinished){targetTime=0;$('countdown').textContent=''}
+  tick();
   $('escrow').textContent='Round escrow '+cfg.address;
   if(cfg.chainId===84532){const link=document.createElement('a');link.href='https://sepolia.basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
-  $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=new Date(Number(c.drawAt)*1000).toLocaleString();
+  $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=targetTime?new Date(targetTime*1000).toLocaleString():'';
   $('ladder').replaceChildren(...[150000n,80000n,50000n,30000n,20000n].map(rate=>{let li=document.createElement('li');li.textContent=fmt(sold*rate);return li}));
   if(!$('nominee').length){for(let i=0;i<Number(await contract.charityCount());i++){
     let addr=await contract.charities(i);$('nominee').add(new Option(cfg.labels?.[addr]||addr,i));
@@ -67,11 +71,13 @@ async function refresh(){
   let now=BigInt(Math.floor(Date.now()/1000));let eligible=account && await contract.eligibleUntil(account)>=now;
   let canEnter=eligible && !closed && now>=c.opens;
   $('eligibility').textContent=account?(eligible?'Wallet verified for entry.':'This wallet needs an operator eligibility attestation.'):'Connect a wallet to enter.';
-  $('buy').disabled=busy||!canEnter;$('free').disabled=busy||!canEnter||(account&&await contract.usedFree(account));
+  $('buy').disabled=busy||!canEnter;$('free').disabled=busy||!canEnter||!freeCapacity||(account&&await contract.usedFree(account));
   let prior=await contract.previous();
-  $('bonus').hidden=!(account && canEnter && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
+  $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();
-  $('refund').hidden=!(account&&closed&&sold<6000n&&await contract.paid(account)>0n);
+  $('round-notice').textContent=postponed && !closed && sold<6000n
+    ? 'Round postponed. Tickets and the full pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + new Date(Number(salesClose)*1000).toLocaleString() + '.'
+    : '';
   if(account){let count=Number(await contract.balanceOf(account));let ids=await Promise.all(Array.from({length:count},(_,i)=>contract.tokenOfOwnerByIndex(account,i)));$('tickets').textContent=ids.map(n=>'#'+String(n).padStart(5,'0')).join(' · ')||'No tickets in this wallet.'}
   const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Claim prize';b.onclick=()=>act(()=>contract.claim(id));li.append(' ',b)}list.push(li)}
   $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+new Date(Number(deadline)*1000).toLocaleString():closed?'Entries closed.':'Draw pending.';
@@ -79,7 +85,7 @@ async function refresh(){
 async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
 $('connect').onclick=()=>connect().catch(report);
 $('buy').onclick=()=>act(async()=>{const n=Number($('qty').value);if(!Number.isInteger(n)||n<1||n>25)throw Error('Enter 1–25 tickets.');const c=await contract.config();const token=new Contract(c.currency,['function allowance(address,address) view returns(uint256)','function approve(address,uint256) returns(bool)'],signer);if(await token.allowance(account,cfg.address)<BigInt(n)*1000000n)await(await token.approve(cfg.address,BigInt(n)*1000000n)).wait();return contract.buy(n,Number($('nominee').value))});
-$('bonus').onclick=()=>act(()=>contract.claimBonus(Number($('nominee').value)));$('free').onclick=()=>act(()=>contract.claimFree(Number($('nominee').value)));$('refund').onclick=()=>act(()=>contract.refund());
+$('bonus').onclick=()=>act(()=>contract.claimBonus(Number($('nominee').value)));$('free').onclick=()=>act(()=>contract.claimFree(Number($('nominee').value)));
 window.ethereum?.on?.('accountsChanged',()=>location.reload());window.ethereum?.on?.('chainChanged',()=>location.reload());
 if(cfg.local&&!window.ethereum)$('connect').textContent='Use practice wallet';
 if(!cfg.address){$('status').textContent=cfg.error||'No raffle round is open yet. Check back for the next round.';$('connect').disabled=true}

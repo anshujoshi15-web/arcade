@@ -12,14 +12,14 @@ function disableActions() {
 
 async function refresh() {
   disableActions();
-  const [config, sold, minted, closed, request, seeded, deadline, outstanding, places] = await Promise.all([
+  const [config, sold, minted, closed, request, seeded, deadline, outstanding, places, drawTime, postponed] = await Promise.all([
     round.config(), round.sold(), round.minted(), round.closed(), round.requestId(),
-    round.seeded(), round.deadline(), round.outstanding(), round.places()
+    round.seeded(), round.deadline(), round.outstanding(), round.places(), round.drawTime(), round.postponements()
   ]);
   const block = await round.runner.getBlock('latest');
   const now = BigInt(block.timestamp);
   const phase = deadline ? 'Settled' : seeded ? 'Ready to finalize' : request ? 'Waiting for VRF' :
-    closed ? (sold < 6000n ? 'Closed · refunds available' : 'Closed · draw pending') :
+    closed ? 'Closed · draw pending' : postponed && sold < 6000n ? 'Postponed · sales open' :
     now < config.opens ? 'Scheduled' : 'Entries open';
   const details = {
     Contract: await round.getAddress(),
@@ -40,7 +40,7 @@ async function refresh() {
     return [term, description];
   }));
   if (!walletRound || busy) return;
-  field('draw').disabled = !(sold >= 6000n && !request && (now >= config.drawAt || minted === 10000n));
+  field('draw').disabled = !(sold >= 6000n && !request && (now >= drawTime || minted === 10000n));
   field('finalize').disabled = !seeded || Boolean(deadline);
   field('sweep').disabled = !(deadline && now > deadline && outstanding);
   const isRegistrar = walletAddress.toLowerCase() === config.registrar.toLowerCase();

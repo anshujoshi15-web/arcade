@@ -15,9 +15,8 @@ for(;;){
       break;
     }
     if(!deadline && await round.closed()){
-      if(await round.sold()<6000n){console.log('Refunds available to original buyers');break}
       if(await round.seeded())console.log((await(await round.finalize()).wait()).hash);
-      else if(!(await round.requestId())&&(await round.minted()===10000n||now>=Number((await round.config()).drawAt)))console.log((await(await round.requestDraw()).wait()).hash);
+      else if(!(await round.requestId())&&(await round.minted()===10000n||now>=Number(await round.drawTime())))console.log((await(await round.requestDraw()).wait()).hash);
     }
   }catch(error){console.error(error.shortMessage||error.message)}
   await delay(30000);

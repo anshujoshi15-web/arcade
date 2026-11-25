@@ -34,8 +34,8 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
     mapping(address => bool) public nominated;
     mapping(address => uint256) public eligibleUntil;
     mapping(address => uint256) public issued;
-    mapping(address => uint256) public paid;
-    mapping(address => bool) public usedFree;
+    uint256 private lockedClose;
+    mapping(address => uint256) private lastFreeWeek;
     mapping(uint256 => bool) public early;
     mapping(uint256=>address) public originalEntrant;
     uint256 public minted;
@@ -59,7 +59,6 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
     event Winner(uint256 indexed serial,address indexed wallet,uint256 amount);
     event Settled(address indexed charity,uint256 donation,uint256 operations);
     event PrizePaid(uint256 indexed serial,address indexed recipient,uint256 amount);
-    event Refunded(address indexed recipient,uint256 amount);
     event Swept(address indexed charity,uint256 amount);
 
     constructor(Config memory c,address[] memory recipients, HouseRaffle prior) ERC721("House Raffle Ticket","HRT") {
@@ -71,7 +70,7 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
         badges=new StreakBadges();
         if(address(prior)!=address(0)){
             (,,,,,,uint64 lastOpen,,,uint32 lastEdition)=prior.config();
-            require(c.edition==lastEdition+1 && c.opens>=lastOpen+6 days && c.opens<=lastOpen+8 days);
+            require(c.edition==lastEdition+1 && c.opens>=lastOpen+6 days);
             goldPriorityUntil=c.opens+1 hours;
         }
         for(uint256 i;i<recipients.length;i++){
@@ -85,16 +84,40 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
         require(msg.sender==config.registrar && wallet!=config.registrar && wallet!=config.house && wallet!=address(this));
         eligibleUntil[wallet]=until;
     }
-    function closed() public view returns(bool){return block.timestamp>=config.closes || minted==10000;}
+    function salesClose() public view returns (uint256) {
+        if (lockedClose != 0) return lockedClose;
+        if (block.timestamp < config.closes) return config.closes;
+        return config.closes + ((block.timestamp - config.closes) / 1 weeks + 1) * 1 weeks;
+    }
+    function drawTime() public view returns (uint256) {
+        return salesClose() + config.drawAt - config.closes;
+    }
+    function postponements() external view returns (uint256) {
+        return (salesClose() - config.closes) / 1 weeks;
+    }
+    function closed() public view returns (bool) {
+        return minted == 10000 || (lockedClose != 0 && block.timestamp >= lockedClose);
+    }
+    function remainingFreeCapacity() public view returns (uint256) {
+        return 4000 - (minted - sold);
+    }
+    function entryWeek() private view returns (uint256) {
+        return block.timestamp < config.opens ? 0 : (block.timestamp - config.opens) / 1 weeks + 1;
+    }
+    function usedFree(address wallet) public view returns (bool) {
+        uint256 week = entryWeek();
+        return week != 0 && lastFreeWeek[wallet] == week;
+    }
     function buy(uint256 count,uint256 nominee) external nonReentrant {
         require(count>0 && count<=25);
+        uint256 scheduledClose = salesClose();
         config.currency.safeTransferFrom(msg.sender,address(this),count*1e6);
-        paid[msg.sender]+=count;
         _enter(count,nominee,false);
+        if (lockedClose == 0 && sold >= 6000) lockedClose = scheduledClose;
     }
     function claimFree(uint256 nominee) external nonReentrant {
-        require(!usedFree[msg.sender]);
-        usedFree[msg.sender]=true;
+        require(!usedFree(msg.sender));
+        lastFreeWeek[msg.sender] = entryWeek();
         _enter(1,nominee,true);
     }
     function claimBonus(uint256 nominee) external nonReentrant {
@@ -103,6 +126,7 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
     }
     function _enter(uint256 count,uint256 nominee,bool free) private {
         require(block.timestamp>=config.opens && !closed() && minted+count<=10000);
+        if (free) require(count <= remainingFreeCapacity());
         require(issued[msg.sender]+count<=100 && balanceOf(msg.sender)+count<=100);
         address choice=charities[nominee];
         if(!nominated[msg.sender]){
@@ -132,14 +156,8 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
         }
         return super._update(to,id,auth);
     }
-    function refund() external nonReentrant {
-        require(closed() && sold<6000);
-        uint256 amount=paid[msg.sender]*1e6;
-        require(amount>0);paid[msg.sender]=0;
-        config.currency.safeTransfer(msg.sender,amount);emit Refunded(msg.sender,amount);
-    }
     function requestDraw() external nonReentrant {
-        require(sold>=6000 && requestId==0 && (block.timestamp>=config.drawAt || minted==10000));
+        require(sold>=6000 && requestId==0 && (block.timestamp>=drawTime() || minted==10000));
         requestId=config.coordinator.requestRandomWords(ICoordinator.Request(config.keyHash,config.subscription,10,150000,1,
             abi.encodeWithSelector(bytes4(keccak256("VRF ExtraArgsV1")),false)));
         require(requestId!=0);emit Requested(requestId);
@@ -183,7 +201,7 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
         string memory number=Strings.toString(100000+id);
         bytes memory serial=new bytes(5);
         for(uint256 i;i<5;i++)serial[i]=bytes(number)[i+1];
-        string memory status=claimed[id]?"Claimed":wonSerial(id)?"Winner":closed()&&sold<6000?"Void":deadline!=0?"Draw complete":"Entered";
+        string memory status=claimed[id]?"Claimed":wonSerial(id)?"Winner":deadline!=0?"Draw complete":"Entered";
         bytes memory image = ticketArtwork(serial, id <= 100, uint256(config.edition).toString());
         bytes memory attributes = ticketAttributes(id, status);
         return string.concat("data:application/json;base64,", Base64.encode(abi.encodePacked(
