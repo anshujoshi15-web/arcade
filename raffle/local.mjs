@@ -1,0 +1,25 @@
+import fs from 'node:fs';
+import ganache from 'ganache';
+import {JsonRpcProvider,ContractFactory} from 'ethers';
+import {compile} from './build.mjs';
+const src='contracts/HouseRaffle.sol',mock='contracts/TestServices.sol';
+const artifacts=compile([src,mock]);
+const chain=ganache.server({chain:{chainId:31337},wallet:{deterministic:true},logging:{quiet:true}});
+await chain.listen(18545,'127.0.0.1');
+const provider=new JsonRpcProvider('http://127.0.0.1:18545');provider.pollingInterval=50;
+const admin=await provider.getSigner(0),player=await provider.getSigner(1);
+async function deploy(file,name,...args){let a=artifacts[file][name];let c=await new ContractFactory(a.abi,a.evm.bytecode.object,admin).deploy(...args);await c.waitForDeployment();return c}
+const dollar=await deploy(mock,'TestDollar'),vrf=await deploy(mock,'TestCoordinator');
+const addresses=await provider.listAccounts();
+const charity=addresses[3].address,other=addresses[4].address;
+const now=Math.floor(Date.now()/1000);
+const round=await deploy(src,'HouseRaffle',[dollar.target,vrf.target,'0x'+'00'.repeat(32),1,addresses[2].address,admin.address,now-1,now+604800,now+612000,1],[charity,other],'0x'+'00'.repeat(20));
+await(await round.attest(player.address,now+604800)).wait();
+await(await dollar.connect(player).faucet()).wait();
+const {enableLocalEnrollment}=await import('./local-enroll.mjs');
+enableLocalEnrollment({admin,round,dollar,end:now+604800});
+const cfg={local:true,chainId:31337,address:round.target,rpc:'http://127.0.0.1:18545',labels:{[charity]:'Community Food Fund (test)',[other]:'Habitat Recovery Fund (test)'}};
+process.env.LOCAL_ROUND=JSON.stringify(cfg);
+console.log('Local wallet edition http://127.0.0.1:14173 · chain 31337 · RPC '+cfg.rpc);
+console.log('Connect a browser test wallet on chain 31337 for practice funds.');
+await import('./server.mjs');

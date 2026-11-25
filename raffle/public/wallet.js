@@ -1,0 +1,86 @@
+import {BrowserProvider,Contract,JsonRpcProvider,formatUnits} from '/ethers.js';
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(formatUnits(n,6)).toLocaleString('en-US',{style:'currency',currency:'USD'});
+const abi=await fetch('/abi.json').then(r=>r.json());
+const cfg=await fetch('/round.json').then(r=>r.json());
+let provider,contract,signer,account,busy=false,historyLoaded=false;
+let targetTime=0,drawFinished=false;
+function tick(){
+  if(!targetTime)return;
+  const left=Math.max(0,targetTime-Math.floor(Date.now()/1000));
+  $('countdown').textContent=drawFinished?'Draw settled':left?Math.floor(left/86400)+'d '+Math.floor(left%86400/3600)+'h '+Math.floor(left%3600/60)+'m '+left%60+'s':'Draw due';
+}
+setInterval(tick,1000);
+const zero='0x'+'00'.repeat(20);
+async function loadHistory(){
+  const box=$('history');const sections=[];let addr=await contract.previous();
+  while(addr!==zero){
+    const past=new Contract(addr,abi,provider),c=await past.config();
+    let h=document.createElement('h3');h.textContent='Round '+c.edition;sections.push(h);
+    const count=Number(await past.places()),list=document.createElement('ol');
+    for(let i=0;i<count;i++){const serial=await past.winners(i);let item=document.createElement('li');item.textContent='#'+serial+' · '+await past.claimant(serial)+' · '+fmt(await past.award(serial));
+      if(account===await past.claimant(serial) && await past.deadline()>=BigInt(Math.floor(Date.now()/1000)) && !await past.claimed(serial)){
+        const button=document.createElement('button');button.textContent='Claim';button.onclick=()=>act(()=>past.connect(signer).claim(serial));item.append(' ',button);
+      }
+      list.append(item);
+    }
+    if(count)sections.push(list);else{let message=document.createElement('p');message.textContent='No winning serials published.';sections.push(message)}
+    let receipt=document.createElement('p');receipt.textContent='Round escrow '+addr;if(cfg.chainId===84532){let a=document.createElement('a');a.href='https://sepolia.basescan.org/address/'+addr+'#tokentxns';a.textContent=' View transfers';receipt.append(a)}sections.push(receipt);
+    addr=await past.previous();
+  }
+  box.replaceChildren(...sections);if(!sections.length)box.textContent='This is the first linked round.';
+  historyLoaded=true;
+}
+function report(error){$('status').textContent=error.shortMessage||error.message;}
+async function connect(){
+  if(cfg.local && !window.ethereum){
+    provider=new JsonRpcProvider(cfg.rpc);signer=await provider.getSigner(1);account=await signer.getAddress();
+    contract=new Contract(cfg.address,abi,signer);historyLoaded=false;
+    $('connect').textContent='Practice wallet connected';await refresh();return;
+  }
+  if(!window.ethereum)throw Error('Open this page in a browser with an Ethereum wallet.');
+  if(cfg.local){
+    try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x7a69'}]})}
+    catch(e){if(e.code!==4902)throw e;await window.ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:'0x7a69',chainName:'House Raffle Local',nativeCurrency:{name:'Practice Ether',symbol:'ETH',decimals:18},rpcUrls:[cfg.rpc]}]})}
+  }
+  provider=new BrowserProvider(window.ethereum);
+  await provider.send('eth_requestAccounts',[]);
+  if(Number((await provider.getNetwork()).chainId)!==cfg.chainId)throw Error('Switch your wallet to chain '+cfg.chainId+' and reconnect.');
+  signer=await provider.getSigner();account=await signer.getAddress();
+  if(cfg.local){
+    const response=await fetch('/local-enroll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address:account})});
+    if(!response.ok)throw Error('Local test wallet enrollment failed.');
+  }
+  historyLoaded=false;contract=new Contract(cfg.address,abi,signer);$('connect').textContent=account.slice(0,6)+'…'+account.slice(-4);await refresh();
+}
+async function refresh(){
+  const [c,sold,minted,closed,deadline,places]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places()]);
+  $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':'Chain '+cfg.chainId;
+  targetTime=Number(c.drawAt);drawFinished=deadline>0n;tick();
+  $('escrow').textContent='Round escrow '+cfg.address;
+  if(cfg.chainId===84532){const link=document.createElement('a');link.href='https://sepolia.basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
+  $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=new Date(Number(c.drawAt)*1000).toLocaleString();
+  $('ladder').replaceChildren(...[150000n,80000n,50000n,30000n,20000n].map(rate=>{let li=document.createElement('li');li.textContent=fmt(sold*rate);return li}));
+  if(!$('nominee').length){for(let i=0;i<Number(await contract.charityCount());i++){
+    let addr=await contract.charities(i);$('nominee').add(new Option(cfg.labels?.[addr]||addr,i));
+  }}
+  let now=BigInt(Math.floor(Date.now()/1000));let eligible=account && await contract.eligibleUntil(account)>=now;
+  let canEnter=eligible && !closed && now>=c.opens;
+  $('eligibility').textContent=account?(eligible?'Wallet verified for entry.':'This wallet needs an operator eligibility attestation.'):'Connect a wallet to enter.';
+  $('buy').disabled=busy||!canEnter;$('free').disabled=busy||!canEnter||(account&&await contract.usedFree(account));
+  let prior=await contract.previous();
+  $('bonus').hidden=!(account && canEnter && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
+  if(!historyLoaded)await loadHistory();
+  $('refund').hidden=!(account&&closed&&sold<6000n&&await contract.paid(account)>0n);
+  if(account){let count=Number(await contract.balanceOf(account));let ids=await Promise.all(Array.from({length:count},(_,i)=>contract.tokenOfOwnerByIndex(account,i)));$('tickets').textContent=ids.map(n=>'#'+String(n).padStart(5,'0')).join(' · ')||'No tickets in this wallet.'}
+  const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Claim prize';b.onclick=()=>act(()=>contract.claim(id));li.append(' ',b)}list.push(li)}
+  $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+new Date(Number(deadline)*1000).toLocaleString():closed?'Entries closed.':'Draw pending.';
+}
+async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
+$('connect').onclick=()=>connect().catch(report);
+$('buy').onclick=()=>act(async()=>{const n=Number($('qty').value);if(!Number.isInteger(n)||n<1||n>25)throw Error('Enter 1–25 tickets.');const c=await contract.config();const token=new Contract(c.currency,['function allowance(address,address) view returns(uint256)','function approve(address,uint256) returns(bool)'],signer);if(await token.allowance(account,cfg.address)<BigInt(n)*1000000n)await(await token.approve(cfg.address,BigInt(n)*1000000n)).wait();return contract.buy(n,Number($('nominee').value))});
+$('bonus').onclick=()=>act(()=>contract.claimBonus(Number($('nominee').value)));$('free').onclick=()=>act(()=>contract.claimFree(Number($('nominee').value)));$('refund').onclick=()=>act(()=>contract.refund());
+window.ethereum?.on?.('accountsChanged',()=>location.reload());window.ethereum?.on?.('chainChanged',()=>location.reload());
+if(cfg.local&&!window.ethereum)$('connect').textContent='Use practice wallet';
+if(!cfg.address){$('status').textContent='Waiting for a configured round. The practice edition is available from the original game page.';$('connect').disabled=true}
+else{try{provider=new JsonRpcProvider(cfg.rpc);if(Number((await provider.getNetwork()).chainId)!==cfg.chainId)throw Error('Round RPC network mismatch.');contract=new Contract(cfg.address,abi,provider);await refresh();$('status').textContent='Round loaded.';setInterval(()=>{if(!busy)refresh().catch(report)},20000)}catch(e){report(e)}}

@@ -1,0 +1,16 @@
+{
+  "monday": "2026-11-30",
+  "previous": "0x0000000000000000000000000000000000000000",
+  "publicRpc": "REPLACE_WITH_PUBLIC_BASE_SEPOLIA_RPC",
+  "round": {
+    "currency": "REPLACE_WITH_BASE_SEPOLIA_USDC",
+    "coordinator": "REPLACE_WITH_VRF_V2_5_COORDINATOR",
+    "keyHash": "REPLACE_WITH_SUPPORTED_GAS_LANE",
+    "subscription": "REPLACE_WITH_FUNDED_SUBSCRIPTION_ID",
+    "house": "REPLACE_WITH_HOUSE_VAULT",
+    "registrar": "REPLACE_WITH_ELIGIBILITY_REGISTRAR",
+    "edition": 1
+  },
+  "charities": ["REPLACE_WITH_VERIFIED_CHARITY_ADDRESS"],
+  "labels": {"REPLACE_WITH_VERIFIED_CHARITY_ADDRESS": "Verified recipient name"}
+}
