@@ -12,6 +12,8 @@ const publicFile = path => new URL('./public/' + path, import.meta.url);
 const arcadeFile = path => new URL('../' + path, import.meta.url);
 const roundFile = publicFile('round.json');
 const routes = new Map([
+  ['/admin', ['text/html', publicFile('admin.html')]],
+  ['/admin.js', ['text/javascript', publicFile('admin.js')]],
   ['/how-it-works', ['text/html', publicFile('how-it-works.html')]],
   ['/', ['text/html', hosted ? arcadeFile('house-raffle.html') : publicFile('index.html')]],
   ['/wallet', ['text/html', publicFile('index.html')]],

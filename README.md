@@ -13,3 +13,5 @@ The wallet edition is available at `/wallet`. To configure a deployed round, set
 ### File Manager upload
 
 The [File Manager ZIP](downloads/House-Arcade-File-Manager.zip) contains the play-credit demo and How It Works page. Extract its two HTML files into the subdomain’s document root. The package runs as static HTML and contains no wallet integration.
+
+See the [Remix deployment and admin guide](DEPLOY.md) for constructor inputs and instructions for opening `/admin`.
