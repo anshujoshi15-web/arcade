@@ -68,10 +68,11 @@ async function refresh() {
     description.textContent = value;
     return [term, description];
   }));
+  field('withdrawal-balance').textContent = usdc(escrow);
   field('withdrawal-status').textContent = cancelled === null ? 'Withdrawal status is unavailable for this contract.' :
     cancelled !== true ? 'Withdrawals are available after the House cancels the round.' :
     escrow === 0n ? 'There is no USDC left to withdraw.' :
-    usdc(escrow) + ' available for refunds. Destination: ' + config.house + '.';
+    'The full balance is available for refunds. Destination: ' + config.house + '.';
   if (!walletRound || busy) return;
   const isHouse = walletAddress.toLowerCase() === config.house.toLowerCase();
   field('cancel-round').disabled = !isHouse || cancelled !== false || Boolean(request);
@@ -118,6 +119,7 @@ async function loadJson(path) {
 async function initialize() {
   const [config, abi] = await Promise.all([loadJson('/round.json'), loadJson('/abi.json')]);
   if (!config.address || !config.rpc || !config.chainId) {
+    field('withdrawal-balance').textContent = 'Unavailable';
     status('Set PUBLIC_ROUND on the Node.js host to connect this page to a deployed raffle.');
     return;
   }
@@ -251,4 +253,7 @@ field('eligibility').onsubmit = event => {
     void send('attest', player, revoke ? 0 : expiry);
   } catch (error) { status(errorText(error)); }
 };
-initialize().catch(error => status(errorText(error)));
+initialize().catch(error => {
+  field('withdrawal-balance').textContent = 'Unavailable';
+  status(errorText(error));
+});
