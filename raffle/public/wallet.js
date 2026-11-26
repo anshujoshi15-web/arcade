@@ -57,7 +57,7 @@ async function connect(authorizedAddress){
   historyLoaded=false;contract=new Contract(cfg.address,abi,signer);await refresh();return account;
 }
 async function refresh(){
-  const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false)]);
+  const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired,publicPaidEntry]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false),contract.publicPaidEntry().catch(()=>false)]);
   $('opens-at').textContent = formatUtc(c.opens);
   $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':'Chain '+cfg.chainId;
   awaitingThreshold=sold<6000n;
@@ -73,9 +73,17 @@ async function refresh(){
     let addr=await contract.charities(i);$('nominee').add(new Option(cfg.labels?.[addr]||addr,i));
   }}
   let now=BigInt(Math.floor(Date.now()/1000));let eligible=account && await contract.eligibleUntil(account)>=now;
-  let canEnter=eligible && !closed && now>=c.opens;
-  $('eligibility').textContent=account?(eligible?'Wallet verified for entry.':'This wallet needs an operator eligibility attestation.'):'Connect a wallet to enter.';
-  $('buy').disabled=!paidEntryEnabled||busy||!canEnter;$('free').disabled=busy||!canEnter||!freeCapacity||(account&&await contract.usedFree(account));
+  const open = !closed && now >= c.opens;
+  const canEnter = eligible && open;
+  const isOperator = account && [c.house, c.registrar].some(address => address.toLowerCase() === account.toLowerCase());
+  const canBuy = account && open && (eligible || (publicPaidEntry && !isOperator));
+  $('eligibility').textContent = !account ? 'Connect a wallet to enter.' :
+    eligible ? 'Wallet verified for entry.' :
+    isOperator ? 'House and registrar wallets cannot enter.' :
+    publicPaidEntry ? 'Paid tickets are open to players. Free entry needs a wallet eligibility attestation.' :
+    'This round requires wallet approval before entry.';
+  $('buy').disabled = !paidEntryEnabled || busy || !canBuy;
+  $('free').disabled = busy || !canEnter || !freeCapacity || (account && await contract.usedFree(account));
   let prior=await contract.previous();
   $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();

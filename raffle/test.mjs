@@ -14,9 +14,11 @@ async function roundContract(){const t=(await chain.request({method:'eth_getBloc
 async function tx(p){return(await p).wait()}
 async function close(){await chain.request({method:'evm_increaseTime',params:[86500]});await chain.request({method:'evm_mine',params:[]})}
 const failed=await roundContract(),buyer=await account(1);
-await tx(failed.attest(buyer.address,2**40));await tx(usd.connect(buyer).faucet());await tx(usd.connect(buyer).approve(failed.target,1e6));await tx(failed.connect(buyer).buy(1,0));await close();assert.equal(await failed.closed(),false);assert.equal(await failed.postponements(),1n);
+await tx(usd.connect(buyer).faucet());await tx(usd.connect(buyer).approve(failed.target,1e6));await tx(failed.connect(buyer).buy(1,0));await close();assert.equal(await failed.closed(),false);assert.equal(await failed.postponements(),1n);
 assert.equal(await usd.balanceOf(failed.target),330000n);assert.equal(await usd.balanceOf(donation.address),340000n);assert.equal(await usd.balanceOf(house.address),330000n);assert.equal(await failed.ownerOf(1),buyer.address);
 await assert.rejects(failed.requestDraw.staticCall());
+await assert.rejects(failed.connect(buyer).claimFree.staticCall(0), /Free entry requires eligibility/);
+await tx(failed.attest(buyer.address,2**40));
 await tx(failed.connect(buyer).claimFree(0));
 await assert.rejects(failed.connect(buyer).claimFree.staticCall(0));
 await chain.request({method:'evm_increaseTime',params:[604800]});await chain.request({method:'evm_mine',params:[]});
@@ -46,7 +48,7 @@ const donationBeforeRound=await usd.balanceOf(donation.address);
 const r=await roundContract(), players=new Map();
 for(let i=1;i<=60;i++){
   const p=await account(i);players.set(p.address,p);
-  await tx(r.attest(p.address,2**40));await tx(usd.connect(p).faucet());await tx(usd.connect(p).approve(r.target,100e6));
+  await tx(usd.connect(p).faucet());await tx(usd.connect(p).approve(r.target,100e6));
   for(let j=0;j<4;j++)await tx(r.connect(p).buy(25,0,{gasLimit:8000000}));
 }
 const free=await account(61);players.set(free.address,free);await tx(r.attest(free.address,2**40));await tx(r.connect(free).claimFree(0));await assert.rejects(r.connect(free).claimFree.staticCall(0));
@@ -77,4 +79,4 @@ for(let week=1;week<=13;week++){
   await chain.request({method:'evm_increaseTime',params:[604800]});await chain.request({method:'evm_mine',params:[]});
 }
 console.log('Passed 13-round streak series, bonus ticket, keeper and gold badges, and priority serial.');
-console.log('Passed rollover, 6000 paid mints, free entry, VRF callback, 5 distinct winners, per-purchase splits, snapshot claim and expiry sweep.');await chain.disconnect();
+console.log('Passed rollover, 6000 paid mints without attestations, free entry, VRF callback, 5 distinct winners, per-purchase splits, snapshot claim and expiry sweep.');await chain.disconnect();

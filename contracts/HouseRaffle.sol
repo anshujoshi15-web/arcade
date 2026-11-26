@@ -24,6 +24,7 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
     Config public config;
     HouseRaffle public immutable previous;
     address public immutable donationWallet;
+    bool public constant publicPaidEntry = true;
     StreakBadges public immutable badges;
     mapping(address=>uint256) public streak;
     mapping(address=>bool) public usedBonus;
@@ -143,7 +144,11 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
     }
     function _enter(uint256 count,uint256 nominee,bool free) private {
         require(block.timestamp>=config.opens && !closed() && minted+count<=10000);
-        if (free) require(count <= remainingFreeCapacity());
+        require(msg.sender != config.house && msg.sender != config.registrar && msg.sender != address(this));
+        if (free) {
+            require(eligibleUntil[msg.sender] >= block.timestamp, "Free entry requires eligibility");
+            require(count <= remainingFreeCapacity());
+        }
         require(issued[msg.sender]+count<=100 && balanceOf(msg.sender)+count<=100);
         address choice=charities[nominee];
         if(!nominated[msg.sender]){
@@ -167,8 +172,8 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
         }
     }
     function _update(address to,uint256 id,address auth) internal override returns(address){
-        if(deadline==0){
-            if(_ownerOf(id)!=address(0)) require(!closed());
+        if(deadline==0 && _ownerOf(id)!=address(0)){
+            require(!closed());
             require(eligibleUntil[to]>=block.timestamp && balanceOf(to)<100);
         }
         return super._update(to,id,auth);

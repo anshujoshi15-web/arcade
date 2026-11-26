@@ -43,3 +43,7 @@ The first sales checkpoint can advance by up to four weeks. At the limit, the co
 To prefill the Admin ledgers, add the contract creation block as the numeric `deploymentBlock` in `PUBLIC_ROUND`. Otherwise enter the block shown in the contract deployment receipt. Load the ledgers to see the original buyers and registered ETH claims. The refund CSV lists original payment amounts. The claim CSV includes fields for recording the conversion rate and the ETH payout transaction.
 
 The hosted default is the current Base mainnet round in `raffle/round.mainnet.json`. A mainnet `PUBLIC_ROUND` overrides it. A legacy Base Sepolia configuration uses the mainnet default. Set `PUBLIC_ROUND` to `{}` to leave the site without an active round.
+
+## Public paid purchases
+
+The revised contract accepts paid entries from player wallets without a registrar attestation. House and registrar wallets remain excluded. Free and bonus entries and receipt of pre-draw transfers still require an attestation. The deployed contract address determines which rules apply. A new deployment needs a new VRF consumer registration and updated `PUBLIC_ROUND` configuration to enable purchases on the site.
