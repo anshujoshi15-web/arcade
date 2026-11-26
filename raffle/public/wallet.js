@@ -70,7 +70,6 @@ async function refresh(){
   $('escrow').textContent='Prize escrow '+cfg.address;
   if(cfg.chainId===8453){const link=document.createElement('a');link.href='https://basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
   $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=targetTime?formatUtc(targetTime):'';
-  $('ladder').replaceChildren(...[150000n,80000n,50000n,30000n,20000n].map(rate=>{let li=document.createElement('li');li.textContent=fmt(sold*rate)+(cfg.local ? "" : " in ETH");return li}));
   if(!$('nominee').length){for(let i=0;i<Number(await contract.charityCount());i++){
     let addr=await contract.charities(i);$('nominee').add(new Option(cfg.labels?.[addr]||addr,i));
   }}
