@@ -11,7 +11,7 @@ export const appkit = createAppKit({
     name: 'House Arcade',
     description: 'Games from The House of Joshi',
     url: window.location.origin,
-    icons: [window.location.origin + '/house-raffle-ticket-gold.svg']
+    icons: [window.location.origin + '/arcade-logo.png']
   },
   features: { analytics: false, email: false, socials: false },
   themeVariables: { '--w3m-accent': '#0000ff' }

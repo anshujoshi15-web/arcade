@@ -14,13 +14,17 @@ const publicFile = path => new URL('./public/' + path, import.meta.url);
 const arcadeFile = path => new URL('../' + path, import.meta.url);
 const footer = fs.readFileSync(publicFile('footer.html'), 'utf8');
 function pageContent(file) {
-  return fs.readFileSync(file, 'utf8').replace('<!-- arcade-footer -->', footer);
+  return fs.readFileSync(file, 'utf8')
+    .replace('<!-- arcade-footer -->', footer)
+    .replace(/(<title>)/i, '<link rel="icon" type="image/png" href="/arcade-favicon.png"><link rel="apple-touch-icon" href="/arcade-logo.png">$1')
+    .replace(/(<a (?:href="\/" class="arcade-brand"|class="arcade-brand" href="\/")>)House Arcade<\/a>/, '$1<img src="/arcade-logo.png" alt="" width="32" height="32">House Arcade</a>');
 }
 const roundFile = publicFile('round.json');
 const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
 const upcoming = new Set(Object.keys(gameRules));
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
 const routes = new Map([
+  ...['arcade-logo.png', 'arcade-favicon.png', 'arcade-share.png'].map(name => ['/' + name, ['image/png', publicFile(name)]]),
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],
   ['/rules', ['text/html', publicFile('rules.html')]],
