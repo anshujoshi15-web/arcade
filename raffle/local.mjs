@@ -13,7 +13,7 @@ const dollar=await deploy(mock,'TestDollar'),vrf=await deploy(mock,'TestCoordina
 const addresses=await provider.listAccounts();
 const charity=addresses[3].address,other=addresses[4].address;
 const now=Math.floor(Date.now()/1000);
-const round=await deploy(src,'HouseRaffle',[dollar.target,vrf.target,'0x'+'00'.repeat(32),1,addresses[2].address,admin.address,now-1,now+604800,now+612000,1],[charity,other],'0x'+'00'.repeat(20));
+const round=await deploy(src,'HouseRaffle',[dollar.target,vrf.target,'0x'+'00'.repeat(32),1,addresses[2].address,admin.address,now-1,now+604800,now+612000,1],[charity,other],'0x'+'00'.repeat(20),addresses[5].address);
 await(await round.attest(player.address,now+604800)).wait();
 await(await dollar.connect(player).faucet()).wait();
 const {enableLocalEnrollment}=await import('./local-enroll.mjs');

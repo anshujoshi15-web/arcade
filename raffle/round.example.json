@@ -11,6 +11,7 @@
     "registrar": "REPLACE_WITH_ELIGIBILITY_REGISTRAR",
     "edition": 1
   },
+  "donationWallet": "REPLACE_WITH_DONATION_CUSTODY_WALLET",
   "charities": ["REPLACE_WITH_VERIFIED_CHARITY_ADDRESS"],
   "labels": {"REPLACE_WITH_VERIFIED_CHARITY_ADDRESS": "Verified recipient name"}
 }

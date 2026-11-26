@@ -3,7 +3,7 @@
 1. Upload [HouseRaffle.sol](contracts/HouseRaffle.sol) and [StreakBadges.sol](contracts/StreakBadges.sol) into the same Remix folder. The imports already pin OpenZeppelin 5.1.0.
 2. Compile HouseRaffle.sol with Solidity 0.8.24, EVM Cancun, optimizer enabled at 200 runs, and Via IR off.
 3. In Remix Deploy & Run, select Browser Extension and confirm your wallet is on Base Sepolia (84532) with test ETH for gas. Create a Chainlink VRF v2.5 subscription on Base Sepolia and fund it with test LINK.
-4. Select HouseRaffle and leave Value at zero. Enter the three constructor arguments below. The raffle deploys the badge contract as part of its constructor.
+4. Select HouseRaffle and leave Value at zero. Enter the four constructor arguments below. The raffle deploys the badge contract as part of its constructor.
 
 The `c` tuple in order:
 
@@ -11,7 +11,7 @@ The `c` tuple in order:
 ["0x036CbD53842c5426634e7929541eC2318f3dCF7e","0x5C210eF41CD1a72de73bF76eC39637bB0d3d7BEE","0x9e1344a1247c8a1785d0a4681a27152bffdb43666ae5bf7d14d24a5efd44bf71","SUBSCRIPTION_ID","HOUSE_WALLET","REGISTRAR_WALLET",OPENS,CLOSES,DRAW_AT,1]
 ```
 
-Replace the placeholders. Times are Unix seconds and must satisfy `OPENS < CLOSES <= DRAW_AT`. The final number is the edition. For `recipients`, enter an array of 1–32 distinct charity wallet addresses in published tie-break order. For `prior`, use `0x0000000000000000000000000000000000000000` for the first round. Subsequent rounds use the previous round contract address and the next edition number.
+Replace the placeholders. Times are Unix seconds and must satisfy `OPENS < CLOSES <= DRAW_AT`. The final number is the edition. For `recipients`, enter an array of 1–32 distinct charity wallet addresses in published tie-break order. For `prior`, use `0x0000000000000000000000000000000000000000` for the first round. Subsequent rounds use the previous round contract address and the next edition number. For `donation`, enter the House-controlled donation custody wallet, separate from the House wallet and from the nominated recipient list.
 
 Verify network-specific addresses before signing. [Circle USDC addresses](https://developers.circle.com/stablecoins/usdc-contract-addresses) · [Chainlink supported networks](https://docs.chain.link/vrf/v2-5/supported-networks#base-sepolia-testnet)
 
@@ -36,8 +36,8 @@ Rollover uses exact seven-day UTC intervals. A round spanning a Mountain Time da
 
 ## Escrow, manual ETH payouts, and refunds
 
-Paid entry on the hosted site remains disabled during the soft opening. Deploy the revised contract to use these rules. Ticket USDC remains in a single contract escrow until settlement or recovery. After the draw settles, the contract sends 34% to the donation recipient and 33% to the House, reserving the rest for prize claims. A snapshot winner’s claim releases their prize allocation in USDC to the House. The House pays the winner in Base ETH and publishes the conversion rate and ETH transaction. Unclaimed allocations go to the donation recipient after 30 days.
+Paid entry on the hosted site remains disabled during the soft opening. Deploy the revised contract to use these rules. Each paid ticket sends 34% immediately to the donation wallet and 33% to the House wallet. The remaining 33% stays in the contract as the prize reserve. After the draw settles, the House pays the nominated recipient from the donation wallet and publishes the transfer. A snapshot winner’s claim releases their prize allocation in USDC to the House. The House pays the winner in Base ETH and publishes the conversion rate and ETH transaction. Unclaimed allocations go to the donation recipient after 30 days.
 
-The first sales checkpoint can advance by up to four weeks. At the limit, the contract closes entries if there are fewer than 6,000 paid tickets. Before a randomness request, the House can end a round via `emergencyClose()`. The House can then call `recoverFunds()` to transfer the escrow balance to its wallet. Use the public entry events and `paidBy(address)` to reconcile original buyers and pay full USDC refunds manually. Free entries have no refund value. The admin dashboard provides both actions.
+The first sales checkpoint can advance by up to four weeks. At the limit, the contract closes entries if there are fewer than 6,000 paid tickets. Before a randomness request, the House can end a round via `emergencyClose()`. The House can then call `recoverFunds()` to transfer the prize escrow balance to its wallet. Full refunds require the funds already distributed to the donation and House wallets as well. Use the public entry events and `paidBy(address)` to reconcile original buyers and pay full USDC refunds manually. Free entries have no refund value. The admin dashboard provides both actions.
 
 To prefill the Admin ledgers, add the contract creation block as the numeric `deploymentBlock` in `PUBLIC_ROUND`. Otherwise enter the block shown in the contract deployment receipt. Load the ledgers to see the original buyers and registered ETH claims. The refund CSV lists original payment amounts. The claim CSV includes fields for recording the conversion rate and the ETH payout transaction.

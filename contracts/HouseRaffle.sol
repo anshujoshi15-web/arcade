@@ -23,6 +23,7 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
     }
     Config public config;
     HouseRaffle public immutable previous;
+    address public immutable donationWallet;
     StreakBadges public immutable badges;
     mapping(address=>uint256) public streak;
     mapping(address=>bool) public usedBonus;
@@ -61,14 +62,16 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
     event Requested(uint256 indexed requestId);
     event SeedReceived(uint256 indexed requestId,uint256 word);
     event Winner(uint256 indexed serial,address indexed wallet,uint256 amount);
-    event Settled(address indexed charity,uint256 donation,uint256 operations);
+    event Settled(address indexed charity,uint256 prizeReserve);
     event PrizeClaimed(uint256 indexed serial, address indexed recipient, uint256 usdcValue);
     event Swept(address indexed charity,uint256 amount);
 
-    constructor(Config memory c,address[] memory recipients, HouseRaffle prior) ERC721("House Raffle Ticket","HRT") {
+    constructor(Config memory c,address[] memory recipients, HouseRaffle prior,address donation) ERC721("House Raffle Ticket","HRT") {
         require(address(c.currency).code.length>0 && address(c.coordinator).code.length>0);
         require(c.house!=address(0) && c.registrar!=address(0) && c.opens<c.closes && c.closes<=c.drawAt);
         require(recipients.length>0 && recipients.length<=32);
+        require(donation != address(0) && donation != c.house && donation != address(this), "Invalid donation wallet");
+        donationWallet = donation;
         config=c;
         previous=prior;
         badges=new StreakBadges();
@@ -125,6 +128,8 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
         config.currency.safeTransferFrom(msg.sender,address(this),count*1e6);
         _enter(count,nominee,false);
         paidBy[msg.sender] += count * 1e6;
+        config.currency.safeTransfer(donationWallet, count * 340000);
+        config.currency.safeTransfer(config.house, count * 330000);
         if (lockedClose == 0 && sold >= 6000) lockedClose = scheduledClose;
     }
     function claimFree(uint256 nominee) external nonReentrant {
@@ -208,9 +213,7 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
             charity=charities[0];
             for(uint256 i=1;i<charities.length;i++) if(votes[charities[i]]>votes[charity]) charity=charities[i];
             deadline=block.timestamp+30 days;
-            config.currency.safeTransfer(charity,sold*340000);
-            config.currency.safeTransfer(config.house,sold*330000);
-            emit Settled(charity,sold*340000,sold*330000);
+            emit Settled(charity, outstanding);
         }
     }
     function claim(uint256 id) external nonReentrant {

@@ -26,7 +26,7 @@ async function loadHistory(){
       list.append(item);
     }
     if(count)sections.push(list);else{let message=document.createElement('p');message.textContent='No winning serials published.';sections.push(message)}
-    let receipt=document.createElement('p');receipt.textContent='Round escrow '+addr;if(cfg.chainId===8453){let a=document.createElement('a');a.href='https://basescan.org/address/'+addr+'#tokentxns';a.textContent=' View transfers';receipt.append(a)}sections.push(receipt);
+    let receipt=document.createElement('p');receipt.textContent='Prize escrow '+addr;if(cfg.chainId===8453){let a=document.createElement('a');a.href='https://basescan.org/address/'+addr+'#tokentxns';a.textContent=' View transfers';receipt.append(a)}sections.push(receipt);
     addr=await past.previous();
   }
   box.replaceChildren(...sections);if(!sections.length)box.textContent='This is the first linked round.';
@@ -62,7 +62,7 @@ async function refresh(){
   $('time-label').textContent=awaitingThreshold?'Next sales checkpoint':minted===10000n&&!drawFinished?'Sold out · draw can start':'Draw time';
   if(minted===10000n&&!drawFinished){targetTime=0;$('countdown').textContent=''}
   tick();
-  $('escrow').textContent='Round escrow '+cfg.address;
+  $('escrow').textContent='Prize escrow '+cfg.address;
   if(cfg.chainId===8453){const link=document.createElement('a');link.href='https://basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
   $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=targetTime?new Date(targetTime*1000).toLocaleString():'';
   $('ladder').replaceChildren(...[150000n,80000n,50000n,30000n,20000n].map(rate=>{let li=document.createElement('li');li.textContent=fmt(sold*rate)+(cfg.local ? "" : " in ETH");return li}));
@@ -77,7 +77,7 @@ async function refresh(){
   $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();
   $('round-notice').textContent=cancelled || expired ? 'Round ended. The House will send full USDC refunds to the original buyers.' : postponed && !closed && sold<6000n
-    ? 'Round postponed. Tickets and the full pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + new Date(Number(salesClose)*1000).toLocaleString() + '.'
+    ? 'Round postponed. Tickets and the full prize pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + new Date(Number(salesClose)*1000).toLocaleString() + '.'
     : '';
   if(account){let count=Number(await contract.balanceOf(account));let ids=await Promise.all(Array.from({length:count},(_,i)=>contract.tokenOfOwnerByIndex(account,i)));$('tickets').textContent=ids.map(n=>'#'+String(n).padStart(5,'0')).join(' · ')||'No tickets in this wallet.'}
   const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Register ETH prize claim';b.onclick=()=>act(()=>contract.claim(id));li.append(' ',b)}list.push(li)}

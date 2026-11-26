@@ -10,7 +10,7 @@ if(cmd==='deploy'){
   const config=JSON.parse(fs.readFileSync(arg));
   Object.assign(config.round,weeklySchedule(config.monday));
   if(!config.publicRpc)throw Error('A public RPC URL is required for players');
-  const r=await new ContractFactory(a.abi,a.evm.bytecode.object,wallet).deploy(config.round,config.charities,config.previous||'0x'+'00'.repeat(20));
+  const r=await new ContractFactory(a.abi,a.evm.bytecode.object,wallet).deploy(config.round,config.charities,config.previous||'0x'+'00'.repeat(20),config.donationWallet);
   await r.waitForDeployment();
   fs.writeFileSync('public/round.json',JSON.stringify({address:r.target,chainId:chain,rpc:config.publicRpc,labels:config.labels},null,2));
   console.log(r.target);

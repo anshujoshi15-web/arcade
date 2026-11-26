@@ -25,8 +25,8 @@ async function refresh() {
   const now = BigInt(block.timestamp);
   const address = await round.getAddress();
   const currency = new Contract(config.currency, ['function balanceOf(address) view returns(uint256)'], round.runner);
-  const [escrow, salesClose, cutoff] = await Promise.all([
-    currency.balanceOf(address), round.salesClose(), round.postponementLimit().catch(() => null)
+  const [escrow, salesClose, cutoff, donationWallet, donationRecipient] = await Promise.all([
+    currency.balanceOf(address), round.salesClose(), round.postponementLimit().catch(() => null), round.donationWallet().catch(() => null), round.charity()
   ]);
   const phase = cancelled ? 'Ended · manual refunds' : expired ? 'Four-week limit reached · end round to recover funds' : deadline ? 'Settled' : seeded ? 'Ready to finalize' : request ? 'Waiting for VRF' :
     closed ? 'Closed · draw pending' : postponed && sold < 6000n ? 'Postponed · sales open' :
@@ -36,8 +36,14 @@ async function refresh() {
     Network: String(chainId),
     Round: String(config.edition),
     Status: phase,
-    'Escrow balance': usdc(escrow),
+    'Contract escrow balance': usdc(escrow),
     'Gross ticket payments': usdc(sold * 1000000n),
+    ...(donationWallet ? {
+      'Donation wallet': donationWallet,
+      'Selected donation recipient': donationRecipient === ZeroAddress ? 'Selected at settlement' : donationRecipient,
+      'Donation allocation transferred': usdc(sold * 340000n),
+      'House allocation transferred': usdc(sold * 330000n)
+    } : {}),
     'Prize allocation': usdc(sold * 330000n),
     'Paid tickets': sold.toString(),
     'Paid tickets still needed': (sold < 6000n ? 6000n - sold : 0n).toString(),
