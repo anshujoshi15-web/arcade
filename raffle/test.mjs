@@ -22,6 +22,26 @@ await assert.rejects(failed.connect(buyer).claimFree.staticCall(0));
 await chain.request({method:'evm_increaseTime',params:[604800]});await chain.request({method:'evm_mine',params:[]});
 await tx(failed.connect(buyer).claimFree(0));
 assert.equal(await failed.postponements(),2n);
+assert.equal(await failed.paidBy(buyer.address),1000000n);
+await assert.rejects(failed.connect(buyer).emergencyClose.staticCall());
+await assert.rejects(failed.connect(house).recoverFunds.staticCall());
+await chain.request({method:'evm_increaseTime',params:[3*604800]});
+await chain.request({method:'evm_mine',params:[]});
+assert.equal(await failed.postponements(),4n);
+assert.equal(await failed.expired(),true);
+assert.equal(await failed.closed(),true);
+await assert.rejects(failed.connect(buyer).claimFree.staticCall(0));
+await assert.rejects(failed.requestDraw.staticCall());
+await tx(failed.connect(house).emergencyClose());
+assert.equal(await failed.cancelled(),true);
+await assert.rejects(failed.connect(buyer).recoverFunds.staticCall());
+const houseBeforeRecovery=await usd.balanceOf(house.address);
+await tx(failed.connect(house).recoverFunds());
+assert.equal(await usd.balanceOf(house.address),houseBeforeRecovery+1000000n);
+assert.equal(await usd.balanceOf(failed.target),0n);
+await assert.rejects(failed.connect(house).recoverFunds.staticCall());
+console.log('Passed four-week cutoff, House-only closure and full escrow recovery.');
+const houseBeforeRound=await usd.balanceOf(house.address);
 const r=await roundContract(), players=new Map();
 for(let i=1;i<=60;i++){
   const p=await account(i);players.set(p.address,p);
@@ -29,10 +49,10 @@ for(let i=1;i<=60;i++){
   for(let j=0;j<4;j++)await tx(r.connect(p).buy(25,0,{gasLimit:8000000}));
 }
 const free=await account(61);players.set(free.address,free);await tx(r.attest(free.address,2**40));await tx(r.connect(free).claimFree(0));await assert.rejects(r.connect(free).claimFree.staticCall(0));
-await close();await tx(r.requestDraw());await tx(vrf.deliver(1,774));await tx(r.finalize({gasLimit:3000000}));
-assert.equal(await usd.balanceOf(charity.address),2040_000000n);assert.equal(await usd.balanceOf(house.address),1980_000000n);
+await close();await tx(r.requestDraw());await assert.rejects(r.connect(house).emergencyClose.staticCall());await tx(vrf.deliver(1,774));await tx(r.finalize({gasLimit:3000000}));
+assert.equal(await usd.balanceOf(charity.address),2040_000000n);assert.equal(await usd.balanceOf(house.address),houseBeforeRound+1980_000000n);
 const recipients=new Set();
-for(let i=0;i<5;i++){const id=await r.winners(i),owner=await r.claimant(id);recipients.add(owner);if(i===0){await tx(r.connect(players.get(owner)).transferFrom(owner,free.address,id));await tx(r.connect(players.get(owner)).claim(id));assert.equal(await r.award(id),900_000000n)}}
+for(let i=0;i<5;i++){const id=await r.winners(i),owner=await r.claimant(id);recipients.add(owner);if(i===0){await tx(r.connect(players.get(owner)).transferFrom(owner,free.address,id));const before=await usd.balanceOf(house.address);await tx(r.connect(players.get(owner)).claim(id));assert.equal(await usd.balanceOf(house.address),before+900_000000n);assert.equal(await r.award(id),900_000000n)}}
 assert.equal(recipients.size,5);
 await chain.request({method:'evm_increaseTime',params:[31*86400]});await chain.request({method:'evm_mine',params:[]});await tx(r.sweep());assert.equal(await usd.balanceOf(r.target),0n);
 // Advance a separate series one week at a time and exercise all streak milestones.

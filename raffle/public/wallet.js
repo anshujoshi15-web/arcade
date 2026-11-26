@@ -21,7 +21,7 @@ async function loadHistory(){
     const count=Number(await past.places()),list=document.createElement('ol');
     for(let i=0;i<count;i++){const serial=await past.winners(i);let item=document.createElement('li');item.textContent='#'+serial+' · '+await past.claimant(serial)+' · '+fmt(await past.award(serial));
       if(account===await past.claimant(serial) && await past.deadline()>=BigInt(Math.floor(Date.now()/1000)) && !await past.claimed(serial)){
-        const button=document.createElement('button');button.textContent='Claim';button.onclick=()=>act(()=>past.connect(signer).claim(serial));item.append(' ',button);
+        const button=document.createElement('button');button.textContent='Register ETH prize claim';button.onclick=()=>act(()=>past.connect(signer).claim(serial));item.append(' ',button);
       }
       list.append(item);
     }
@@ -55,7 +55,7 @@ async function connect(authorizedAddress){
   historyLoaded=false;contract=new Contract(cfg.address,abi,signer);await refresh();return account;
 }
 async function refresh(){
-  const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity()]);
+  const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false)]);
   $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':'Chain '+cfg.chainId;
   awaitingThreshold=sold<6000n;
   targetTime=Number(awaitingThreshold?salesClose:drawTime);drawFinished=deadline>0n;
@@ -76,11 +76,11 @@ async function refresh(){
   let prior=await contract.previous();
   $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();
-  $('round-notice').textContent=postponed && !closed && sold<6000n
+  $('round-notice').textContent=cancelled || expired ? 'Round ended. The House will send full USDC refunds to the original buyers.' : postponed && !closed && sold<6000n
     ? 'Round postponed. Tickets and the full pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + new Date(Number(salesClose)*1000).toLocaleString() + '.'
     : '';
   if(account){let count=Number(await contract.balanceOf(account));let ids=await Promise.all(Array.from({length:count},(_,i)=>contract.tokenOfOwnerByIndex(account,i)));$('tickets').textContent=ids.map(n=>'#'+String(n).padStart(5,'0')).join(' · ')||'No tickets in this wallet.'}
-  const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Claim prize';b.onclick=()=>act(()=>contract.claim(id));li.append(' ',b)}list.push(li)}
+  const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Register ETH prize claim';b.onclick=()=>act(()=>contract.claim(id));li.append(' ',b)}list.push(li)}
   $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+new Date(Number(deadline)*1000).toLocaleString():closed?'Entries closed.':'Draw pending.';
 }
 async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}

@@ -8,6 +8,7 @@ if(![31337,1337,84532].includes(cfg.chainId)||Number((await rpc.getNetwork()).ch
 const round=new Contract(cfg.address,JSON.parse(fs.readFileSync('HouseRaffle.json')).abi,new Wallet(process.env.OPERATOR_KEY,rpc));
 for(;;){
   try{
+    if (await round.cancelled() || await round.expired()) { console.log('Round ended. The House must recover funds and issue manual refunds.'); break; }
     const now=(await rpc.getBlock('latest')).timestamp;
     const deadline=Number(await round.deadline());
     if(deadline && now>deadline){

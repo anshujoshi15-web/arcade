@@ -34,6 +34,8 @@ Deploy the revised HouseRaffle bytecode for these rules. A previously deployed r
 
 Rollover uses exact seven-day UTC intervals. A round spanning a Mountain Time daylight-saving transition retains its UTC cadence and can shift by one hour in local time.
 
-## Soft opening and ETH payout plan
+## Escrow, manual ETH payouts, and refunds
 
-The hosted site disables paid raffle entry during the soft opening. Free entry uses a configured raffle round and its existing eligibility checks. The current HouseRaffle artifact pays prizes in USDC and retains that behavior on chain. The House plans to convert prize funds manually and send ETH to winning wallets. Before opening paid rounds, confirm how the House will access prize funds for conversion and how the manual payout will be reconciled against on-chain claims. The existing contract provides a funded USDC claim path for winners. The other four games remain Coming Soon with rules and practice previews.
+Paid entry on the hosted site remains disabled during the soft opening. Deploy the revised contract to use these rules. Ticket USDC remains in a single contract escrow until settlement or recovery. After the draw settles, the contract sends 34% to the donation recipient and 33% to the House, reserving the rest for prize claims. A snapshot winner’s claim releases their prize allocation in USDC to the House. The House pays the winner in Base ETH and publishes the conversion rate and ETH transaction. Unclaimed allocations go to the donation recipient after 30 days.
+
+The first sales checkpoint can advance by up to four weeks. At the limit, the contract closes entries if there are fewer than 6,000 paid tickets. Before a randomness request, the House can end a round via `emergencyClose()`. The House can then call `recoverFunds()` to transfer the escrow balance to its wallet. Use the public entry events and `paidBy(address)` to reconcile original buyers and pay full USDC refunds manually. Free entries have no refund value. The admin dashboard provides both actions.

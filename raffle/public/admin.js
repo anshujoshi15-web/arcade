@@ -5,20 +5,20 @@ const status = message => { field('status').textContent = message; };
 const errorText = error => error.shortMessage || error.message;
 let round, walletRound, walletAddress, chainId, busy = false;
 
-const actions = ['draw', 'finalize', 'sweep', 'grant', 'revoke'];
+const actions = ['cancel-round', 'recover-funds', 'draw', 'finalize', 'sweep', 'grant', 'revoke'];
 function disableActions() {
   for (const action of actions) field(action).disabled = true;
 }
 
 async function refresh() {
   disableActions();
-  const [config, sold, minted, closed, request, seeded, deadline, outstanding, places, drawTime, postponed] = await Promise.all([
+  const [config, sold, minted, closed, request, seeded, deadline, outstanding, places, drawTime, postponed, cancelled, expired] = await Promise.all([
     round.config(), round.sold(), round.minted(), round.closed(), round.requestId(),
-    round.seeded(), round.deadline(), round.outstanding(), round.places(), round.drawTime(), round.postponements()
+    round.seeded(), round.deadline(), round.outstanding(), round.places(), round.drawTime(), round.postponements(), round.cancelled().catch(()=>null), round.expired().catch(()=>false)
   ]);
   const block = await round.runner.getBlock('latest');
   const now = BigInt(block.timestamp);
-  const phase = deadline ? 'Settled' : seeded ? 'Ready to finalize' : request ? 'Waiting for VRF' :
+  const phase = cancelled ? 'Ended · manual refunds' : expired ? 'Four-week limit reached · end round to recover funds' : deadline ? 'Settled' : seeded ? 'Ready to finalize' : request ? 'Waiting for VRF' :
     closed ? 'Closed · draw pending' : postponed && sold < 6000n ? 'Postponed · sales open' :
     now < config.opens ? 'Scheduled' : 'Entries open';
   const details = {
@@ -40,7 +40,10 @@ async function refresh() {
     return [term, description];
   }));
   if (!walletRound || busy) return;
-  field('draw').disabled = !(sold >= 6000n && !request && (now >= drawTime || minted === 10000n));
+  const isHouse = walletAddress.toLowerCase() === config.house.toLowerCase();
+  field('cancel-round').disabled = !isHouse || cancelled !== false || Boolean(request);
+  field('recover-funds').disabled = !isHouse || cancelled !== true;
+  field('draw').disabled = cancelled === true || !(sold >= 6000n && !request && (now >= drawTime || minted === 10000n));
   field('finalize').disabled = !seeded || Boolean(deadline);
   field('sweep').disabled = !(deadline && now > deadline && outstanding);
   const isRegistrar = walletAddress.toLowerCase() === config.registrar.toLowerCase();
@@ -111,6 +114,10 @@ async function initialize() {
 }
 
 field('refresh').onclick = () => refresh().catch(error => status(errorText(error)));
+field('cancel-round').onclick = () => {
+  if (window.confirm('Cancel this round permanently? Entries and the draw will stop. The House must refund buyers in full.')) void send('emergencyClose');
+};
+field('recover-funds').onclick = () => send('recoverFunds');
 field('draw').onclick = () => send('requestDraw');
 field('finalize').onclick = () => send('finalize');
 field('sweep').onclick = () => send('sweep');
