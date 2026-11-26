@@ -17,7 +17,7 @@ function pageContent(file) {
   return fs.readFileSync(file, 'utf8')
     .replace('<!-- arcade-footer -->', footer)
     .replace(/(<title>)/i, '<link rel="icon" type="image/png" href="/arcade-favicon.png?v=3"><link rel="apple-touch-icon" href="/arcade-logo.png?v=3">$1')
-    .replace(/(<a (?:href="\/" class="arcade-brand"|class="arcade-brand" href="\/")>)House Arcade<\/a>/, '$1<img src="/arcade-logo.png?v=3" alt="" width="42" height="42"><span>House Arcade</span></a>');
+    .replace(/(<a (?:href="\/" class="arcade-brand"|class="arcade-brand" href="\/")>)House Arcade<\/a>/, '$1<img src="/arcade-logo.png?v=3" alt="" width="36" height="36"><span>House Arcade</span></a>');
 }
 const roundFile = publicFile('round.json');
 const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
