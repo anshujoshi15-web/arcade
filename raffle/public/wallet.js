@@ -1,3 +1,4 @@
+import {formatUtc} from '/utc-time.js';
 import {setupWalletButton} from '/wallet-button.js';
 import {BrowserProvider,Contract,JsonRpcProvider,formatUnits} from '/ethers.js';
 const $=id=>document.getElementById(id);
@@ -56,6 +57,7 @@ async function connect(authorizedAddress){
 }
 async function refresh(){
   const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false)]);
+  $('opens-at').textContent = formatUtc(c.opens);
   $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':'Chain '+cfg.chainId;
   awaitingThreshold=sold<6000n;
   targetTime=Number(awaitingThreshold?salesClose:drawTime);drawFinished=deadline>0n;
@@ -64,7 +66,7 @@ async function refresh(){
   tick();
   $('escrow').textContent='Prize escrow '+cfg.address;
   if(cfg.chainId===8453){const link=document.createElement('a');link.href='https://basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
-  $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=targetTime?new Date(targetTime*1000).toLocaleString():'';
+  $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=targetTime?formatUtc(targetTime):'';
   $('ladder').replaceChildren(...[150000n,80000n,50000n,30000n,20000n].map(rate=>{let li=document.createElement('li');li.textContent=fmt(sold*rate)+(cfg.local ? "" : " in ETH");return li}));
   if(!$('nominee').length){for(let i=0;i<Number(await contract.charityCount());i++){
     let addr=await contract.charities(i);$('nominee').add(new Option(cfg.labels?.[addr]||addr,i));
@@ -77,11 +79,11 @@ async function refresh(){
   $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();
   $('round-notice').textContent=cancelled ? 'Round ended by the House. Full USDC refunds will be sent to original buyers.' : expired ? 'The four-week limit has been reached. Entries are closed and the round is awaiting formal closure by the House.' : postponed && !closed && sold<6000n
-    ? 'Round postponed. Tickets and the full prize pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + new Date(Number(salesClose)*1000).toLocaleString() + '.'
+    ? 'Round postponed. Tickets and the full prize pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + formatUtc(salesClose) + '.'
     : '';
   if(account){let count=Number(await contract.balanceOf(account));let ids=await Promise.all(Array.from({length:count},(_,i)=>contract.tokenOfOwnerByIndex(account,i)));$('tickets').textContent=ids.map(n=>'#'+String(n).padStart(5,'0')).join(' · ')||'No tickets in this wallet.'}
   const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Register ETH prize claim';b.onclick=()=>act(()=>contract.claim(id));li.append(' ',b)}list.push(li)}
-  $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+new Date(Number(deadline)*1000).toLocaleString():closed?'Entries closed.':'Draw pending.';
+  $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+formatUtc(deadline):closed?'Entries closed.':'Draw pending.';
 }
 async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
 $('buy').onclick = () => act(async () => {

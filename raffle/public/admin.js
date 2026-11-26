@@ -1,3 +1,4 @@
+import {formatUtc} from '/utc-time.js';
 import { BrowserProvider, Contract, JsonRpcProvider, ZeroAddress, getAddress, formatUnits } from '/ethers.js';
 
 const field = id => document.getElementById(id);
@@ -6,7 +7,6 @@ const errorText = error => error.shortMessage || error.message;
 let round, walletRound, walletAddress, chainId, busy = false;
 
 const usdc = amount => formatUnits(amount, 6) + ' USDC';
-const date = timestamp => new Date(Number(timestamp) * 1000).toLocaleString();
 let buyerLedger = [];
 let claimLedger = [];
 
@@ -48,10 +48,11 @@ async function refresh() {
     'Paid tickets': sold.toString(),
     'Paid tickets still needed': (sold < 6000n ? 6000n - sold : 0n).toString(),
     'Postponements used': postponed.toString() + ' of 4',
-    'Sales checkpoint': date(salesClose),
-    'Four-week cutoff': cutoff ? date(cutoff) : 'Unavailable for this contract',
-    'Draw time': date(drawTime),
-    'Claim deadline': deadline ? date(deadline) : 'Opens after settlement',
+    'Entries open': formatUtc(config.opens),
+    'Sales checkpoint': formatUtc(salesClose),
+    'Four-week cutoff': cutoff ? formatUtc(cutoff) : 'Unavailable for this contract',
+    'Draw time': formatUtc(drawTime),
+    'Claim deadline': deadline ? formatUtc(deadline) : 'Opens after settlement',
     'House wallet': config.house,
     'Total minted': minted.toString(),
     'Winners selected': places.toString(),
@@ -230,7 +231,7 @@ field('eligibility').onsubmit = event => {
     const player = getAddress(field('player').value.trim());
     if (player === ZeroAddress) throw new Error('Enter a player wallet address.');
     const revoke = event.submitter?.value === 'revoke';
-    const expiry = Math.floor(new Date(field('expiry').value).getTime() / 1000);
+    const expiry = Math.floor(Date.parse(field('expiry').value + 'Z') / 1000);
     if (!revoke && (!Number.isFinite(expiry) || expiry <= Date.now() / 1000)) throw new Error('Choose a future expiry.');
     void send('attest', player, revoke ? 0 : expiry);
   } catch (error) { status(errorText(error)); }

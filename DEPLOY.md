@@ -32,7 +32,7 @@ Admin sign-in is restricted to House wallet `0x6736d2eA9807297F0e56967361B941085
 
 Deploy the revised HouseRaffle bytecode for these rules. A previously deployed raffle retains its original contract rules. When sales are below 6,000 paid tickets, the on-chain checkpoint advances automatically by seven days and tickets and escrow remain in the same round. After the threshold is reached, the current sales checkpoint and draw time are fixed. Free and bonus entries share a 4,000-entry cap so paid sales can always reach the draw threshold. Each wallet may claim one free entry per seven-day period from the opening time, within its 100-entry round cap.
 
-Rollover uses exact seven-day UTC intervals. A round spanning a Mountain Time daylight-saving transition retains its UTC cadence and can shift by one hour in local time.
+The site and Admin display round times in UTC. Rollover uses exact seven-day UTC intervals. For the example first mainnet round, the final four values of the constructor tuple are `1795699800,1796000400,1796007600,1`, corresponding to 26 November 2026 at 13:30 UTC (opening), 30 November at 01:00 UTC (checkpoint), and 30 November at 03:00 UTC (draw). Replace the schedule before deployment if it has passed.
 
 ## Escrow, manual ETH payouts, and refunds
 

@@ -20,6 +20,7 @@ const roundFile = publicFile('round.json');
 const upcoming = new Set(Object.keys(gameRules));
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
 const routes = new Map([
+  ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],
   ['/rules', ['text/html', publicFile('rules.html')]],
   ['/appkit.js', ['text/javascript', publicFile('generated/appkit.js')]],
   ['/spin-wheel', ['text/html', publicFile('game-preview.html')]],

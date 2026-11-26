@@ -16,7 +16,7 @@
 <p id="status" role="status">Loading round configuration…</p>
 <div class="grid">
 <section><h2>Round status</h2><dl id="round"></dl><button id="cancel-round" disabled>End round</button><button id="recover-funds" disabled>Recover prize escrow for refunds</button><button id="refresh" disabled>Refresh status</button><button id="draw" disabled>Request draw</button><button id="finalize" disabled>Finalize draw</button><button id="sweep" disabled>Send expired prizes to charity</button><p>Draw and settlement actions follow the contract’s rules and can be called by any wallet when eligible.</p></section>
-<section><h2>Player eligibility</h2><p>Only the registrar wallet can grant or revoke entry eligibility. Verify the player’s eligibility before granting access.</p><form id="eligibility"><label for="player">Player wallet address</label><input id="player" required placeholder="0x…"><label for="expiry">Expiry in your local time</label><input id="expiry" type="datetime-local"><button id="grant" value="grant" disabled>Grant eligibility</button><button id="revoke" value="revoke" disabled>Revoke eligibility</button></form></section>
+<section><h2>Player eligibility</h2><p>Only the registrar wallet can grant or revoke entry eligibility. Verify the player’s eligibility before granting access.</p><form id="eligibility"><label for="player">Player wallet address</label><input id="player" required placeholder="0x…"><label for="expiry">Expiry in UTC</label><input id="expiry" type="datetime-local"><button id="grant" value="grant" disabled>Grant eligibility</button><button id="revoke" value="revoke" disabled>Revoke eligibility</button></form></section>
 </div>
 <section>
 <h2>Refund ledger and ETH claim queue</h2>
