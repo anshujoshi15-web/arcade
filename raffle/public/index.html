@@ -35,7 +35,7 @@
     <div id="game" hidden>
       <section class="round-metrics" aria-label="Round statistics">
         <div><span>Tickets available</span><strong id="available"></strong></div>
-        <div class="live-pool"><span>Live prize pool</span><strong id="pool"></strong><small>USD value paid in ETH</small><small>Each paid ticket adds $0.33 in prize value.</small></div>
+        <div class="live-pool"><span>Live prize pool</span><strong id="pool"></strong><small>USD value paid in Base ETH</small><small>Each paid ticket adds $0.33 in prize value.</small></div>
         <div><span id="time-label">Draw time</span><strong id="countdown"></strong><small id="when"></small></div>
       </section>
       <section class="raffle-card draw-progress">
@@ -59,24 +59,28 @@
         </section>
         <section class="raffle-card">
           <h2>Prize ladder</h2>
-          <p>At 10,000 paid tickets. Actual prizes scale with paid sales and are paid in ETH.</p>
+          <p>At 10,000 paid tickets. Actual prizes scale with paid sales and are paid in Base ETH.</p>
           <ol class="prize-ladder">
-            <li>$1,500 in ETH</li>
-            <li>$800 in ETH</li>
-            <li>$500 in ETH</li>
-            <li>$300 in ETH</li>
-            <li>$200 in ETH</li>
+            <li>$1,500 in Base ETH</li>
+            <li>$800 in Base ETH</li>
+            <li>$500 in Base ETH</li>
+            <li>$300 in Base ETH</li>
+            <li>$200 in Base ETH</li>
           </ol>
         </section>
       </div>
+      <section class="raffle-card"><h2>House-token streak bonuses</h2><p>House-token bonuses are planned for 2-, 4-, 8-, and 12-week participation streaks. Players can choose EVO, Kaboom, King Joshi, Queen Joshi, or KIND. The House publishes bonus amounts before an eligible round opens and funds them separately from donations and the main prize pool. House tokens carry no promised value.</p></section>
       <section class="raffle-card" aria-labelledby="my-tickets-title">
         <h2 id="my-tickets-title">My tickets</h2>
         <p>Purchased and free tickets are minted to the wallet used to enter. Wallet apps may take time to show new tickets.</p>
         <div id="tickets">Connect your wallet to see your tickets.</div>
       </section>
+      <section class="raffle-card"><h2>Raffle ticket contract and wallets</h2>
+        <p id="escrow"></p><p id="house-wallet"></p><p id="donation-wallet"></p>
+      </section>
       <section class="raffle-card"><h2>Draw results</h2><ol id="winners"></ol><p id="receipt"></p></section>
       <section class="raffle-card"><h2>Hall of Winners</h2><div id="history"></div></section>
-      <div class="raffle-card"><details><summary>Round rules, eligibility and odds</summary><p>Each round offers 10,000 serials. A purchase can contain 1–25 tickets, and each wallet can receive up to 100 entries. Free and bonus tickets use the same serial pool, with up to 4,000 combined so 6,000 slots remain available for paid entry. Five distinct wallets win. A single ticket in a full round has a 1 in 10,000 chance at first place.</p><p>A draw requires 6,000 paid entries. Below that threshold, sales stay open and tickets and the full pot carry forward. Refunds are available only if the House cancels or formally closes the round without a draw. In that case, the House refunds original buyers in full in USDC. Gold, Early and streak marks are collectible traits and carry the same draw weight as other serials.</p><p>Each entrant’s first nomination counts once. Tied charities follow their published order in the nomination menu. The charity receives 34% of paid entries, the House receives 33%, and the five prizes total 33%. Winners have 30 days to claim. Unclaimed prizes go to the winning charity.</p><p>Entry is for adults meeting the round’s age and location requirements. Check your wallet’s entry status above. A ticket has no promised resale value.</p><p id="escrow"></p></details></div>
+      <div class="raffle-card"><details><summary>Round rules, eligibility and odds</summary><p>Each round offers 10,000 serials. A purchase can contain 1–25 tickets, and each wallet can receive up to 100 entries. Free and bonus tickets use the same serial pool, with up to 4,000 combined so 6,000 slots remain available for paid entry. Five distinct wallets win. A single ticket in a full round has a 1 in 10,000 chance at first place.</p><p>A draw requires 6,000 paid entries. Below that threshold, sales stay open and tickets and the full pot carry forward. Refunds are available only if the House cancels or formally closes the round without a draw. In that case, the House refunds original buyers in full in USDC. Gold, Early and streak marks are collectible traits and carry the same draw weight as other serials.</p><p>Each entrant’s first nomination counts once. Tied charities follow their published order in the nomination menu. The charity receives 34% of paid entries, the House receives 33%, and the five prizes total 33%. Winners have 30 days to claim. Unclaimed prizes go to the winning charity.</p><p>Entry is for adults meeting the round’s age and location requirements. Check your wallet’s entry status above. A ticket has no promised resale value.</p></details></div>
     </div>
   </div>
 </main>

@@ -28,7 +28,7 @@ async function loadHistory(){
       list.append(item);
     }
     if(count)sections.push(list);else{let message=document.createElement('p');message.textContent='No winning serials published.';sections.push(message)}
-    let receipt=document.createElement('p');receipt.textContent='Prize escrow '+addr;if(cfg.chainId===8453){let a=document.createElement('a');a.href='https://basescan.org/address/'+addr+'#tokentxns';a.textContent=' View transfers';receipt.append(a)}sections.push(receipt);
+    let receipt=document.createElement('p');receipt.textContent='Raffle ticket contract '+addr;if(cfg.chainId===8453){let a=document.createElement('a');a.href='https://basescan.org/address/'+addr+'#tokentxns';a.textContent=' View transfers';receipt.append(a)}sections.push(receipt);
     addr=await past.previous();
   }
   box.replaceChildren(...sections);if(!sections.length)box.textContent='This is the first linked round.';
@@ -95,8 +95,22 @@ async function showOwnedTickets() {
   container.replaceChildren(list);
 }
 
+function showAddress(id, label, address, fragment = '') {
+  const field = $(id);
+  field.textContent = label + ': ';
+  if (!address || cfg.chainId !== 8453) {
+    field.append(address || 'Unavailable for this contract');
+    return;
+  }
+  const link = document.createElement('a');
+  link.href = 'https://basescan.org/address/' + address + fragment;
+  link.textContent = address;
+  link.style.overflowWrap = 'anywhere';
+  field.append(link);
+}
+
 async function refresh(){
-  const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired,publicPaidEntry]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false),contract.publicPaidEntry().catch(()=>false)]);
+  const [donation,c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired,publicPaidEntry]=await Promise.all([contract.donationWallet().catch(()=>null),contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false),contract.publicPaidEntry().catch(()=>false)]);
   $('paid-progress').value = Math.min(Number(sold), 6000);
   $('paid-progress-label').textContent = sold.toLocaleString('en-US') + (sold >= 6000n ? ' paid tickets · threshold met' : ' of 6,000 paid tickets');
   $('pool-updated').textContent = 'Updated ' + formatUtc(Date.now() / 1000);
@@ -107,8 +121,9 @@ async function refresh(){
   $('time-label').textContent=awaitingThreshold?'Next sales checkpoint':minted===10000n&&!drawFinished?'Sold out · draw can start':'Draw time';
   if(minted===10000n&&!drawFinished){targetTime=0;$('countdown').textContent=''}
   tick();
-  $('escrow').textContent='Prize escrow '+cfg.address;
-  if(cfg.chainId===8453){const link=document.createElement('a');link.href='https://basescan.org/address/'+cfg.address+'#events';link.textContent=' View draw and settlement records';$('escrow').append(link)}
+  showAddress('escrow', 'Raffle ticket contract', cfg.address, '#events');
+  showAddress('house-wallet', 'House wallet', c.house);
+  showAddress('donation-wallet', 'Donation wallet', donation);
   $('available').textContent=(10000-Number(minted)).toLocaleString();$('pool').textContent=fmt(sold*330000n);$('when').textContent=targetTime?formatUtc(targetTime):'';
   if(!$('nominee').length){for(let i=0;i<Number(await contract.charityCount());i++){
     let addr=await contract.charities(i);$('nominee').add(new Option(cfg.labels?.[addr]||addr,i));

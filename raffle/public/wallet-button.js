@@ -47,9 +47,14 @@ export function setupWalletButton({
     connectInjected();
     return;
   }
-  button.disabled = true;
 
-  void import('/appkit.js').then(({appkit}) => {
+  button.onclick = async () => {
+    feedback.textContent = 'Loading wallet options…';
+    await ready;
+    feedback.textContent = '';
+    await button.onclick();
+  };
+  const ready = import('/appkit.js').then(({appkit}) => {
     let connected = false;
     let lastConnection;
     const update = () => {
