@@ -16,7 +16,7 @@ async function close(){await chain.request({method:'evm_increaseTime',params:[86
 const failed=await roundContract(),buyer=await account(1);
 await tx(usd.connect(buyer).faucet());await tx(usd.connect(buyer).approve(failed.target,1e6));await tx(failed.connect(buyer).buy(1,0));await close();assert.equal(await failed.closed(),false);assert.equal(await failed.postponements(),1n);
 assert.equal(await usd.balanceOf(failed.target),330000n);assert.equal(await usd.balanceOf(donation.address),340000n);assert.equal(await usd.balanceOf(house.address),330000n);assert.equal(await failed.ownerOf(1),buyer.address);
-await assert.rejects(failed.requestDraw.staticCall());
+await assert.rejects(failed.connect(house).requestDraw.staticCall());
 await assert.rejects(failed.connect(buyer).claimFree.staticCall(0), /Free entry requires eligibility/);
 await tx(failed.attest(buyer.address,2**40));
 await tx(failed.connect(buyer).claimFree(0));
@@ -33,7 +33,7 @@ assert.equal(await failed.postponements(),4n);
 assert.equal(await failed.expired(),true);
 assert.equal(await failed.closed(),true);
 await assert.rejects(failed.connect(buyer).claimFree.staticCall(0));
-await assert.rejects(failed.requestDraw.staticCall());
+await assert.rejects(failed.connect(house).requestDraw.staticCall());
 await tx(failed.connect(house).emergencyClose());
 assert.equal(await failed.cancelled(),true);
 await assert.rejects(failed.connect(buyer).recoverFunds.staticCall());
@@ -55,7 +55,7 @@ const free=await account(61);players.set(free.address,free);await tx(r.attest(fr
 assert.equal(await usd.balanceOf(r.target),1980_000000n);
 assert.equal(await usd.balanceOf(donation.address),donationBeforeRound+2040_000000n);
 assert.equal(await usd.balanceOf(house.address),houseBeforeRound+1980_000000n);
-await close();await tx(r.requestDraw());await assert.rejects(r.connect(house).emergencyClose.staticCall());await tx(vrf.deliver(1,774));await tx(r.finalize({gasLimit:3000000}));
+await close();await assert.rejects(r.connect(buyer).requestDraw.staticCall(), /House wallet only/);await tx(r.connect(house).requestDraw());await assert.rejects(r.connect(house).emergencyClose.staticCall());await tx(vrf.deliver(1,774));await tx(r.finalize({gasLimit:3000000}));
 assert.equal(await usd.balanceOf(charity.address),0n);assert.equal(await usd.balanceOf(donation.address),donationBeforeRound+2040_000000n);assert.equal(await usd.balanceOf(house.address),houseBeforeRound+1980_000000n);
 const recipients=new Set();
 for(let i=0;i<5;i++){const id=await r.winners(i),owner=await r.claimant(id);recipients.add(owner);if(i===0){await tx(r.connect(players.get(owner)).transferFrom(owner,free.address,id));const before=await usd.balanceOf(house.address);await tx(r.connect(players.get(owner)).claim(id));assert.equal(await usd.balanceOf(house.address),before+900_000000n);assert.equal(await r.award(id),900_000000n)}}

@@ -70,7 +70,7 @@ async function refresh() {
   const isHouse = walletAddress.toLowerCase() === config.house.toLowerCase();
   field('cancel-round').disabled = !isHouse || cancelled !== false || Boolean(request);
   field('recover-funds').disabled = !isHouse || cancelled !== true || escrow === 0n;
-  field('draw').disabled = cancelled === true || !(sold >= 6000n && !request && (now >= drawTime || minted === 10000n));
+  field('draw').disabled = !isHouse || cancelled === true || !(sold >= 6000n && !request && (now >= drawTime || minted === 10000n));
   field('finalize').disabled = !seeded || Boolean(deadline);
   field('sweep').disabled = !(deadline && now > deadline && outstanding);
   const isRegistrar = walletAddress.toLowerCase() === config.registrar.toLowerCase();

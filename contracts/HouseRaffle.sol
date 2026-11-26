@@ -193,6 +193,7 @@ contract HouseRaffle is ERC721Enumerable, ReentrancyGuard {
         emit FundsRecovered(config.house, amount);
     }
     function requestDraw() external nonReentrant {
+        require(msg.sender == config.house, "House wallet only");
         require(!cancelled && sold>=6000 && requestId==0 && (block.timestamp>=drawTime() || minted==10000));
         requestId=config.coordinator.requestRandomWords(ICoordinator.Request(config.keyHash,config.subscription,10,150000,1,
             abi.encodeWithSelector(bytes4(keccak256("VRF ExtraArgsV1")),false)));
