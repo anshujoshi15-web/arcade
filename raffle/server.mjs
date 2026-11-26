@@ -1,3 +1,5 @@
+import { homeMarkdown, llmsText, sitemap, structuredData, serverCard } from './agent-discovery.mjs';
+import { origin, contentSignal } from './public/arcade-agent-data.mjs';
 import { gameRules, upcomingRules } from './game-rules.mjs';
 import { adminAuth, isAdmin } from './admin-auth.mjs';
 import { enroll } from './local-enroll.mjs';
@@ -16,6 +18,8 @@ const footer = fs.readFileSync(publicFile('footer.html'), 'utf8');
 function pageContent(file) {
   return fs.readFileSync(file, 'utf8')
     .replace('<!-- arcade-footer -->', footer)
+    .replace('<!-- arcade-json-ld -->', () => '<script type="application/ld+json">' +
+      JSON.stringify(structuredData).replaceAll('<', '\\u003c') + '</script>')
     .replace(/(<title>)/i, '<link rel="icon" type="image/png" href="/arcade-favicon.png?v=3"><link rel="apple-touch-icon" href="/arcade-logo.png?v=3">$1')
     .replace(/(<a (?:href="\/" class="arcade-brand"|class="arcade-brand" href="\/")>)House Arcade<\/a>/, '$1<img src="/arcade-logo.png?v=3" alt="" width="36" height="36"><span>House Arcade</span></a>');
 }
@@ -23,7 +27,19 @@ const roundFile = publicFile('round.json');
 const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
 const upcoming = new Set(Object.keys(gameRules));
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
+const agentResources = new Map([
+  ['/index.md', ['text/markdown', homeMarkdown]],
+  ['/llms.txt', ['text/plain', llmsText]],
+  ['/sitemap.xml', ['application/xml', sitemap]],
+  ['/.well-known/mcp/server-card.json', ['application/json', JSON.stringify(serverCard)]],
+  ['/mcp/server-card', ['application/json', JSON.stringify(serverCard)]]
+]);
 const routes = new Map([
+  ['/robots.txt', ['text/plain; charset=utf-8', publicFile('robots.txt')]],
+  ['/about', ['text/html', publicFile('about.html')]],
+  ['/contact', ['text/html', publicFile('contact.html')]],
+  ['/webmcp.js', ['text/javascript', publicFile('webmcp.js')]],
+  ['/arcade-agent-data.mjs', ['text/javascript', publicFile('arcade-agent-data.mjs')]],
   ...['arcade-logo.png', 'arcade-favicon.png', 'arcade-share.png'].map(name => ['/' + name, ['image/png', publicFile(name)]]),
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],
@@ -57,6 +73,27 @@ for (const name of ['house-raffle-ticket-gold.svg', 'house-raffle-ticket-standar
 
 export function handleRequest(req, res) {
   const path = req.url.split('?')[0];
+  if (hosted && path === '/') {
+    res.setHeader('Vary', 'Accept');
+    res.setHeader('Content-Signal', contentSignal);
+    res.setHeader('Link', [
+      '<' + origin + '/index.md>; rel="alternate"; type="text/markdown"',
+      '<' + origin + '/llms.txt>; rel="describedby"; type="text/plain"',
+      '<' + origin + '/sitemap.xml>; rel="sitemap"; type="application/xml"'
+    ].join(', '));
+    if (req.accepts?.(['text/html', 'text/markdown']) === 'text/markdown') {
+      res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+      res.end(homeMarkdown);
+      return;
+    }
+  }
+  if (agentResources.has(path)) {
+    const [type, content] = agentResources.get(path);
+    res.setHeader('Content-Signal', contentSignal);
+    res.setHeader('Content-Type', type + '; charset=utf-8');
+    res.end(content);
+    return;
+  }
   if (path === '/admin/challenge' || path === '/admin/verify') {
     void adminAuth(req, res, path, hosted);
     return;

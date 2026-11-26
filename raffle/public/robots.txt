@@ -1,0 +1,7 @@
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
+Disallow: /admin
+Disallow: /local-enroll
+
+Sitemap: https://arcade.thehouseofjoshi.com/sitemap.xml
