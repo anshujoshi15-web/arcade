@@ -5,6 +5,7 @@ const $=id=>document.getElementById(id);
 const fmt=n=>Number(formatUnits(n,6)).toLocaleString('en-US',{style:'currency',currency:'USD'});
 const abi=await fetch('/abi.json').then(r=>r.json());
 const cfg=await fetch('/round.json').then(r=>r.json()).catch(()=>({error:'Unable to load the raffle round. Please refresh and try again.'}));
+const paidEntryEnabled = cfg.local === true || cfg.paidSalesEnabled === true;
 let provider,contract,signer,account,busy=false,historyLoaded=false;
 let targetTime=0,drawFinished=false,awaitingThreshold=false;
 function tick(){
@@ -74,7 +75,7 @@ async function refresh(){
   let now=BigInt(Math.floor(Date.now()/1000));let eligible=account && await contract.eligibleUntil(account)>=now;
   let canEnter=eligible && !closed && now>=c.opens;
   $('eligibility').textContent=account?(eligible?'Wallet verified for entry.':'This wallet needs an operator eligibility attestation.'):'Connect a wallet to enter.';
-  $('buy').disabled=!cfg.local||busy||!canEnter;$('free').disabled=busy||!canEnter||!freeCapacity||(account&&await contract.usedFree(account));
+  $('buy').disabled=!paidEntryEnabled||busy||!canEnter;$('free').disabled=busy||!canEnter||!freeCapacity||(account&&await contract.usedFree(account));
   let prior=await contract.previous();
   $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();
@@ -87,7 +88,7 @@ async function refresh(){
 }
 async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
 $('buy').onclick = () => act(async () => {
-  if (!cfg.local) throw Error('Paid entry is unavailable during the soft opening.');
+  if (!paidEntryEnabled) throw Error('Paid entry is unavailable during the soft opening.');
   const quantity = Number($('qty').value);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 25) throw Error('Enter 1–25 tickets.');
   const nominee = Number($('nominee').value);
@@ -98,10 +99,12 @@ $('buy').onclick = () => act(async () => {
   if (!buyer || !buyerSigner) throw Error('Connect a wallet first.');
   const {currency} = await raffle.config();
   const token = new Contract(currency, ['function allowance(address,address) view returns(uint256)',
-    'function approve(address,uint256) returns(bool)'], buyerSigner);
+    'function approve(address,uint256) returns(bool)', 'function balanceOf(address) view returns(uint256)'], buyerSigner);
   const price = BigInt(quantity) * 1000000n;
+  if (await token.balanceOf(buyer) < price) throw Error('You need ' + quantity + ' USDC on Base for this purchase.');
   if (await token.allowance(buyer, cfg.address) < price) await (await token.approve(cfg.address, price)).wait();
   if (session !== walletUpdate) throw Error('Your wallet changed. Reconnect and try again.');
+  await raffle.buy.staticCall(quantity, nominee);
   return raffle.buy(quantity, nominee);
 });
 $('bonus').onclick=()=>act(()=>contract.claimBonus(Number($('nominee').value)));$('free').onclick=()=>act(()=>contract.claimFree(Number($('nominee').value)));
@@ -140,7 +143,7 @@ async function useAppKitWallet(connection, readProvider) {
   await refresh();
   if (walletError && update === walletUpdate) throw walletError;
 }
-if (cfg.local) {
+if (paidEntryEnabled && cfg.address) {
   $('paid-entry').hidden = false;
   $('soft-open').hidden = true;
 }

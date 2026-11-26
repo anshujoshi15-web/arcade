@@ -95,12 +95,12 @@ export function handleRequest(req, res) {
       try {
         const configuredRound = process.env.PUBLIC_ROUND ? JSON.parse(process.env.PUBLIC_ROUND) : mainnetRound;
         const activeRound = configuredRound.chainId === 84532 ? mainnetRound : configuredRound;
-        const {address, chainId, rpc, labels, deploymentBlock} = activeRound;
+        const {address, chainId, rpc, labels, deploymentBlock, paidSalesEnabled} = activeRound;
         if (address && (!/^0x[0-9a-f]{40}$/i.test(address) ||
             /^0x0{40}$/i.test(address) || chainId !== 8453 ||
             new URL(rpc).protocol !== 'https:' ||
             (deploymentBlock !== undefined && (!Number.isSafeInteger(deploymentBlock) || deploymentBlock < 0)))) throw new Error('Invalid PUBLIC_ROUND');
-        res.end(JSON.stringify(address ? {address, chainId, rpc, labels, deploymentBlock} : {}));
+        res.end(JSON.stringify(address ? {address, chainId, rpc, labels, deploymentBlock, paidSalesEnabled: paidSalesEnabled === true} : {}));
       } catch {
         res.writeHead(503).end(JSON.stringify({error:'The raffle round is unavailable.'}));
       }

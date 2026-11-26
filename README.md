@@ -21,3 +21,5 @@ See the [Remix deployment and admin guide](DEPLOY.md) for constructor inputs and
 Run `npm ci` and `npm run build` before `npm start`. The build bundles the AppKit Ethers adapter into the browser asset served at `/appkit.js`. AppKit offers wallet extensions, mobile wallets, and WalletConnect QR codes on public pages. The House-only admin signature flow uses its existing browser-wallet connection.
 
 In the Reown project dashboard, allow `https://arcade.thehouseofjoshi.com` for the configured project. If the modal falls back to the browser extension, check that `/appkit.js` returns JavaScript and that the Hostinger build ran. If the modal opens but pairing fails, check the project's domain allowlist. The hosted raffle uses Base mainnet (8453).
+
+Paid entry is off by default for hosted rounds. Once paid play is cleared for a particular round, set the Boolean `"paidSalesEnabled": true` in that round’s `PUBLIC_ROUND` JSON and apply the Hostinger settings. Replacing the round configuration without the flag disables paid entry on the site. The setting controls the website’s purchase flow. Direct contract calls are governed by eligibility and the contract’s rules.
