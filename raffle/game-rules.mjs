@@ -42,6 +42,6 @@ export function upcomingRules(game) {
     game.headings.map(label => '<th scope="col">' + label + '</th>').join('') +
     '</tr></thead><tbody>' + rows + '</tbody></table>' +
     game.notes.map(note => '<p>' + note + '</p>').join('') +
-    '<p>Prize amounts are stated in dollars and planned for payment in ETH. Bonuses use a House token of the winner’s choice. The Arcade is in a soft opening, and this game has no public entries yet.</p>' +
+    '<p>Main prizes are quoted in USD. The House manually converts the prize funds to ETH and sends the equivalent amount in ETH to the winning wallet at payout. Bonuses use a House token of the winner’s choice. The Arcade is in a soft opening, and this game has no public entries yet.</p>' +
     '<p><a href="/rules">Read the Arcade General Rules</a></p></section>';
 }

@@ -36,4 +36,4 @@ Rollover uses exact seven-day UTC intervals. A round spanning a Mountain Time da
 
 ## Soft opening and ETH payout plan
 
-The hosted site disables paid raffle entry during the soft opening. Free entry uses a configured raffle round and its existing eligibility checks. The current HouseRaffle artifact pays prizes in USDC and retains that behavior on chain. The planned ETH terms require a compatible payout implementation and a reviewed conversion mechanism before enabling sales. The other four games remain Coming Soon with rules and practice previews.
+The hosted site disables paid raffle entry during the soft opening. Free entry uses a configured raffle round and its existing eligibility checks. The current HouseRaffle artifact pays prizes in USDC and retains that behavior on chain. The House plans to convert prize funds manually and send ETH to winning wallets. Before opening paid rounds, confirm how the House will access prize funds for conversion and how the manual payout will be reconciled against on-chain claims. The existing contract provides a funded USDC claim path for winners. The other four games remain Coming Soon with rules and practice previews.
