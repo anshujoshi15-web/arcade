@@ -84,16 +84,11 @@ async function showOwnedTickets() {
     label.textContent = serial;
     item.append(label);
     if (cfg.chainId === 8453) {
-      for (const [text, href] of [
-        ['OpenSea', 'https://opensea.io/item/base/' + address + '/' + id],
-        ['BaseScan', 'https://basescan.org/nft/' + address + '/' + id]
-      ]) {
-        const link = document.createElement('a');
-        link.href = href;
-        link.textContent = text;
-        link.setAttribute('aria-label', 'View ticket ' + serial + ' on ' + text);
-        item.append(link);
-      }
+      const link = document.createElement('a');
+      link.href = 'https://basescan.org/nft/' + address + '/' + id;
+      link.textContent = 'BaseScan';
+      link.setAttribute('aria-label', 'View ticket ' + serial + ' on BaseScan');
+      item.append(link);
     }
     list.append(item);
   }
