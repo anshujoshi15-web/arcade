@@ -17,6 +17,7 @@ function pageContent(file) {
   return fs.readFileSync(file, 'utf8').replace('<!-- arcade-footer -->', footer);
 }
 const roundFile = publicFile('round.json');
+const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
 const upcoming = new Set(Object.keys(gameRules));
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
 const routes = new Map([
@@ -92,8 +93,9 @@ export function handleRequest(req, res) {
     res.setHeader('Cache-Control', 'no-store');
     if (hosted) {
       try {
-        const {address, chainId, rpc, labels, deploymentBlock} = JSON.parse(process.env.PUBLIC_ROUND || '{}');
-        if (chainId === 84532) { res.end('{}'); return; }
+        const configuredRound = process.env.PUBLIC_ROUND ? JSON.parse(process.env.PUBLIC_ROUND) : mainnetRound;
+        const activeRound = configuredRound.chainId === 84532 ? mainnetRound : configuredRound;
+        const {address, chainId, rpc, labels, deploymentBlock} = activeRound;
         if (address && (!/^0x[0-9a-f]{40}$/i.test(address) ||
             /^0x0{40}$/i.test(address) || chainId !== 8453 ||
             new URL(rpc).protocol !== 'https:' ||
