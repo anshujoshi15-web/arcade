@@ -1,0 +1,50 @@
+body { font: 16px/1.5 system-ui, sans-serif; }
+.raffle-wrap { width: min(1120px, 92%); margin-inline: auto; }
+.raffle-hero { background: linear-gradient(125deg, #00184d, #102675 65%, #2020c7); color: white; padding: clamp(28px, 6vw, 66px) 0; }
+.raffle-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); gap: clamp(22px, 5vw, 60px); align-items: center; }
+.raffle-kicker { display: flex; flex-wrap: wrap; gap: 12px; color: #d3e1ff; font-size: 14px; }
+.raffle-kicker span + span:not(:empty)::before { content: "·"; margin-right: 12px; }
+.raffle-hero h1 { margin: 8px 0; font: 400 clamp(48px, 8vw, 96px)/.98 Georgia, serif; letter-spacing: -.045em; }
+.raffle-intro { max-width: 38ch; color: #e4ecff; font-size: clamp(17px, 2vw, 21px); }
+.raffle-hero figure { margin: 0; text-align: center; }
+.raffle-hero img { width: 100%; height: auto; display: block; filter: drop-shadow(0 14px 20px #060c325c); }
+.raffle-hero figcaption { margin-top: 8px; color: #d3e1ff; font-size: 13px; }
+.raffle-actions, .buy-line, .entry-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.raffle-actions a, .raffle-content button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 14px; border: 1px solid transparent; border-radius: 8px; font: inherit; font-weight: 650; text-decoration: none; }
+.raffle-actions .primary { background: white; color: #00184d; }
+.raffle-actions .secondary { border-color: #b0caff; color: white; }
+.raffle-content { padding: 18px 0 44px; }
+.raffle-content a { color: #0000cc; }
+.raffle-content .primary { background: #0000ff; color: white; }
+.raffle-content .secondary { background: #eef2ff; color: #00184d; border-color: #b0caff; }
+.raffle-content button { cursor: pointer; }
+.raffle-content button:disabled { opacity: .55; cursor: default; }
+.notice { background: #e9efff; border-left: 3px solid #0000ff; padding: 10px 14px; border-radius: 4px; }
+.notice:empty { display: none; }
+.round-metrics, .raffle-columns { display: grid; gap: 12px; }
+.round-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.round-metrics > div, .raffle-card { background: white; border: 1px solid #d3e1ff; border-radius: 12px; padding: clamp(12px, 2vw, 22px); overflow-wrap: anywhere; }
+.round-metrics span, .round-metrics small { display: block; color: #34517c; }
+.round-metrics strong { display: block; margin: 4px 0; font: 400 clamp(22px, 3vw, 38px)/1.1 Georgia, serif; }
+.raffle-card { margin-top: 12px; }
+.raffle-card h2 { margin: 0 0 8px; font: 400 clamp(24px, 4vw, 34px)/1.1 Georgia, serif; }
+.draw-progress > div { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.draw-progress p { margin: 4px 0; }
+.draw-progress progress { width: 100%; accent-color: #0000ff; margin: 10px 0 4px; }
+.raffle-columns { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+.raffle-card label { display: block; font-weight: 650; margin: 8px 0 4px; }
+.raffle-card input, .raffle-card select { padding: 8px; border: 1px solid #a4b6dc; border-radius: 6px; color: inherit; background: white; font: inherit; }
+.raffle-card select { width: 100%; }
+.raffle-card input { width: 5rem; }
+.entry-actions { margin-top: 12px; }
+.muted { color: #34517c; }
+.prize-ladder { padding-left: 26px; }
+.prize-ladder li { padding: 8px 0; border-bottom: 1px solid #d3e1ff; }
+.prize-ladder li:first-child { font-weight: 750; }
+summary { cursor: pointer; font-weight: 700; }
+@media (max-width: 700px) {
+  .raffle-hero-grid, .raffle-columns { grid-template-columns: 1fr; }
+  .raffle-hero figure { max-width: 420px; }
+  .round-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .round-metrics > div:last-child { grid-column: 1 / -1; }
+}

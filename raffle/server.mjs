@@ -21,6 +21,7 @@ const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', 
 const upcoming = new Set(Object.keys(gameRules));
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
 const routes = new Map([
+  ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],
   ['/rules', ['text/html', publicFile('rules.html')]],
   ['/appkit.js', ['text/javascript', publicFile('generated/appkit.js')]],
@@ -46,10 +47,8 @@ const routes = new Map([
   ['/wallet.js', ['text/javascript', publicFile('wallet.js')]],
   ['/ethers.js', ['text/javascript', ethersBundle]]
 ]);
-if (hosted) {
-  for (const name of ['house-raffle-ticket-gold.svg', 'house-raffle-ticket-standard.svg']) {
-    routes.set('/' + name, ['image/svg+xml', arcadeFile(name)]);
-  }
+for (const name of ['house-raffle-ticket-gold.svg', 'house-raffle-ticket-standard.svg']) {
+  routes.set('/' + name, ['image/svg+xml', arcadeFile(name)]);
 }
 
 export function handleRequest(req, res) {

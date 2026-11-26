@@ -58,6 +58,8 @@ async function connect(authorizedAddress){
 }
 async function refresh(){
   const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired,publicPaidEntry]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false),contract.publicPaidEntry().catch(()=>false)]);
+  $('paid-progress').value = Math.min(Number(sold), 6000);
+  $('paid-progress-label').textContent = sold.toLocaleString('en-US') + ' of 6,000 paid tickets' + (sold >= 6000n ? ' · threshold met' : '');
   $('opens-at').textContent = formatUtc(c.opens);
   $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':'Chain '+cfg.chainId;
   awaitingThreshold=sold<6000n;
