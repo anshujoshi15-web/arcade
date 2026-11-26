@@ -69,7 +69,11 @@
           </ol>
         </section>
       </div>
-      <section class="raffle-card"><h2>My serials</h2><p id="tickets">Connect your wallet to see your tickets.</p></section>
+      <section class="raffle-card" aria-labelledby="my-tickets-title">
+        <h2 id="my-tickets-title">My tickets</h2>
+        <p>Purchased and free tickets are minted to the wallet used to enter. Wallet apps and OpenSea may take time to index new tickets.</p>
+        <div id="tickets">Connect your wallet to see your tickets.</div>
+      </section>
       <section class="raffle-card"><h2>Draw results</h2><ol id="winners"></ol><p id="receipt"></p></section>
       <section class="raffle-card"><h2>Hall of Winners</h2><div id="history"></div></section>
       <div class="raffle-card"><details><summary>Round rules, eligibility and odds</summary><p>Each round offers 10,000 serials. A purchase can contain 1–25 tickets, and each wallet can receive up to 100 entries. Free and bonus tickets use the same serial pool, with up to 4,000 combined so 6,000 slots remain available for paid entry. Five distinct wallets win. A single ticket in a full round has a 1 in 10,000 chance at first place.</p><p>A draw requires 6,000 paid entries. Below that threshold, sales stay open and tickets and the full pot carry forward. Refunds are available only if the House cancels or formally closes the round without a draw. In that case, the House refunds original buyers in full in USDC. Gold, Early and streak marks are collectible traits and carry the same draw weight as other serials.</p><p>Each entrant’s first nomination counts once. Tied charities follow their published order in the nomination menu. The charity receives 34% of paid entries, the House receives 33%, and the five prizes total 33%. Winners have 30 days to claim. Unclaimed prizes go to the winning charity.</p><p>Entry is for adults meeting the round’s age and location requirements. Check your wallet’s entry status above. A ticket has no promised resale value.</p><p id="escrow"></p></details></div>

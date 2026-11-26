@@ -56,6 +56,50 @@ async function connect(authorizedAddress){
   }
   historyLoaded=false;contract=new Contract(cfg.address,abi,signer);await refresh();return account;
 }
+async function showOwnedTickets() {
+  const wallet = account;
+  const currentContract = contract;
+  const container = $('tickets');
+  if (!wallet) {
+    container.textContent = 'Connect your wallet to see your tickets.';
+    return;
+  }
+
+  const count = Number(await currentContract.balanceOf(wallet));
+  const ids = await Promise.all(Array.from({length: count}, (_, index) =>
+    currentContract.tokenOfOwnerByIndex(wallet, index)));
+  if (wallet !== account || currentContract !== contract) return;
+  if (!ids.length) {
+    container.textContent = 'No tickets in this wallet.';
+    return;
+  }
+
+  const list = document.createElement('ul');
+  list.className = 'owned-tickets';
+  const address = cfg.address.toLowerCase();
+  for (const id of ids) {
+    const item = document.createElement('li');
+    const serial = '#' + String(id).padStart(5, '0');
+    const label = document.createElement('strong');
+    label.textContent = serial;
+    item.append(label);
+    if (cfg.chainId === 8453) {
+      for (const [text, href] of [
+        ['OpenSea', 'https://opensea.io/item/base/' + address + '/' + id],
+        ['BaseScan', 'https://basescan.org/nft/' + address + '/' + id]
+      ]) {
+        const link = document.createElement('a');
+        link.href = href;
+        link.textContent = text;
+        link.setAttribute('aria-label', 'View ticket ' + serial + ' on ' + text);
+        item.append(link);
+      }
+    }
+    list.append(item);
+  }
+  container.replaceChildren(list);
+}
+
 async function refresh(){
   const [c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired,publicPaidEntry]=await Promise.all([contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false),contract.publicPaidEntry().catch(()=>false)]);
   $('paid-progress').value = Math.min(Number(sold), 6000);
@@ -92,7 +136,7 @@ async function refresh(){
   $('round-notice').textContent=cancelled ? 'Round ended by the House. Full USDC refunds will be sent to original buyers.' : expired ? 'The four-week limit has been reached. Entries are closed and the round is awaiting formal closure by the House.' : postponed && !closed && sold<6000n
     ? 'Round postponed. Tickets and the full prize pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + formatUtc(salesClose) + '.'
     : '';
-  if(account){let count=Number(await contract.balanceOf(account));let ids=await Promise.all(Array.from({length:count},(_,i)=>contract.tokenOfOwnerByIndex(account,i)));$('tickets').textContent=ids.map(n=>'#'+String(n).padStart(5,'0')).join(' · ')||'No tickets in this wallet.'}
+  await showOwnedTickets();
   const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Register ETH prize claim';b.onclick=()=>act(()=>contract.claim(id));li.append(' ',b)}list.push(li)}
   $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+formatUtc(deadline):closed?'Entries closed.':'Draw pending.';
 }
