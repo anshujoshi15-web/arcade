@@ -48,3 +48,6 @@ summary { cursor: pointer; font-weight: 700; }
   .round-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .round-metrics > div:last-child { grid-column: 1 / -1; }
 }
+
+.round-metrics .live-pool { background: #eef2ff; border-color: #b0caff; }
+.live-pool strong { color: #0000cc; }

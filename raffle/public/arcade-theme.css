@@ -72,3 +72,20 @@ main button { touch-action: manipulation; }
 .arcade-contact span { overflow-wrap: anywhere; color: var(--arcade-muted); }
 
 .arcade-footer a, .arcade-footer a:hover, .arcade-footer a:focus-visible { text-decoration: none; }
+
+.arcade-header .arcade-chrome {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 76px;
+}
+.arcade-header .arcade-nav { justify-content: center; }
+.arcade-header .wallet-actions { max-width: 240px; justify-content: flex-end; }
+.arcade-header .wallet-feedback { width: 100%; text-align: right; }
+@media (max-width: 720px) {
+  .arcade-header .arcade-chrome { grid-template-columns: 1fr auto; }
+  .arcade-header .arcade-nav { grid-column: 1 / -1; justify-content: flex-start; }
+  .arcade-header .arcade-brand { justify-self: start; }
+  .arcade-header .wallet-actions { grid-column: 2; grid-row: 1; }
+
+}

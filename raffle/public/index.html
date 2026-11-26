@@ -35,13 +35,13 @@
     <div id="game" hidden>
       <section class="round-metrics" aria-label="Round statistics">
         <div><span>Tickets available</span><strong id="available"></strong></div>
-        <div><span>Funded prize pool</span><strong id="pool"></strong><small>USD value paid in ETH</small></div>
+        <div class="live-pool"><span>Live prize pool</span><strong id="pool"></strong><small>USD value paid in ETH</small><small>Each paid ticket adds $0.33 in prize value.</small></div>
         <div><span id="time-label">Draw time</span><strong id="countdown"></strong><small id="when"></small></div>
       </section>
       <section class="raffle-card draw-progress">
         <div><h2>Draw qualification</h2><p id="paid-progress-label">0 of 6,000 paid tickets</p></div>
         <progress id="paid-progress" max="6000" value="0" aria-label="Paid tickets toward draw threshold"></progress>
-        <p class="muted">Entries opened <strong id="opens-at"></strong></p>
+        <p class="muted">Entries opened <strong id="opens-at"></strong></p><p class="muted" id="pool-updated"></p>
       </section>
       <p id="round-notice" class="notice" role="status"></p>
       <div class="raffle-columns">
