@@ -6,6 +6,7 @@
 <title>Raffle Admin · House Arcade</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f5f8ff;color:#00184d;font:16px/1.5 system-ui,sans-serif}header{background:white;border-bottom:1px solid #d3e1ff}header div,main{max-width:980px;margin:auto;padding:20px 5%}header div{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}a{color:#0000cc}h1{font:clamp(36px,6vw,64px) Georgia;margin:.5em 0}h2{font-size:20px;margin-top:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:16px}section{background:white;border:1px solid #d3e1ff;border-radius:12px;padding:20px}dl{margin:0 0 18px}dt{font-weight:650}dd{margin:0 0 10px;overflow-wrap:anywhere}label{display:block;margin-top:12px}input,button{font:inherit;padding:10px;border-radius:6px}input{width:100%;border:1px solid #7897cb}button{background:#0000ff;color:white;border:0;margin:6px 4px 0 0;cursor:pointer}button:disabled{background:#e0e7f5;color:#475774;cursor:default}#status{overflow-wrap:anywhere}
+.admin-table{overflow:auto;margin-top:12px}table{border-collapse:collapse;width:100%;min-width:32rem}th,td{text-align:left;padding:8px;border-bottom:1px solid #d3e1ff}main>section{margin-top:16px}#ledger-block{max-width:18rem}
 </style>
 </head>
 <body>
@@ -17,6 +18,20 @@
 <section><h2>Round status</h2><dl id="round"></dl><button id="cancel-round" disabled>End round</button><button id="recover-funds" disabled>Recover USDC for manual refunds</button><button id="refresh" disabled>Refresh status</button><button id="draw" disabled>Request draw</button><button id="finalize" disabled>Finalize draw</button><button id="sweep" disabled>Send expired prizes to charity</button><p>Draw and settlement actions follow the contract’s rules and can be called by any wallet when eligible.</p></section>
 <section><h2>Player eligibility</h2><p>Only the registrar wallet can grant or revoke entry eligibility. Verify the player’s eligibility before granting access.</p><form id="eligibility"><label for="player">Player wallet address</label><input id="player" required placeholder="0x…"><label for="expiry">Expiry in your local time</label><input id="expiry" type="datetime-local"><button id="grant" value="grant" disabled>Grant eligibility</button><button id="revoke" value="revoke" disabled>Revoke eligibility</button></form></section>
 </div>
+<section>
+<h2>Refund ledger and ETH claim queue</h2>
+<p>Load the round’s on-chain events starting at its deployment block. Refunds and ETH payouts are sent separately by the House. Use the CSVs to reconcile those payments.</p>
+<form id="ledger-form"><label for="ledger-block">Contract deployment block</label><input id="ledger-block" type="number" min="0" step="1" required><button id="load-ledger" disabled>Load ledgers</button></form>
+<p id="ledger-status" role="status"></p>
+<h3>Original buyers</h3>
+<p>These are original USDC payments. They become refund obligations only when a round ends without a draw. The ledger cannot tell which manual refunds have already been sent.</p>
+<button id="download-buyers" disabled>Download buyer CSV</button>
+<div class="admin-table" tabindex="0" aria-label="Original buyers"><table><thead><tr><th scope="col">Buyer</th><th scope="col">Paid tickets</th><th scope="col">Paid USDC</th></tr></thead><tbody id="buyers"></tbody></table></div>
+<h3>Registered ETH prize claims</h3>
+<p>Each reference is an on-chain claim. Keep the conversion rate and ETH payout transaction in your payment records.</p>
+<button id="download-claims" disabled>Download claims CSV</button>
+<div class="admin-table" tabindex="0" aria-label="Registered ETH prize claims"><table><thead><tr><th scope="col">Serial</th><th scope="col">Snapshot wallet</th><th scope="col">USDC prize value</th><th scope="col">Claim transaction</th></tr></thead><tbody id="claims"></tbody></table></div>
+</section>
 </main><script type="module" src="/admin.js"></script>
 </body>
 </html>
