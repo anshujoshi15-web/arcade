@@ -7,11 +7,13 @@ const errorText = error => error.shortMessage || error.message;
 let round, walletRound, walletAddress, chainId, busy = false;
 
 const usdc = amount => formatUnits(amount, 6) + ' USDC';
+let withdrawal;
 let buyerLedger = [];
 let claimLedger = [];
 
 const actions = ['cancel-round', 'recover-funds', 'draw', 'finalize', 'sweep', 'grant', 'revoke'];
 function disableActions() {
+  withdrawal = undefined;
   for (const action of actions) field(action).disabled = true;
 }
 
@@ -66,10 +68,17 @@ async function refresh() {
     description.textContent = value;
     return [term, description];
   }));
+  field('withdrawal-status').textContent = cancelled === null ? 'Withdrawal status is unavailable for this contract.' :
+    cancelled !== true ? 'Withdrawals are available after the House cancels the round.' :
+    escrow === 0n ? 'There is no USDC left to withdraw.' :
+    usdc(escrow) + ' available for refunds. Destination: ' + config.house + '.';
   if (!walletRound || busy) return;
   const isHouse = walletAddress.toLowerCase() === config.house.toLowerCase();
   field('cancel-round').disabled = !isHouse || cancelled !== false || Boolean(request);
-  field('recover-funds').disabled = !isHouse || cancelled !== true || escrow === 0n;
+  if (isHouse && cancelled === true && escrow > 0n) {
+    withdrawal = {escrow, house: config.house};
+    field('recover-funds').disabled = false;
+  }
   field('draw').disabled = !isHouse || cancelled === true || !(sold >= 6000n && !request && (now >= drawTime || minted === 10000n));
   field('finalize').disabled = !seeded || Boolean(deadline);
   field('sweep').disabled = !(deadline && now > deadline && outstanding);
@@ -85,6 +94,7 @@ async function send(method, ...args) {
   disableActions();
   try {
     status('Review the transaction in your wallet.');
+    if (method === 'recoverFunds') await walletRound.recoverFunds.staticCall();
     const tx = await walletRound[method](...args);
     status('Waiting for confirmation…');
     await tx.wait();
@@ -221,7 +231,12 @@ field('refresh').onclick = () => refresh().catch(error => status(errorText(error
 field('cancel-round').onclick = () => {
   if (window.confirm('Cancel this round permanently? Entries and the draw will stop. The House must refund buyers in full.')) void send('emergencyClose');
 };
-field('recover-funds').onclick = () => send('recoverFunds');
+field('recover-funds').onclick = () => {
+  if (!withdrawal || field('recover-funds').disabled) return;
+  const {escrow, house} = withdrawal;
+  if (window.confirm('Withdraw the full USDC balance (currently ' + usdc(escrow) +
+    ') to the House wallet ' + house + ' for manual refunds?')) void send('recoverFunds');
+};
 field('draw').onclick = () => send('requestDraw');
 field('finalize').onclick = () => send('finalize');
 field('sweep').onclick = () => send('sweep');
