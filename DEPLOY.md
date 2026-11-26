@@ -33,3 +33,7 @@ Admin sign-in is restricted to House wallet `0x6736d2eA9807297F0e56967361B941085
 Deploy the revised HouseRaffle bytecode for these rules. A previously deployed raffle retains its original contract rules. When sales are below 6,000 paid tickets, the on-chain checkpoint advances automatically by seven days and tickets and escrow remain in the same round. After the threshold is reached, the current sales checkpoint and draw time are fixed. Free and bonus entries share a 4,000-entry cap so paid sales can always reach the draw threshold. Each wallet may claim one free entry per seven-day period from the opening time, within its 100-entry round cap.
 
 Rollover uses exact seven-day UTC intervals. A round spanning a Mountain Time daylight-saving transition retains its UTC cadence and can shift by one hour in local time.
+
+## Soft opening and ETH payout plan
+
+The hosted site disables paid raffle entry during the soft opening. Free entry uses a configured raffle round and its existing eligibility checks. The current HouseRaffle artifact pays prizes in USDC and retains that behavior on chain. The planned ETH terms require a compatible payout implementation and a reviewed conversion mechanism before enabling sales. The other four games remain Coming Soon with rules and practice previews.

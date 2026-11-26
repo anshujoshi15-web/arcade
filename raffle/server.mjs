@@ -1,3 +1,4 @@
+import { gameRules, upcomingRules } from './game-rules.mjs';
 import { adminAuth, isAdmin } from './admin-auth.mjs';
 import { enroll } from './local-enroll.mjs';
 import http from 'node:http';
@@ -16,7 +17,7 @@ function pageContent(file) {
   return fs.readFileSync(file, 'utf8').replace('<!-- arcade-footer -->', footer);
 }
 const roundFile = publicFile('round.json');
-const upcoming = new Set(['/puzzle-print', '/spin-wheel', '/weekly-bingo', '/treasure-hunt']);
+const upcoming = new Set(Object.keys(gameRules));
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
 const routes = new Map([
   ['/rules', ['text/html', publicFile('rules.html')]],
@@ -60,7 +61,7 @@ export function handleRequest(req, res) {
     if (!isAdmin(req)) {
       if (previewAssets.has(path)) { res.writeHead(404).end(); return; }
       res.setHeader('Content-Type', 'text/html');
-      res.end(pageContent(publicFile('coming-soon.html')));
+      res.end(pageContent(publicFile('coming-soon.html')).replace('<!-- game-rules -->', () => upcomingRules(gameRules[path])));
       return;
     }
   }

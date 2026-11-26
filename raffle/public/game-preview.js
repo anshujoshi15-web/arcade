@@ -24,7 +24,7 @@ function spin() {
     const stop = sample(100);
     result.textContent = String(stop);
     const payout = stop === 93 ? 5 : stop >= 89 && stop <= 92 ? 2 : stop >= 74 && stop <= 88 ? 1 : 0;
-    el('status').textContent = payout ? 'Instant win: ' + payout + ' practice tokens.' :
+    el('status').textContent = payout ? 'Instant win: ' + payout + ' practice tokens. Planned bonuses can be paid in a House token of the winner’s choice.' :
       stop >= 94 ? 'Weekly jackpot entry earned in this preview.' : 'Try another spin.';
   };
 }

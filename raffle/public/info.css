@@ -5,3 +5,6 @@ body { font: 16px/1.6 system-ui, sans-serif; }
 .info h2 { margin: 0; font-size: 21px; }
 .info p:last-child { margin-bottom: 0; }
 .info a { color: #0000cc; }
+
+.upcoming-prizes { width: 100%; border-collapse: collapse; text-align: left; }
+.upcoming-prizes th, .upcoming-prizes td { padding: 8px; border-bottom: 1px solid var(--arcade-line); }

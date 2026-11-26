@@ -72,7 +72,7 @@ async function refresh(){
   let now=BigInt(Math.floor(Date.now()/1000));let eligible=account && await contract.eligibleUntil(account)>=now;
   let canEnter=eligible && !closed && now>=c.opens;
   $('eligibility').textContent=account?(eligible?'Wallet verified for entry.':'This wallet needs an operator eligibility attestation.'):'Connect a wallet to enter.';
-  $('buy').disabled=busy||!canEnter;$('free').disabled=busy||!canEnter||!freeCapacity||(account&&await contract.usedFree(account));
+  $('buy').disabled=!cfg.local||busy||!canEnter;$('free').disabled=busy||!canEnter||!freeCapacity||(account&&await contract.usedFree(account));
   let prior=await contract.previous();
   $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();
@@ -85,6 +85,7 @@ async function refresh(){
 }
 async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
 $('buy').onclick = () => act(async () => {
+  if (!cfg.local) throw Error('Paid entry is unavailable during the soft opening.');
   const quantity = Number($('qty').value);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 25) throw Error('Enter 1–25 tickets.');
   const nominee = Number($('nominee').value);
@@ -136,6 +137,10 @@ async function useAppKitWallet(connection, readProvider) {
   }
   await refresh();
   if (walletError && update === walletUpdate) throw walletError;
+}
+if (cfg.local) {
+  $('paid-entry').hidden = false;
+  $('soft-open').hidden = true;
 }
 if (!cfg.address) {
   $('status').textContent = cfg.error || 'No raffle round is open yet. Check back for the next round.';
