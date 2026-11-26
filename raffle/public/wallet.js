@@ -76,7 +76,7 @@ async function refresh(){
   let prior=await contract.previous();
   $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();
-  $('round-notice').textContent=cancelled || expired ? 'Round ended. The House will send full USDC refunds to the original buyers.' : postponed && !closed && sold<6000n
+  $('round-notice').textContent=cancelled ? 'Round ended by the House. Full USDC refunds will be sent to original buyers.' : expired ? 'The four-week limit has been reached. Entries are closed and the round is awaiting formal closure by the House.' : postponed && !closed && sold<6000n
     ? 'Round postponed. Tickets and the full prize pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + new Date(Number(salesClose)*1000).toLocaleString() + '.'
     : '';
   if(account){let count=Number(await contract.balanceOf(account));let ids=await Promise.all(Array.from({length:count},(_,i)=>contract.tokenOfOwnerByIndex(account,i)));$('tickets').textContent=ids.map(n=>'#'+String(n).padStart(5,'0')).join(' · ')||'No tickets in this wallet.'}

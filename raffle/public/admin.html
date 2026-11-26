@@ -24,7 +24,7 @@
 <form id="ledger-form"><label for="ledger-block">Contract deployment block</label><input id="ledger-block" type="number" min="0" step="1" required><button id="load-ledger" disabled>Load ledgers</button></form>
 <p id="ledger-status" role="status"></p>
 <h3>Original buyers</h3>
-<p>These are original USDC payments. They become refund obligations only when a round ends without a draw. The 33% prize reserve can be recovered from the contract. Full refunds also require the 34% donation and 33% House allocations already sent to their wallets. The ledger does not track manual refunds.</p>
+<p>These are original USDC payments. They become refund obligations only when the House cancels or formally closes a round without a draw. The 33% prize reserve can be recovered from the contract. Full refunds also require the 34% donation and 33% House allocations already sent to their wallets. The ledger does not track manual refunds.</p>
 <button id="download-buyers" disabled>Download buyer CSV</button>
 <div class="admin-table" tabindex="0" aria-label="Original buyers"><table><thead><tr><th scope="col">Buyer</th><th scope="col">Paid tickets</th><th scope="col">Paid USDC</th></tr></thead><tbody id="buyers"></tbody></table></div>
 <h3>Registered ETH prize claims</h3>
