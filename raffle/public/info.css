@@ -8,3 +8,17 @@ body { font: 16px/1.6 system-ui, sans-serif; }
 
 .upcoming-prizes { width: 100%; border-collapse: collapse; text-align: left; }
 .upcoming-prizes th, .upcoming-prizes td { padding: 8px; border-bottom: 1px solid var(--arcade-line); }
+
+.support-form { display: grid; gap: 8px; max-width: 38rem; }
+.support-form input,
+.support-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #7897cb;
+  border-radius: 6px;
+  font: inherit;
+}
+.support-form textarea { resize: vertical; }
+.support-form .wallet-button { justify-self: start; }
+.support-form [role=status] { overflow-wrap: anywhere; }

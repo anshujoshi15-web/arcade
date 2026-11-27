@@ -1,3 +1,4 @@
+import { listSupportReports, submitSupportReport } from './support.mjs';
 import { homeMarkdown, llmsText, sitemap, structuredData, serverCard } from './agent-discovery.mjs';
 import { origin, contentSignal } from './public/arcade-agent-data.mjs';
 import { gameRules, upcomingRules } from './game-rules.mjs';
@@ -49,6 +50,7 @@ const routes = new Map([
   ['/weekly-bingo', ['text/html', publicFile('game-preview.html')]],
   ['/treasure-hunt', ['text/html', publicFile('game-preview.html')]],
   ['/game-preview.js', ['text/javascript', publicFile('game-preview.js')]],
+  ['/support-form.js', ['text/javascript', publicFile('support-form.js')]],
   ['/help', ['text/html', publicFile('help.html')]],
   ['/privacy', ['text/html', publicFile('privacy.html')]],
   ['/arcade-theme.css', ['text/css', publicFile('arcade-theme.css')]],
@@ -92,6 +94,18 @@ export function handleRequest(req, res) {
     res.setHeader('Content-Signal', contentSignal);
     res.setHeader('Content-Type', type + '; charset=utf-8');
     res.end(content);
+    return;
+  }
+  if (path === '/support/report') {
+    void submitSupportReport(req, res, hosted);
+    return;
+  }
+  if (path === '/admin/support-reports') {
+    if (!isAdmin(req)) {
+      res.writeHead(401, {'Cache-Control':'no-store'}).end();
+      return;
+    }
+    void listSupportReports(req, res);
     return;
   }
   if (path === '/admin/challenge' || path === '/admin/verify') {

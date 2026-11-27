@@ -5,5 +5,16 @@
 <section><h2>Connect on a phone or tablet</h2><p>Tap Connect wallet and choose your wallet. On a phone or tablet, the connection can open your wallet app. On desktop, use a wallet extension or scan the WalletConnect QR code from your phone. House Raffle shows the network for the current round.</p></section>
 <section><h2>Enter House Raffle</h2><p>Connect your wallet and open <a href="/raffle#entry-status">Wallet entry status</a> to check paid and free entry. Read <a href="/how-it-works">How It Works</a> for entry limits, postponements, prize claims, and the charity split.</p></section>
 <section><h2>Upcoming games</h2><p>Puzzle Print, Spin Wheel, Weekly Bingo, and Treasure Hunt are coming soon. See the <a href="/">games list</a> for availability.</p></section>
-<section><h2>Report an issue</h2><p>Use the <a href="https://github.com/anshujoshi15-web/arcade/issues">House Arcade issue tracker</a> for technical problems. You need a GitHub account to open an issue. The tracker is public and links to the Arcade source repository. Share the game, device, and error message. Keep your recovery phrase and private keys private.</p></section>
-</main><!-- arcade-footer --><script type="module" src="/wallet-button.js"></script></body></html>
+<section><h2>Report an issue</h2>
+<p>Tell the House which game or page is affected. Include your device, browser, and any error message. Keep recovery phrases and private keys private.</p>
+<form id="support-form" class="support-form">
+<label for="support-email">Email for a reply (optional)</label>
+<input id="support-email" name="email" type="email" autocomplete="email" maxlength="254">
+<label for="support-message">What happened?</label>
+<textarea id="support-message" name="message" rows="5" minlength="10" maxlength="1500" required></textarea>
+<div hidden><label for="support-website">Leave blank</label><input id="support-website" name="website" tabindex="-1" autocomplete="off"></div>
+<button class="wallet-button" type="submit" disabled>Send report</button>
+<p id="support-status" role="status"></p>
+</form>
+<p>You can also <a href="mailto:support@thehouseofjoshi.com">email Arcade support</a>.</p></section>
+</main><!-- arcade-footer --><script type="module" src="/wallet-button.js"></script><script type="module" src="/support-form.js"></script></body></html>

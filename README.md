@@ -27,3 +27,9 @@ Paid entry is off by default for hosted rounds. Once paid play is cleared for a 
 ## Agent discovery
 
 The hosted app publishes `/robots.txt`, `/sitemap.xml`, `/llms.txt`, and the MCP card at `/.well-known/mcp/server-card.json`. Request the homepage with `Accept: text/markdown` or open `/index.md` for the Markdown version. The homepage registers two read-only WebMCP tools in supporting browsers. The same tools are available through the stateless Streamable HTTP MCP endpoint at `/mcp`.
+
+The Help form saves private support reports on the Node.js host. The default
+location is .house-arcade/support under the hosting user's home directory. Set
+ARCADE_SUPPORT_DIR to an absolute, writable directory outside the deployment
+tree to control where reports persist across releases. Sign in with the House
+wallet at /admin and choose **Load support reports** to view the latest 100.

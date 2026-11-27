@@ -257,3 +257,39 @@ initialize().catch(error => {
   field('withdrawal-balance').textContent = 'Unavailable';
   status(errorText(error));
 });
+
+field('load-support').onclick = async () => {
+  const button = field('load-support');
+  const feedback = field('support-admin-status');
+  const list = field('support-reports');
+  button.disabled = true;
+  feedback.textContent = 'Loading support reports…';
+  try {
+    const response = await fetch('/admin/support-reports', {cache:'no-store'});
+    if (response.status === 401) throw new Error('Your admin session expired. Sign in again.');
+    if (!response.ok) throw new Error('Unable to load support reports.');
+    const {reports} = await response.json();
+    list.replaceChildren(...reports.map(report => {
+      const item = document.createElement('details');
+      const title = document.createElement('summary');
+      title.textContent = formatUtc(Date.parse(report.createdAt) / 1000) + ' · ' + report.id;
+      const message = document.createElement('p');
+      message.textContent = report.message;
+      message.style.whiteSpace = 'pre-wrap';
+      message.style.overflowWrap = 'anywhere';
+      item.append(title, message);
+      if (report.email) {
+        const email = document.createElement('p');
+        email.textContent = 'Reply to ' + report.email;
+        item.append(email);
+      }
+      return item;
+    }));
+    feedback.textContent = reports.length ? reports.length + ' reports loaded.' : 'No reports yet.';
+  } catch (error) {
+    list.replaceChildren();
+    feedback.textContent = errorText(error);
+  } finally {
+    button.disabled = false;
+  }
+};
