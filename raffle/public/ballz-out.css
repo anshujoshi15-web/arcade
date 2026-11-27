@@ -7,3 +7,6 @@
 .ballz-orb[data-face="Blue"] { color: #4b9eff; }
 .ballz-orb[data-face="Gold"] { color: #e8ae41; }
 .ballz-practice #call-gold { background: #f8cf7b; border-color: #c9983f; color: #322009; }
+
+.ballz-ladder strong { white-space: nowrap; }
+.ballz-ladder .cleared { box-shadow: inset 0 1px 0 #fff8, 0 3px 0 #694710; }
