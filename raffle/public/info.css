@@ -70,4 +70,5 @@ body { font: 16px/1.6 system-ui, sans-serif; }
 .showcase-choices span:first-child { background:var(--accent); color:#07142b; }
 @media(max-width:650px){.game-showcase{grid-template-columns:1fr}.showcase-visual{min-height:190px}}
 
-.info a.wallet-button { display: inline-block; color: #fff; text-decoration: none; }
+.info a.wallet-button { display: inline-block; padding: 10px 14px; border-radius: 6px; background: #0000ff; color: #fff; font-weight: 700; text-decoration: none; }
+.info a.wallet-button:hover { background: #003ec1; }
