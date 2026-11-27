@@ -11,8 +11,7 @@ const upcomingGames = [
 ];
 const raffle = page('House Raffle', '/raffle');
 export const pages = [
-  page('House Arcade', '/'), raffle, page('Puzzle Print practice', '/puzzle-print/practice'),
-  page('Ballz Bingo practice', '/ballz-bingo/practice'), page('Play or Pass practice', '/play-or-pass/practice'), page('Ballz Out practice', '/ballz-out/practice'), page('Weekly Bingo practice', '/weekly-bingo/practice'), page('Spin Wheel practice', '/spin-wheel/practice'), page('Treasure Hunt practice', '/treasure-hunt/practice'), page('Raffle rules', '/how-it-works'),
+  page('House Arcade', '/'), raffle, page('Raffle rules', '/how-it-works'),
   page('Arcade General Rules', '/rules'), ...upcomingGames, page('About', '/about'),
   page('Contact', '/contact'), page('Help', '/help'), page('Privacy and wallet data', '/privacy')
 ];
@@ -20,7 +19,7 @@ const games = [
   {...raffle, status:'Public game; check the raffle page for the active round'},
   ...upcomingGames.map(game => ({
     ...game,
-    status:['Puzzle Print','Spin Wheel','Treasure Hunt','Weekly Bingo','Ballz Out','Play or Pass','Ballz Bingo'].includes(game.name) ? 'Free practice available; prize rounds Coming Soon' : 'Coming Soon'
+    status:'Free practice'
   }))
 ];
 export const arcadeTools = [

@@ -27,15 +27,6 @@ function pageContent(file) {
 }
 const roundFile = publicFile('round.json');
 const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
-const practiceGames = new Map([
-  ['/ballz-bingo', '/ballz-bingo/practice'],
-  ['/play-or-pass', '/play-or-pass/practice'],
-  ['/ballz-out', '/ballz-out/practice'],
-  ['/weekly-bingo', '/weekly-bingo/practice'],
-  ['/spin-wheel', '/spin-wheel/practice'],
-  ['/puzzle-print', '/puzzle-print/practice'],
-  ['/treasure-hunt', '/treasure-hunt/practice']
-]);
 const agentResources = new Map([
   ['/index.md', ['text/markdown', homeMarkdown]],
   ['/llms.txt', ['text/plain', llmsText]],
@@ -50,25 +41,25 @@ const routes = new Map([
   ['/webmcp.js', ['text/javascript', publicFile('webmcp.js')]],
   ['/arcade-agent-data.mjs', ['text/javascript', publicFile('arcade-agent-data.mjs')]],
   ...['arcade-logo.png', 'arcade-favicon.png', 'arcade-share.png'].map(name => ['/' + name, ['image/png', publicFile(name)]]),
-  ['/puzzle-print/practice', ['text/html', publicFile('puzzle.html')]],
-  ['/treasure-hunt/practice', ['text/html', publicFile('treasure-hunt.html')]],
+  ['/puzzle-print', ['text/html', publicFile('puzzle.html')]],
+  ['/treasure-hunt', ['text/html', publicFile('treasure-hunt.html')]],
   ['/puzzle.js', ['text/javascript', publicFile('puzzle.js')]],
   ['/puzzle-art.jpg', ['image/jpeg', publicFile('puzzle-art.jpg')]],
   ['/treasure-hunt.mjs', ['text/javascript', publicFile('treasure-hunt.mjs')]],
   ['/treasure-map.jpg', ['image/jpeg', publicFile('treasure-map.jpg')]],
-  ['/spin-wheel/practice', ['text/html', publicFile('spin-wheel.html')]],
+  ['/spin-wheel', ['text/html', publicFile('spin-wheel.html')]],
   ['/spin-wheel.css', ['text/css', publicFile('spin-wheel.css')]],
   ['/spin-wheel.mjs', ['text/javascript', publicFile('spin-wheel.mjs')]],
-  ['/weekly-bingo/practice', ['text/html', publicFile('weekly-bingo.html')]],
+  ['/weekly-bingo', ['text/html', publicFile('weekly-bingo.html')]],
   ['/weekly-bingo.css', ['text/css', publicFile('weekly-bingo.css')]],
   ['/weekly-bingo.mjs', ['text/javascript', publicFile('weekly-bingo.mjs')]],
-  ['/ballz-out/practice', ['text/html', publicFile('ballz-out.html')]],
+  ['/ballz-out', ['text/html', publicFile('ballz-out.html')]],
   ['/ballz-out.css', ['text/css', publicFile('ballz-out.css')]],
   ['/ballz-out.mjs', ['text/javascript', publicFile('ballz-out.mjs')]],
-  ['/play-or-pass/practice', ['text/html', publicFile('play-or-pass.html')]],
+  ['/play-or-pass', ['text/html', publicFile('play-or-pass.html')]],
   ['/play-or-pass.css', ['text/css', publicFile('play-or-pass.css')]],
   ['/play-or-pass.mjs', ['text/javascript', publicFile('play-or-pass.mjs')]],
-  ['/ballz-bingo/practice', ['text/html', publicFile('ballz-bingo.html')]],
+  ['/ballz-bingo', ['text/html', publicFile('ballz-bingo.html')]],
   ['/practice.css', ['text/css', publicFile('practice.css')]],
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],
@@ -135,17 +126,20 @@ export function handleRequest(req, res) {
     return;
   }
   if (path === '/admin/treasure-hunt' || path === '/admin/puzzle-print') {
-    res.writeHead(302, {Location:practiceGames.get(path.slice('/admin'.length))}).end();
+    res.writeHead(302, {Location:path.slice('/admin'.length)}).end();
     return;
   }
-  if (Object.hasOwn(gameRules, path)) {
-    const game = gameRules[path];
+  const gamePath = path.replace(/\/(practice|rules)$/, '');
+  if (Object.hasOwn(gameRules, gamePath) && path === gamePath + '/practice') {
+    res.writeHead(302, {Location:gamePath}).end();
+    return;
+  }
+  if (Object.hasOwn(gameRules, gamePath) && path === gamePath + '/rules') {
+    const game = gameRules[gamePath];
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.end(pageContent(publicFile('coming-soon.html'))
       .replaceAll('<!-- game-name -->', game.name)
-      .replace('<!-- game-showcase -->', () => gameShowcase(path, game))
-      .replace('<!-- practice-link -->', () => practiceGames.has(path) ?
-        '<p><a class="wallet-button" href="' + practiceGames.get(path) + '">Play free practice</a> · No payments or prizes</p>' : '')
+      .replace('<!-- game-showcase -->', () => gameShowcase(gamePath, game))
       .replace('<!-- game-rules -->', () => upcomingRules(game)));
     return;
   }
