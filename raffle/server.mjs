@@ -42,6 +42,7 @@ const routes = new Map([
   ['/webmcp.js', ['text/javascript', publicFile('webmcp.js')]],
   ['/arcade-agent-data.mjs', ['text/javascript', publicFile('arcade-agent-data.mjs')]],
   ...['arcade-logo.png', 'arcade-favicon.png', 'arcade-share.png'].map(name => ['/' + name, ['image/png', publicFile(name)]]),
+  ['/treasure-hunt.css', ['text/css', publicFile('treasure-hunt.css')]],
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],
   ['/rules', ['text/html', publicFile('rules.html')]],
@@ -104,6 +105,18 @@ export function handleRequest(req, res) {
   }
   if (path === '/admin/challenge' || path === '/admin/verify') {
     void adminAuth(req, res, path, hosted);
+    return;
+  }
+  if (path === '/admin/treasure-hunt' || path === '/treasure-hunt.mjs') {
+    res.setHeader('Cache-Control', 'private, no-store');
+    if (!isAdmin(req)) {
+      if (path === '/admin/treasure-hunt') res.writeHead(302, {Location:'/admin'}).end();
+      else res.writeHead(404).end();
+      return;
+    }
+    const page = path === '/admin/treasure-hunt';
+    res.setHeader('Content-Type', page ? 'text/html; charset=utf-8' : 'text/javascript; charset=utf-8');
+    res.end(page ? pageContent(publicFile('treasure-hunt.html')) : fs.readFileSync(publicFile('treasure-hunt.mjs')));
     return;
   }
   if (previewAssets.has(path)) {

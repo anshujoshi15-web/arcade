@@ -1,0 +1,12 @@
+.hunt header { padding: clamp(20px, 5vw, 40px); background: #081737; color: #f0f5ff; border-radius: 16px; }
+.hunt header p { margin: 0; }
+.hunt header p:first-child { color: #6ce0cc; font-weight: 700; }
+.hunt h1 { margin: 8px 0 12px; }
+.hunt progress { width: min(100%, 32rem); accent-color: #0000ff; }
+.hunt-map { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 4px; max-width: 32rem; list-style: none; padding: 8px; background: #081737; border-radius: 12px; }
+.hunt-map li { position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0; color: #dce9ff; background: #193562; border-radius: 5px; font-weight: 800; }
+.hunt-map .found { color: #073343; background: repeating-linear-gradient(135deg,#6ce0cc 0 9px,#8eecd9 9px 11px); }
+.hunt-map .treasure { color: #382400; background: #f7c96b; }
+.hunt-map small { position: absolute; right: 4px; bottom: 1px; }
+.hunt-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.hunt-reset { font: inherit; color: #0000cc; padding: 6px 0; background: transparent; border: 0; text-decoration: underline; cursor: pointer; }
