@@ -12,7 +12,7 @@ export const homeMarkdown = [
 ].join('\n\n');
 export const llmsText = [
   '# ' + siteName, '> ' + description,
-  'The raffle page provides current round status. The other games are Coming Soon and their rules are public. Agent tools supply public links and game availability.',
+  'The raffle page provides current round status. Puzzle Print and Treasure Hunt have free practice games. Prize rounds for both games and the other upcoming games are Coming Soon. Agent tools supply public links and game availability.',
   '## Public pages', linkList(pages), '## Agent resources',
   linkList([{name:'Homepage Markdown',url:origin+'/index.md'},{name:'Sitemap',url:origin+'/sitemap.xml'},
     {name:'MCP server card',url:origin+'/.well-known/mcp/server-card.json'}]), ''

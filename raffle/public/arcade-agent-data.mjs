@@ -11,13 +11,17 @@ const upcomingGames = [
 ];
 const raffle = page('House Raffle', '/raffle');
 export const pages = [
-  page('House Arcade', '/'), raffle, page('Raffle rules', '/how-it-works'),
+  page('House Arcade', '/'), raffle, page('Puzzle Print practice', '/puzzle-print/practice'),
+  page('Treasure Hunt practice', '/treasure-hunt/practice'), page('Raffle rules', '/how-it-works'),
   page('Arcade General Rules', '/rules'), ...upcomingGames, page('About', '/about'),
   page('Contact', '/contact'), page('Help', '/help'), page('Privacy and wallet data', '/privacy')
 ];
 const games = [
   {...raffle, status:'Public game; check the raffle page for the active round'},
-  ...upcomingGames.map(game => ({...game, status:'Coming Soon'}))
+  ...upcomingGames.map(game => ({
+    ...game,
+    status:['Puzzle Print','Treasure Hunt'].includes(game.name) ? 'Free practice available; prize rounds Coming Soon' : 'Coming Soon'
+  }))
 ];
 export const arcadeTools = [
   {name:'list_arcade_games',description:'List the House Arcade games, their public URLs, and availability.',read:() => games},

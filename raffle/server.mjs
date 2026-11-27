@@ -27,12 +27,9 @@ function pageContent(file) {
 }
 const roundFile = publicFile('round.json');
 const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
-const housePreviews = new Map([
-  ['/admin/treasure-hunt', ['text/html', 'treasure-hunt.html']],
-  ['/treasure-hunt.mjs', ['text/javascript', 'treasure-hunt.mjs']],
-  ['/admin/puzzle-print', ['text/html', 'puzzle.html']],
-  ['/puzzle.js', ['text/javascript', 'puzzle.js']],
-  ['/puzzle-art.jpg', ['image/jpeg', 'puzzle-art.jpg']]
+const practiceGames = new Map([
+  ['/puzzle-print', '/puzzle-print/practice'],
+  ['/treasure-hunt', '/treasure-hunt/practice']
 ]);
 const agentResources = new Map([
   ['/index.md', ['text/markdown', homeMarkdown]],
@@ -48,6 +45,11 @@ const routes = new Map([
   ['/webmcp.js', ['text/javascript', publicFile('webmcp.js')]],
   ['/arcade-agent-data.mjs', ['text/javascript', publicFile('arcade-agent-data.mjs')]],
   ...['arcade-logo.png', 'arcade-favicon.png', 'arcade-share.png'].map(name => ['/' + name, ['image/png', publicFile(name)]]),
+  ['/puzzle-print/practice', ['text/html', publicFile('puzzle.html')]],
+  ['/treasure-hunt/practice', ['text/html', publicFile('treasure-hunt.html')]],
+  ['/puzzle.js', ['text/javascript', publicFile('puzzle.js')]],
+  ['/puzzle-art.jpg', ['image/jpeg', publicFile('puzzle-art.jpg')]],
+  ['/treasure-hunt.mjs', ['text/javascript', publicFile('treasure-hunt.mjs')]],
   ['/treasure-map.jpg', ['image/jpeg', publicFile('treasure-map.jpg')]],
   ['/treasure-hunt.css', ['text/css', publicFile('treasure-hunt.css')]],
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
@@ -114,18 +116,8 @@ export function handleRequest(req, res) {
     void adminAuth(req, res, path, hosted);
     return;
   }
-  if (housePreviews.has(path)) {
-    const [type, filename] = housePreviews.get(path);
-    const page = type === 'text/html';
-    res.setHeader('Cache-Control', 'private, no-store');
-    if (!isAdmin(req)) {
-      if (page) res.writeHead(302, {Location:'/admin'}).end();
-      else res.writeHead(404).end();
-      return;
-    }
-    res.setHeader('Content-Type', page ? 'text/html; charset=utf-8' : type);
-    const file = publicFile(filename);
-    res.end(page ? pageContent(file) : fs.readFileSync(file));
+  if (path === '/admin/treasure-hunt' || path === '/admin/puzzle-print') {
+    res.writeHead(302, {Location:practiceGames.get(path.slice('/admin'.length))}).end();
     return;
   }
   if (Object.hasOwn(gameRules, path)) {
@@ -134,6 +126,8 @@ export function handleRequest(req, res) {
     res.end(pageContent(publicFile('coming-soon.html'))
       .replaceAll('<!-- game-name -->', game.name)
       .replace('<!-- game-showcase -->', () => gameShowcase(path, game))
+      .replace('<!-- practice-link -->', () => practiceGames.has(path) ?
+        '<p><a class="wallet-button" href="' + practiceGames.get(path) + '">Play free practice</a> · No payments or prizes</p>' : '')
       .replace('<!-- game-rules -->', () => upcomingRules(game)));
     return;
   }
