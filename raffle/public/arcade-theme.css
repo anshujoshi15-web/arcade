@@ -84,8 +84,7 @@ main button { touch-action: manipulation; }
 
 .arcade-network { justify-content: flex-start; border-top: 1px solid var(--arcade-line); }
 
-.arcade-contact a { display: grid; align-content: center; max-width: 100%; text-align: left; }
-.arcade-contact span { overflow-wrap: anywhere; color: var(--arcade-muted); }
+.arcade-contact a { display: grid; place-items: center; min-width: 44px; min-height: 44px; }
 
 .arcade-footer a, .arcade-footer a:hover, .arcade-footer a:focus-visible { text-decoration: none; }
 
