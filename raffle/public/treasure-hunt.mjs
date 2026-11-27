@@ -1,3 +1,4 @@
+import { playSound } from './game-sounds.mjs';
 const designs = 20;
 const copiesPerDesign = 1000;
 const holdingLimit = 50;
@@ -118,19 +119,24 @@ function setup() {
   }
   el('draw-piece').onclick = () => {
     const piece = drawPiece(hunt);
+    if (piece) playSound(summarize(hunt).canClaim ? 'win' : 'tile');
     if (piece) save('Found map piece ' + piece + '.' +
       (summarize(hunt).canClaim ? ' Your map is complete. Claim the treasure.' : ''), piece);
   };
   el('trade-piece').onclick = () => {
     const trade = tradePiece(hunt, randomIndex);
+    if (trade) playSound(summarize(hunt).canClaim ? 'win' : 'trade');
     if (trade) save('Traded a duplicate of piece ' + trade.outgoing + ' for piece ' + trade.incoming + '.', trade.incoming);
   };
   el('claim-map').onclick = () => {
-    if (claimTreasure(hunt)) save('Treasure found at piece ' + hunt.spot + '. Your complete set was used for this practice claim.');
+    if (!claimTreasure(hunt)) return;
+    playSound('jackpot');
+    save('Treasure found at piece ' + hunt.spot + '. Your complete set was used for this practice claim.');
   };
   el('reset-hunt').onclick = () => {
     if (!window.confirm('Start over and replace this browser’s practice collection?')) return;
     hunt = newHunt();
+    playSound('reset');
     save('New hunt started.');
   };
   render();

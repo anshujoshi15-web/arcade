@@ -1,3 +1,4 @@
+import { playSound } from './game-sounds.mjs';
 const storageKey = 'house-arcade-puzzle-v1';
 const types = Array.from({length:25}, (_, index) => index + 1);
 
@@ -121,6 +122,7 @@ function setup() {
       render();
       return;
     }
+    playSound(missing(game).length === 0 ? 'win' : free ? 'ticket' : 'tile');
     save('Drawn pieces: ' + drawn.join(', ') + '.', drawn);
   }
   el('draw').onclick = () => play(el('quantity').valueAsNumber, false);
@@ -128,6 +130,7 @@ function setup() {
   el('swap').onclick = () => {
     const incoming = Number(el('trade').value);
     const outgoing = trade(game, incoming);
+    if (outgoing) playSound(missing(game).length === 0 ? 'win' : 'trade');
     if (outgoing) save('Traded a duplicate of piece ' + outgoing + ' for piece ' + incoming + '.', [incoming]);
   };
   el('nominate').onclick = () => {
@@ -136,11 +139,14 @@ function setup() {
     save('Practice nomination recorded: ' + game.nomination + '.');
   };
   el('claim').onclick = () => {
-    if (claim(game)) save('Your completed practice print is ready to download.');
+    if (!claim(game)) return;
+    playSound('jackpot');
+    save('Your completed practice print is ready to download.');
   };
   el('reset-puzzle').onclick = () => {
     if (!window.confirm('Replace this browser’s practice collection and start over?')) return;
     game = newGame();
+    playSound('reset');
     save('New print started.');
   };
   render();

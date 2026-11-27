@@ -1,3 +1,4 @@
+import { playSound } from './game-sounds.mjs';
 export const numberSide = number => number < 50 ? 'play' : 'pass';
 const pad = number => String(number).padStart(2,'0');
 
@@ -23,6 +24,7 @@ function setup() {
     button.onclick = async () => {
       if (revealing) return;
       revealing = true;
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) playSound('reveal');
       const number = drawNumber();
       sides.forEach(choice => { el('pick-' + choice).disabled = true; });
       delete display.dataset.side;
@@ -35,6 +37,7 @@ function setup() {
       }
       const result = numberSide(number);
       const correct = side === result;
+      playSound(correct ? 'match' : 'miss');
       display.textContent = pad(number);
       display.dataset.side = result;
       rounds++;

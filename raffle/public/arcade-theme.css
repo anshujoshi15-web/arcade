@@ -105,3 +105,16 @@ main button { touch-action: manipulation; }
   .arcade-header .wallet-actions { grid-column: 2; grid-row: 1; }
 
 }
+
+.game-sound-toggle {
+  min-height: 44px;
+  padding: 7px 12px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.practice-hero .game-sound-toggle { margin-top: 14px; }

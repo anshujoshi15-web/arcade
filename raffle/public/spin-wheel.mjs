@@ -1,3 +1,4 @@
+import { playSound } from './game-sounds.mjs';
 export function spinResult(stop) {
   if (stop >= 94) return {tokens:0, jackpot:1, label:'Practice jackpot entry earned.'};
   const tokens = stop === 93 ? 5 : stop >= 89 ? 2 : stop >= 74 ? 1 : 0;
@@ -22,6 +23,7 @@ function setup() {
   button.disabled = false;
   button.addEventListener('click', async () => {
     button.disabled = true;
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) playSound('spin');
     el('spin-result').textContent = 'Spinning…';
     el('spin-stop').textContent = '—';
     const stop = randomStop();
@@ -38,6 +40,7 @@ function setup() {
       disc.style.transform = finalTransform;
       angle = position;
       const result = spinResult(stop);
+      playSound(result.jackpot ? 'jackpot' : result.tokens ? 'win' : 'miss');
       const label = String(stop).padStart(2,'0');
       el('spin-stop').textContent = label;
       el('spin-result').textContent = 'Stop ' + label + '. ' + result.label;

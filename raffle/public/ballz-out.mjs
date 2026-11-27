@@ -1,3 +1,4 @@
+import { playSound } from './game-sounds.mjs';
 const steps = [2, 4, 8, 16, 32];
 const rungNames = ['Tiny flex', 'Getting cocky', 'Questionable confidence', 'Tell nobody', 'Certified Ballz'];
 const reactions = {
@@ -48,6 +49,7 @@ function setup() {
   async function play(guess) {
     if (finished || revealing) return;
     revealing = true;
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) playSound('reveal');
     render();
     const orb = el('orb');
     const face = crypto.getRandomValues(new Uint8Array(1))[0] % 2 ? 'Gold' : 'Blue';
@@ -65,6 +67,7 @@ function setup() {
       banked += result.points;
     }
     revealing = false;
+    playSound(!result.won ? 'miss' : finished ? 'jackpot' : 'win');
     const turn = attempts++;
     status.textContent = face + '. ' + (!result.won ? 'Bust. ' + reaction('bust', turn) :
       finished ? result.points + ' practice points banked. You are insufferable now.' :
@@ -78,6 +81,7 @@ function setup() {
     if (finished || revealing || !level) return;
     const points = steps[level - 1];
     banked += points;
+    playSound('cash');
     finished = true;
     status.textContent = 'Cashed out ' + points + ' practice points. ' + reaction('cash', cashouts++);
     render();
@@ -85,6 +89,7 @@ function setup() {
   restart.onclick = () => {
     level = 0;
     finished = false;
+    playSound('reset');
     delete el('orb').dataset.face;
     status.textContent = 'Fresh ladder. The orb remembers nothing. Call Blue or Gold.';
     render();

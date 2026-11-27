@@ -1,3 +1,4 @@
+import { playSound } from './game-sounds.mjs';
 import {formatUtc} from '/utc-time.js';
 import {setupWalletButton} from '/wallet-button.js';
 import {BrowserProvider,Contract,JsonRpcProvider,formatUnits} from '/ethers.js';
@@ -23,7 +24,7 @@ async function loadHistory(){
     const count=Number(await past.places()),list=document.createElement('ol');
     for(let i=0;i<count;i++){const serial=await past.winners(i);let item=document.createElement('li');item.textContent='#'+serial+' · '+await past.claimant(serial)+' · '+fmt(await past.award(serial));
       if(account===await past.claimant(serial) && await past.deadline()>=BigInt(Math.floor(Date.now()/1000)) && !await past.claimed(serial)){
-        const button=document.createElement('button');button.textContent='Register ETH prize claim';button.onclick=()=>act(()=>past.connect(signer).claim(serial));item.append(' ',button);
+        const button=document.createElement('button');button.textContent='Register ETH prize claim';button.onclick=()=>act(()=>past.connect(signer).claim(serial),'jackpot');item.append(' ',button);
       }
       list.append(item);
     }
@@ -159,10 +160,28 @@ async function refresh(){
     ? 'Round postponed. Tickets and the full prize pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + formatUtc(salesClose) + '.'
     : '';
   await showOwnedTickets();
-  const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Register ETH prize claim';b.onclick=()=>act(()=>contract.claim(id));li.append(' ',b)}list.push(li)}
+  const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Register ETH prize claim';b.onclick=()=>act(()=>contract.claim(id),'jackpot');li.append(' ',b)}list.push(li)}
   $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+formatUtc(deadline):closed?'Entries closed.':'Draw pending.';
 }
-async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
+async function act(send, successSound = 'ticket') {
+  if (busy) return;
+  busy = true;
+  playSound('pending');
+  try {
+    $('status').textContent = 'Waiting for wallet and confirmation…';
+    const tx = await send();
+    await tx.wait();
+    historyLoaded = false;
+    $('status').textContent = 'Confirmed ' + tx.hash;
+    playSound(successSound);
+  } catch (error) {
+    playSound('miss');
+    report(error);
+  } finally {
+    busy = false;
+    await refresh().catch(report);
+  }
+}
 $('buy').onclick = () => act(async () => {
   if (!paidEntryEnabled) throw Error('Paid entry is disabled for this round.');
   const quantity = Number($('qty').value);

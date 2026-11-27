@@ -60,6 +60,7 @@ const routes = new Map([
   ['/play-or-pass.css', ['text/css', publicFile('play-or-pass.css')]],
   ['/play-or-pass.mjs', ['text/javascript', publicFile('play-or-pass.mjs')]],
   ['/ballz-bingo', ['text/html', publicFile('ballz-bingo.html')]],
+  ['/game-sounds.mjs', ['text/javascript', publicFile('game-sounds.mjs')]],
   ['/practice.css', ['text/css', publicFile('practice.css')]],
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],

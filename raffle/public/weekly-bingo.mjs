@@ -1,3 +1,4 @@
+import { playSound } from './game-sounds.mjs';
 const letters = 'BINGO';
 const range = (size, start = 1) => Array.from({length:size}, (_, i) => start + i);
 
@@ -82,6 +83,7 @@ function setup() {
     render(ball);
     const playerWon = markedCount(game) === 24;
     const winners = game.rivals?.flatMap((card, index) => markedCount(game, card) === 24 ? [names[index]] : []) || [];
+    playSound(playerWon ? 'jackpot' : winners.length ? 'miss' : game.card.includes(ball) ? 'match' : 'ball');
     const result = playerWon && winners.length ? 'Shared blackout! You tied with ' + winners.join(' and ') + '.' :
       playerWon ? 'Blackout! You filled the card.' :
       winners.length ? winners.join(' and ') + ' won the practice round.' : '';
@@ -92,6 +94,7 @@ function setup() {
   el('new-card').disabled = false;
   el('new-card').onclick = () => {
     game = newRound();
+    playSound('reset');
     render();
     el('bingo-status').textContent = 'New card ready. Draw a ball to start.';
   };
