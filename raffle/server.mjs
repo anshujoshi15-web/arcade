@@ -27,7 +27,13 @@ function pageContent(file) {
 }
 const roundFile = publicFile('round.json');
 const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
-const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
+const housePreviews = new Map([
+  ['/admin/treasure-hunt', ['text/html', 'treasure-hunt.html']],
+  ['/treasure-hunt.mjs', ['text/javascript', 'treasure-hunt.mjs']],
+  ['/admin/puzzle-print', ['text/html', 'puzzle.html']],
+  ['/puzzle.js', ['text/javascript', 'puzzle.js']],
+  ['/puzzle-art.jpg', ['image/jpeg', 'puzzle-art.jpg']]
+]);
 const agentResources = new Map([
   ['/index.md', ['text/markdown', homeMarkdown]],
   ['/llms.txt', ['text/plain', llmsText]],
@@ -108,20 +114,18 @@ export function handleRequest(req, res) {
     void adminAuth(req, res, path, hosted);
     return;
   }
-  if (path === '/admin/treasure-hunt' || path === '/treasure-hunt.mjs') {
+  if (housePreviews.has(path)) {
+    const [type, filename] = housePreviews.get(path);
+    const page = type === 'text/html';
     res.setHeader('Cache-Control', 'private, no-store');
     if (!isAdmin(req)) {
-      if (path === '/admin/treasure-hunt') res.writeHead(302, {Location:'/admin'}).end();
+      if (page) res.writeHead(302, {Location:'/admin'}).end();
       else res.writeHead(404).end();
       return;
     }
-    const page = path === '/admin/treasure-hunt';
-    res.setHeader('Content-Type', page ? 'text/html; charset=utf-8' : 'text/javascript; charset=utf-8');
-    res.end(page ? pageContent(publicFile('treasure-hunt.html')) : fs.readFileSync(publicFile('treasure-hunt.mjs')));
-    return;
-  }
-  if (previewAssets.has(path)) {
-    res.writeHead(404, {'Cache-Control':'no-store'}).end();
+    res.setHeader('Content-Type', page ? 'text/html; charset=utf-8' : type);
+    const file = publicFile(filename);
+    res.end(page ? pageContent(file) : fs.readFileSync(file));
     return;
   }
   if (Object.hasOwn(gameRules, path)) {
