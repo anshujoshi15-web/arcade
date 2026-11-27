@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spin Wheel Practice · House Arcade</title>
+<link rel="stylesheet" href="/arcade-theme.css"><link rel="stylesheet" href="/wallet-button.css"><link rel="stylesheet" href="/practice.css"><link rel="stylesheet" href="/spin-wheel.css">
+</head><body>
+<header class="arcade-header"><div class="arcade-chrome"><a class="arcade-brand" href="/">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/#games">Games</a><a href="/raffle">House Raffle</a><a href="/spin-wheel" aria-current="page">Spin Wheel</a><a href="/help">Help</a></nav><div class="wallet-actions"><button class="wallet-button" id="connect" type="button" data-wallet-header disabled>Connect wallet</button><span id="wallet-feedback" class="wallet-feedback" role="status"></span></div></div></header>
+<main class="practice spin-practice">
+  <section class="practice-hero"><small>Free practice</small><h1>Spin Wheel</h1><p>Follow the pointer to one of 100 stops. Land on a bonus or a jackpot entry and see what happens next.</p></section>
+  <div class="practice-grid">
+    <section class="practice-board" aria-labelledby="wheel-title">
+      <h2 id="wheel-title">The wheel</h2>
+      <div class="spin-stage">
+        <span class="spin-pointer" aria-hidden="true"></span>
+        <div class="spin-disc" id="spin-disc" aria-hidden="true"></div>
+        <div class="spin-center" aria-hidden="true"><strong id="spin-stop">—</strong><small>Stop</small></div>
+      </div>
+      <p>Each stop has an equal chance.</p>
+    </section>
+    <section class="practice-panel">
+      <h2>Take a spin</h2>
+      <p>Play without a wallet. Tokens and jackpot entries here are practice results.</p>
+      <div class="practice-actions"><button class="primary" id="spin" type="button" disabled>Spin the wheel</button></div>
+      <p id="spin-result" class="practice-status" role="status">Ready to spin.</p>
+      <dl class="spin-tally">
+        <div><dt>Spins</dt><dd id="spin-count">0</dd></div>
+        <div><dt>Practice tokens</dt><dd id="token-count">0</dd></div>
+        <div><dt>Jackpot entries</dt><dd id="jackpot-count">0</dd></div>
+      </dl>
+      <h2>What each stop awards</h2>
+      <table class="spin-outcomes"><thead><tr><th scope="col">Stops</th><th scope="col">Practice result</th></tr></thead><tbody>
+        <tr><th scope="row"><span class="spin-swatch miss"></span>00–73</th><td>No win</td></tr>
+        <tr><th scope="row"><span class="spin-swatch one"></span>74–88</th><td>1 token</td></tr>
+        <tr><th scope="row"><span class="spin-swatch two"></span>89–92</th><td>2 tokens</td></tr>
+        <tr><th scope="row"><span class="spin-swatch five"></span>93</th><td>5 tokens</td></tr>
+        <tr><th scope="row"><span class="spin-swatch jackpot"></span>94–99</th><td>Jackpot entry</td></tr>
+      </tbody></table>
+    </section>
+  </div>
+  <p class="practice-note">Practice uses no funds and pays no prizes. <a href="/spin-wheel#planned-rules">Read the planned rules</a>.</p>
+</main>
+<!-- arcade-footer -->
+<script type="module" src="/wallet-button.js"></script><script type="module" src="/spin-wheel.mjs"></script>
+</body></html>
