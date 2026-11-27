@@ -6,6 +6,8 @@
   position: relative;
   width: min(100%, 30rem);
   aspect-ratio: 1;
+  overflow: clip;
+  overflow-clip-margin: 8px;
   margin: 1.25rem auto;
 }
 .spin-disc {
