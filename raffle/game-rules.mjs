@@ -1,5 +1,11 @@
 const eth = (value, currency = 'ETH') => '$' + value.toLocaleString('en-US', {maximumFractionDigits:2}) + ' in ' + currency;
 const paidEntrySplit = 'Each 1 USDC paid entry is split into 0.34 USDC (34%) for donations, 0.33 USDC (33%) for the House, and 0.33 USDC (33%) for player prizes. Free entries add no funds to the split.';
+const nbaa = {
+  artwork:'/nbaa-cover.jpg',
+  series:'NBAA · No Ballz At All',
+  freeEntry:'One free play per wallet each week. Free-play prizes are awarded in House tokens.',
+  bonus:'House-token bonus choices include EVO, Kaboom, King Joshi, Queen Joshi, KIND, and NBAA.'
+};
 export const gameRules = {
   '/spin-wheel': {
     name:'Spin Wheel',
@@ -29,6 +35,30 @@ export const gameRules = {
     notes:['Trade duplicates to collect all 20 parts and uncover the hidden spot. The pieces burn on claim. The pool and hidden spot are committed before entries open.',
       'Claims open after 9,091 paid pieces, when the prize pool can cover the $6,000 first-place prize at 0.66 USDC per paid piece. Later places unlock as funded. At a fully paid sellout, 40,000 USDC of gross corresponds to 13,600 for the donation, 13,200 for the House, and 13,200 in ETH value for prizes.']
   },
+  '/ballz-out': {
+    ...nbaa,
+    name:'Ballz Out',
+    entry:'Planned price: 1 USDC per play. Make a 50/50 call on each step of a five-step double-or-nothing ladder.',
+    headings:['Choice','Result'],
+    rows:[['Correct call','Advance one step'],['Cash out','Take the current ladder prize after a successful step'],['Incorrect call','Lose the ladder prize for that play']],
+    notes:[paidEntrySplit, 'Each step opens only when the player prize reserve can cover it.']
+  },
+  '/play-or-pass': {
+    ...nbaa,
+    name:'Play or Pass',
+    entry:'Planned price: 1 USDC per play. Pick PLAY or PASS before a single draw from 0 to 99.',
+    headings:['Choice','How it works'],
+    rows:[['PLAY','Choose before the draw'],['PASS','Choose before the draw']],
+    notes:[paidEntrySplit, 'The two choices are designed to have the same long-run payout. The number ranges and payout table will be published before launch.']
+  },
+  '/ballz-bingo': {
+    ...nbaa,
+    name:'Ballz Bingo',
+    entry:'Planned price: 1 USDC per card. Balls are drawn one at a time until the first card fills.',
+    headings:['Round state','Result'],
+    rows:[['Below 6,000 paid cards','Round postpones and the pot carries forward'],['First full card','Wins the entire player pool plus the NBAA bonus pool']],
+    notes:[paidEntrySplit, 'The NBAA bonus pool grows with each paid card.']
+  },
   '/puzzle-print': {
     name:'Puzzle Print',
     prizeCurrency:'Base ETH',
@@ -42,12 +72,15 @@ export const gameRules = {
 
 export function upcomingRules(game) {
   const rows = game.rows.map(([key, value]) => '<tr><th scope="row">' + key + '</th><td>' + value + '</td></tr>').join('');
-  return '<p>' + game.name + '</p><section><h2>Planned game rules</h2><p>' + game.entry + '</p>' +
-    '<p>One free entry per wallet per week. No purchase is necessary. Players must be 18 or older.</p>' +
+  return (game.series ? '<p>' + game.series + '</p><img class="game-cover" src="' + game.artwork +
+    '" width="1600" height="1600" alt="No Ballz At All cover artwork"><p>NBAA is the series’ Cronos token.</p>' : '') +
+    '<section><h2>Planned game rules</h2><p>' + game.entry + '</p>' +
+    '<p>' + (game.freeEntry || 'One free entry per wallet per week.') +
+    ' No purchase is necessary. Players must be 18 or older.</p>' +
     '<table class="upcoming-prizes"><thead><tr>' +
     game.headings.map(label => '<th scope="col">' + label + '</th>').join('') +
     '</tr></thead><tbody>' + rows + '</tbody></table>' +
     game.notes.map(note => '<p>' + note + '</p>').join('') +
-    '<p>Main prizes are shown in USD value and paid in ' + (game.prizeCurrency || 'ETH') + '. Bonuses use a House token of the winner’s choice. The Arcade is in a soft opening, and this game has no public entries yet.</p>' +
+    '<p>Main prizes are shown in USD value and paid in ' + (game.prizeCurrency || 'ETH') + '. ' + (game.bonus || 'Bonuses use a House token of the winner’s choice.') + '</p>' +
     '<p><a href="/rules">Read the Arcade General Rules</a></p></section>';
 }

@@ -26,7 +26,6 @@ function pageContent(file) {
 }
 const roundFile = publicFile('round.json');
 const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
-const upcoming = new Set(Object.keys(gameRules));
 const previewAssets = new Set(['/puzzle.js', '/puzzle-art.jpg', '/game-preview.js']);
 const agentResources = new Map([
   ['/index.md', ['text/markdown', homeMarkdown]],
@@ -46,10 +45,7 @@ const routes = new Map([
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],
   ['/rules', ['text/html', publicFile('rules.html')]],
   ['/appkit.js', ['text/javascript', publicFile('generated/appkit.js')]],
-  ['/spin-wheel', ['text/html', publicFile('game-preview.html')]],
-  ['/weekly-bingo', ['text/html', publicFile('game-preview.html')]],
-  ['/treasure-hunt', ['text/html', publicFile('game-preview.html')]],
-  ['/game-preview.js', ['text/javascript', publicFile('game-preview.js')]],
+  ['/nbaa-cover.jpg', ['image/jpeg', publicFile('nbaa-cover.jpg')]],
   ['/support-form.js', ['text/javascript', publicFile('support-form.js')]],
   ['/help', ['text/html', publicFile('help.html')]],
   ['/privacy', ['text/html', publicFile('privacy.html')]],
@@ -57,9 +53,6 @@ const routes = new Map([
   ['/info.css', ['text/css', publicFile('info.css')]],
   ['/wallet-button.js', ['text/javascript', publicFile('wallet-button.js')]],
   ['/wallet-button.css', ['text/css', publicFile('wallet-button.css')]],
-  ['/puzzle-print', ['text/html', publicFile('puzzle.html')]],
-  ['/puzzle.js', ['text/javascript', publicFile('puzzle.js')]],
-  ['/puzzle-art.jpg', ['image/jpeg', publicFile('puzzle-art.jpg')]],
   ['/admin', ['text/html', publicFile('admin.html')]],
   ['/admin.js', ['text/javascript', publicFile('admin.js')]],
   ['/how-it-works', ['text/html', publicFile('how-it-works.html')]],
@@ -112,14 +105,17 @@ export function handleRequest(req, res) {
     void adminAuth(req, res, path, hosted);
     return;
   }
-  if (upcoming.has(path) || previewAssets.has(path)) {
-    res.setHeader('Cache-Control', 'private, no-store');
-    if (!isAdmin(req)) {
-      if (previewAssets.has(path)) { res.writeHead(404).end(); return; }
-      res.setHeader('Content-Type', 'text/html');
-      res.end(pageContent(publicFile('coming-soon.html')).replace('<!-- game-rules -->', () => upcomingRules(gameRules[path])));
-      return;
-    }
+  if (previewAssets.has(path)) {
+    res.writeHead(404, {'Cache-Control':'no-store'}).end();
+    return;
+  }
+  if (Object.hasOwn(gameRules, path)) {
+    const game = gameRules[path];
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.end(pageContent(publicFile('coming-soon.html'))
+      .replaceAll('<!-- game-name -->', game.name)
+      .replace('<!-- game-rules -->', () => upcomingRules(game)));
+    return;
   }
   if (path === '/admin' || path === '/admin.js') {
     res.setHeader('Cache-Control', 'no-store');

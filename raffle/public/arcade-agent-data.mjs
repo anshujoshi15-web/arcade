@@ -4,17 +4,23 @@ export const description = 'The House of Joshi’s game hub on Base, featuring H
 export const contentSignal = 'search=yes, ai-input=yes, ai-train=no';
 
 const page = (name, path) => ({name, url: origin + path});
+const upcomingGames = [
+  page('Puzzle Print', '/puzzle-print'), page('Spin Wheel', '/spin-wheel'),
+  page('Weekly Bingo', '/weekly-bingo'), page('Treasure Hunt', '/treasure-hunt'),
+  page('Ballz Out', '/ballz-out'), page('Play or Pass', '/play-or-pass'), page('Ballz Bingo', '/ballz-bingo')
+];
+const raffle = page('House Raffle', '/raffle');
 export const pages = [
-  page('House Arcade', '/'), page('House Raffle', '/raffle'), page('Raffle rules', '/how-it-works'),
-  page('Arcade General Rules', '/rules'), page('Puzzle Print', '/puzzle-print'), page('Spin Wheel', '/spin-wheel'),
-  page('Weekly Bingo', '/weekly-bingo'), page('Treasure Hunt', '/treasure-hunt'), page('About', '/about'),
+  page('House Arcade', '/'), raffle, page('Raffle rules', '/how-it-works'),
+  page('Arcade General Rules', '/rules'), ...upcomingGames, page('About', '/about'),
   page('Contact', '/contact'), page('Help', '/help'), page('Privacy and wallet data', '/privacy')
 ];
-const games = pages.slice(1, 2).concat(pages.slice(4, 8)).map((game, index) => ({
-  ...game, status: index === 0 ? 'Public game; check the raffle page for the active round' : 'Coming Soon'
-}));
+const games = [
+  {...raffle, status:'Public game; check the raffle page for the active round'},
+  ...upcomingGames.map(game => ({...game, status:'Coming Soon'}))
+];
 export const arcadeTools = [
-  {name:'list_arcade_games',description:'List the five House Arcade games, their public URLs, and availability.',read:() => games},
+  {name:'list_arcade_games',description:'List the House Arcade games, their public URLs, and availability.',read:() => games},
   {name:'get_arcade_links',description:'Find public Arcade rules, help, contact, privacy and game pages.',read:() => pages}
 ];
 export const emptyInputSchema = {type:'object',properties:{},additionalProperties:false};

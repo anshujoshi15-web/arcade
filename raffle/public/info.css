@@ -22,3 +22,10 @@ body { font: 16px/1.6 system-ui, sans-serif; }
 .support-form textarea { resize: vertical; }
 .support-form .wallet-button { justify-self: start; }
 .support-form [role=status] { overflow-wrap: anywhere; }
+
+.game-cover {
+  display: block;
+  width: min(100%, 25rem);
+  height: auto;
+  border-radius: 12px;
+}
