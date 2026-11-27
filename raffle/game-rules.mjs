@@ -1,4 +1,4 @@
-const eth = value => '$' + value.toLocaleString('en-US', {maximumFractionDigits:2}) + ' in ETH';
+const eth = (value, currency = 'ETH') => '$' + value.toLocaleString('en-US', {maximumFractionDigits:2}) + ' in ' + currency;
 const paidEntrySplit = 'Each 1 USDC paid entry is split into 0.34 USDC (34%) for donations, 0.33 USDC (33%) for the House, and 0.33 USDC (33%) for player prizes. Free entries add no funds to the split.';
 export const gameRules = {
   '/spin-wheel': {
@@ -28,11 +28,12 @@ export const gameRules = {
   },
   '/puzzle-print': {
     name:'Puzzle Print',
+    prizeCurrency:'Base ETH',
     entry:'$2 worth of crypto per piece. The pool has 25,000 pieces across 25 designs. Up to 25 pieces per transaction, 50 held, and one claim per wallet.',
-    rows:[['1st',eth(5000)],['2nd',eth(4000)],['3rd',eth(3000)],['4th to 9th (each)',eth(642.86)],['10th',eth(642.84)],['Total',eth(16500)]],
+    rows:[['1st',eth(5000,'Base ETH')],['2nd',eth(4000,'Base ETH')],['3rd',eth(3000,'Base ETH')],['4th to 9th (each)',eth(642.86,'Base ETH')],['10th',eth(642.84,'Base ETH')],['Total',eth(16500,'Base ETH')]],
     headings:['Claim order','Prize at paid sellout'],
-    notes:['Trade duplicates and collect all 25 pieces. Claims burn the pieces and award the completed artwork as a token. Claims open after 18,182 paid pieces, when the prize pool can cover the $12,000 combined top three prizes at 0.66 USDC of prize value per paid piece. Later places unlock as funded.',
-      'At $50,000 paid gross, the split is $17,000 in crypto for the donation, $16,500 in crypto for the House, and $16,500 in ETH value for player prizes. Paid gross excludes free pieces.']
+    notes:['Trade duplicates and collect all 25 pieces. Claims burn the pieces and award the completed artwork as a token. Each paid piece costs $2 in crypto. Donations receive 34% ($0.68), the House receives 33% ($0.66), and the prize pool receives 33% ($0.66). Claims open at 18,182 paid pieces, which contribute $12,000.12 in prize value and cover the $12,000 combined top three prizes. Later places unlock as funded.',
+      'At $50,000 paid gross, the split is $17,000 in crypto for the donation, $16,500 in crypto for the House, and $16,500 in Base ETH prize value for player prizes. Paid gross excludes free pieces.']
   }
 };
 
@@ -44,6 +45,6 @@ export function upcomingRules(game) {
     game.headings.map(label => '<th scope="col">' + label + '</th>').join('') +
     '</tr></thead><tbody>' + rows + '</tbody></table>' +
     game.notes.map(note => '<p>' + note + '</p>').join('') +
-    '<p>Main prizes are shown in USD value and paid in ETH. Bonuses use a House token of the winner’s choice. The Arcade is in a soft opening, and this game has no public entries yet.</p>' +
+    '<p>Main prizes are shown in USD value and paid in ' + (game.prizeCurrency || 'ETH') + '. Bonuses use a House token of the winner’s choice. The Arcade is in a soft opening, and this game has no public entries yet.</p>' +
     '<p><a href="/rules">Read the Arcade General Rules</a></p></section>';
 }
