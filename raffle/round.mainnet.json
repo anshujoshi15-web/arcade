@@ -1,7 +1,7 @@
 {
-  "address": "0xE2e8c2858785024B867eFffEFc941d3A6be3363b",
+  "address": "0x82c39A6e3f8292fb2abce64D6374c7081415A6A0",
   "chainId": 8453,
   "rpc": "https://mainnet.base.org",
-  "deploymentBlock": 62546596,
+  "deploymentBlock": 62573165,
   "paidSalesEnabled": true
 }

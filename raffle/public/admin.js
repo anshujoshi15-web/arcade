@@ -1,11 +1,12 @@
 import {formatUtc} from '/utc-time.js';
-import { BrowserProvider, Contract, JsonRpcProvider, ZeroAddress, getAddress, formatUnits } from '/ethers.js';
+import { BrowserProvider, Contract, JsonRpcProvider, ZeroAddress, getAddress, formatUnits, parseEther } from '/ethers.js';
 
 const field = id => document.getElementById(id);
 const status = message => { field('status').textContent = message; };
 const errorText = error => error.shortMessage || error.message;
 let round, walletRound, walletAddress, chainId, busy = false;
 
+const vrfSubscriptionAbi = ['function getSubscription(uint256) view returns (uint96 balance, uint96 nativeBalance, uint64 reqCount, address subOwner, address[] consumers)'];
 const usdc = amount => formatUnits(amount, 6) + ' USDC';
 let withdrawal;
 let buyerLedger = [];
@@ -27,8 +28,10 @@ async function refresh() {
   const now = BigInt(block.timestamp);
   const address = await round.getAddress();
   const currency = new Contract(config.currency, ['function balanceOf(address) view returns(uint256)'], round.runner);
-  const [escrow, salesClose, cutoff, donationWallet, donationRecipient] = await Promise.all([
-    currency.balanceOf(address), round.salesClose(), round.postponementLimit().catch(() => null), round.donationWallet().catch(() => null), round.charity()
+  const coordinator = new Contract(config.coordinator, vrfSubscriptionAbi, round.runner);
+  const [escrow, salesClose, cutoff, donationWallet, donationRecipient, subscription] = await Promise.all([
+    currency.balanceOf(address), round.salesClose(), round.postponementLimit().catch(() => null), round.donationWallet().catch(() => null), round.charity(),
+    coordinator.getSubscription(config.subscription).catch(() => null)
   ]);
   const phase = cancelled ? 'Ended · manual refunds' : expired ? 'Four-week limit reached · end round to recover funds' : deadline ? 'Settled' : seeded ? 'Ready to finalize' : request ? 'Waiting for VRF' :
     closed ? 'Closed · draw pending' : postponed && sold < 6000n ? 'Postponed · sales open' :
@@ -54,6 +57,10 @@ async function refresh() {
     'Sales checkpoint': formatUtc(salesClose),
     'Four-week cutoff': cutoff ? formatUtc(cutoff) : 'Unavailable for this contract',
     'Draw time': formatUtc(drawTime),
+    'VRF subscription': String(config.subscription),
+    'VRF LINK balance': subscription ? formatUnits(subscription.balance, 18) + ' LINK' : 'Unavailable',
+    'VRF consumer': subscription ? subscription.consumers.some(consumer => consumer.toLowerCase() === address.toLowerCase()) ?
+      'Raffle registered' : 'Raffle missing from subscription' : 'Unavailable',
     'Claim deadline': deadline ? formatUtc(deadline) : 'Opens after settlement',
     'House wallet': config.house,
     'Total minted': minted.toString(),
@@ -68,6 +75,11 @@ async function refresh() {
     description.textContent = value;
     return [term, description];
   }));
+  const registered = subscription?.consumers.some(consumer => consumer.toLowerCase() === address.toLowerCase());
+  field('vrf-status').textContent = !subscription ? 'Could not read the VRF subscription. Check it in Chainlink before requesting the draw.' :
+    !registered ? 'Add this raffle as a consumer before requesting the draw.' :
+    subscription.balance === 0n ? 'Fund the subscription with Base LINK before requesting the draw.' :
+    'LINK is present. Check the recommended subscription balance in Chainlink before requesting the draw.';
   field('withdrawal-balance').textContent = usdc(escrow);
   field('withdrawal-status').textContent = cancelled === null ? 'Withdrawal status is unavailable for this contract.' :
     cancelled !== true ? 'Withdrawals are available after the House cancels the round.' :
@@ -80,7 +92,7 @@ async function refresh() {
     withdrawal = {escrow, house: config.house};
     field('recover-funds').disabled = false;
   }
-  field('draw').disabled = !isHouse || cancelled === true || !(sold >= 6000n && !request && (now >= drawTime || minted === 10000n));
+  field('draw').disabled = (subscription && (!registered || subscription.balance === 0n)) || !isHouse || cancelled === true || !(sold >= 6000n && !request && (now >= drawTime || minted === 10000n));
   field('finalize').disabled = !seeded || Boolean(deadline);
   field('sweep').disabled = !(deadline && now > deadline && outstanding);
   const isRegistrar = walletAddress.toLowerCase() === config.registrar.toLowerCase();
@@ -132,6 +144,7 @@ async function initialize() {
   field('refresh').disabled = false;
   field('connect').disabled = false;
   field('load-ledger').disabled = false;
+  field('verify-payout').disabled = chainId !== 8453n;
   if (config.deploymentBlock !== undefined) field('ledger-block').value = config.deploymentBlock;
   field('connect').onclick = async () => {
     try {
@@ -222,6 +235,7 @@ async function loadLedger(event) {
     status.textContent = errorText(error);
   } finally {
     field('load-ledger').disabled = false;
+  field('verify-payout').disabled = chainId !== 8453n;
   }
 }
 
@@ -289,6 +303,38 @@ field('load-support').onclick = async () => {
   } catch (error) {
     list.replaceChildren();
     feedback.textContent = errorText(error);
+  } finally {
+    button.disabled = false;
+  }
+};
+
+field('payout-verification').onsubmit = async event => {
+  event.preventDefault();
+  if (!round || chainId !== 8453n) return;
+  const button = field('verify-payout');
+  const output = field('payout-verification-status');
+  button.disabled = true;
+  output.textContent = 'Checking Base transaction…';
+  try {
+    const hash = field('payout-hash').value.trim();
+    if (!/^0x[0-9a-f]{64}$/i.test(hash)) throw new Error('Enter a Base transaction hash.');
+    const recipient = getAddress(field('payout-wallet').value.trim());
+    const amount = parseEther(field('payout-amount').value.trim());
+    if (amount <= 0n) throw new Error('Enter a positive ETH amount.');
+    const [tx, receipt] = await Promise.all([round.runner.getTransaction(hash), round.runner.getTransactionReceipt(hash)]);
+    if (!tx || !receipt) throw new Error('Transaction is missing or pending on Base.');
+    if (receipt.status !== 1) throw new Error('The Base transaction failed.');
+    const {house} = await round.config();
+    if (tx.from.toLowerCase() !== house.toLowerCase() ||
+        tx.to?.toLowerCase() !== recipient.toLowerCase() || tx.value !== amount || tx.data !== '0x') {
+      throw new Error('This transaction does not match the expected direct ETH payment from the House wallet.');
+    }
+    const link = document.createElement('a');
+    link.href = 'https://basescan.org/tx/' + hash;
+    link.textContent = 'View receipt on BaseScan';
+    output.replaceChildren('Verified direct transfer of ' + formatUnits(amount, 18) + ' Base ETH to ' + recipient + '. ', link);
+  } catch (error) {
+    output.textContent = errorText(error);
   } finally {
     button.disabled = false;
   }

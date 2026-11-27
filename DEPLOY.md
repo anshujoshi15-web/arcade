@@ -36,7 +36,7 @@ The site and Admin display round times in UTC. Rollover uses exact seven-day UTC
 
 ## Escrow, manual ETH payouts, and refunds
 
-Paid entry on the hosted site remains disabled during the soft opening. Deploy the revised contract to use these rules. Each paid ticket sends 34% immediately to the donation wallet and 33% to the House wallet. The remaining 33% stays in the contract as the prize reserve. After the draw settles, the House pays the nominated recipient from the donation wallet and publishes the transfer. A snapshot winner’s claim releases their prize allocation in USDC to the House. The House pays the winner in Base ETH and publishes the conversion rate and ETH transaction. Unclaimed allocations go to the donation recipient after 30 days.
+The active Base mainnet raffle accepts paid entries. The revised contract uses the following split and payout workflow. Each paid ticket sends 34% immediately to the donation wallet and 33% to the House wallet. The remaining 33% stays in the contract as the prize reserve. After the draw settles, the House pays the nominated recipient from the donation wallet and publishes the transfer. A snapshot winner’s claim releases their prize allocation in USDC to the House. The House pays the winner in Base ETH and publishes the conversion rate and ETH transaction. Unclaimed allocations go to the donation recipient after 30 days.
 
 The first sales checkpoint can advance by up to four weeks. At the limit, the contract closes entries if there are fewer than 6,000 paid tickets. A postponement or checkpoint does not trigger refunds. Refunds apply only after the House formally ends the round without a draw. Before a randomness request, the House can end a round via `emergencyClose()`. The House can then call `recoverFunds()` to transfer the prize escrow balance to its wallet. Full refunds require the funds already distributed to the donation and House wallets as well. Use the public entry events and `paidBy(address)` to reconcile original buyers and pay full USDC refunds manually. Free entries have no refund value. The admin dashboard provides both actions.
 
@@ -47,3 +47,24 @@ The hosted default is the current Base mainnet round in `raffle/round.mainnet.js
 ## Public paid purchases
 
 The revised contract accepts paid entries from player wallets without a registrar attestation. House and registrar wallets remain excluded. Free and bonus entries and receipt of pre-draw transfers still require an attestation. The deployed contract address determines which rules apply. The same revision requires the House wallet to request the draw. A new deployment needs a new VRF consumer registration and updated `PUBLIC_ROUND` configuration to enable purchases on the site.
+
+## Base mainnet round handoff
+
+Before a qualified draw, use the Admin round panel to confirm that the raffle
+is a registered VRF consumer. Check the recommended LINK funding in Chainlink
+for this subscription and fund it before requesting the draw. A nonzero LINK
+balance alone does not guarantee that Chainlink can fulfill the request.
+
+After settlement, load the Admin claim ledger. Use each registered claim's
+snapshot wallet and USDC prize value to calculate the Base ETH payout at your
+chosen conversion rate. After sending a direct ETH payment from the House
+wallet, verify the amount, recipient and transaction in Admin. Record the
+conversion rate and verified transaction hash in the claims CSV and publish
+the winner and donation receipts. Refunds for a cancelled round use the buyer
+ledger and USDC, separate from the prize payment workflow.
+
+For the next edition, use the current raffle address as the constructor's
+previous round address and increment the edition number. Choose the new UTC
+opening, sales checkpoint and draw timestamps before deploying. Register the
+new contract as a VRF consumer and verify its round configuration and purchase
+mode on Base before switching PUBLIC_ROUND, including its deployment block.

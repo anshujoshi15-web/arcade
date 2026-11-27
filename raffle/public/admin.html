@@ -17,7 +17,7 @@
 <p>Open a practice game: <a href="/puzzle-print">Puzzle Print</a> · <a href="/treasure-hunt">Treasure Hunt</a></p>
 <p id="status" role="status">Loading round configuration…</p>
 <div class="grid">
-<section><h2>Round status</h2><dl id="round"></dl><button id="cancel-round" disabled>End round</button><button id="refresh" disabled>Refresh status</button><button id="draw" disabled>Request draw</button><button id="finalize" disabled>Finalize draw</button><button id="sweep" disabled>Send expired prizes to charity</button><p>Only the House wallet can request the draw on the revised contract. Once Chainlink supplies the randomness, settlement can be finalized.</p></section>
+<section><h2>Round status</h2><dl id="round"></dl><button id="cancel-round" disabled>End round</button><button id="refresh" disabled>Refresh status</button><button id="draw" disabled>Request draw</button><button id="finalize" disabled>Finalize draw</button><button id="sweep" disabled>Send expired prizes to charity</button><p>Only the House wallet can request the draw on the revised contract. Once Chainlink supplies the randomness, settlement can be finalized.</p><p id="vrf-status" role="status"></p></section>
 <section>
   <h2>Withdraw contract funds</h2>
   <p>Contract balance <strong id="withdrawal-balance">Loading…</strong></p>
@@ -39,6 +39,16 @@
 <p>Each reference is an on-chain claim. Keep the conversion rate and ETH payout transaction in your payment records.</p>
 <button id="download-claims" disabled>Download claims CSV</button>
 <div class="admin-table" tabindex="0" aria-label="Registered ETH prize claims"><table><thead><tr><th scope="col">Serial</th><th scope="col">Snapshot wallet</th><th scope="col">USDC prize value</th><th scope="col">Claim transaction</th></tr></thead><tbody id="claims"></tbody></table></div>
+</section>
+<section>
+<h2>Verify a Base ETH payout receipt</h2>
+<p>Use the winner address from the claim ledger and the ETH amount sent. This checks direct transfers from the House wallet.</p>
+<form id="payout-verification">
+<label for="payout-wallet">Winner wallet</label><input id="payout-wallet" required>
+<label for="payout-amount">Amount in Base ETH</label><input id="payout-amount" required inputmode="decimal">
+<label for="payout-hash">Base transaction hash</label><input id="payout-hash" required>
+<button id="verify-payout" type="submit" disabled>Verify receipt</button>
+</form><p id="payout-verification-status" role="status"></p>
 </section>
 <section>
 <h2>Support reports</h2>
