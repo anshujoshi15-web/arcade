@@ -4,7 +4,7 @@ header .wallet-button {
   border: 0;
   border-radius: 6px;
   cursor: pointer;
-  font: 700 14px/1.35 system-ui, sans-serif;
+  font: 700 14px/1.35 var(--arcade-font-body);
   margin: 0;
   padding: 10px 14px;
   white-space: nowrap;

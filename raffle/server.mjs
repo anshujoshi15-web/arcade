@@ -69,6 +69,7 @@ const routes = new Map([
   ['/support-form.js', ['text/javascript', publicFile('support-form.js')]],
   ['/help', ['text/html', publicFile('help.html')]],
   ['/privacy', ['text/html', publicFile('privacy.html')]],
+  ['/typography.css', ['text/css', publicFile('typography.css')]],
   ['/arcade-theme.css', ['text/css', publicFile('arcade-theme.css')]],
   ['/info.css', ['text/css', publicFile('info.css')]],
   ['/wallet-button.js', ['text/javascript', publicFile('wallet-button.js')]],

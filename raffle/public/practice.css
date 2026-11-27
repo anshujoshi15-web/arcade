@@ -6,7 +6,7 @@
   margin: 0 auto;
   padding: clamp(20px, 5vw, 48px) 0;
   color: var(--ink);
-  font: 16px/1.5 system-ui, sans-serif;
+  font: 16px/1.5 var(--arcade-font-body);
 }
 .practice.hunt { line-height: 1.6; --accent: #8be4ce; --art: url('/treasure-map.jpg'); }
 .practice *, .practice *::before, .practice *::after { box-sizing: border-box; }
@@ -19,7 +19,7 @@
   background: linear-gradient(90deg, #070f28 10%, #0b1638f5 36%, #0b16388c 75%), var(--art) center 42% / cover;
 }
 .practice-hero small { color: var(--accent); font-weight: 750; }
-.practice-hero h1 { margin: .12em 0; font: clamp(42px, 8vw, 84px)/1 Georgia, serif; }
+.practice-hero h1 { margin: .12em 0; font: clamp(42px, 8vw, 84px)/1 var(--arcade-font-heading); }
 .hunt .practice-hero h1 { font-size: clamp(42px, 8vw, 76px); }
 .practice-hero p { max-width: 31rem; margin: .75rem 0 0; color: #e8eeff; }
 .practice-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .85fr); gap: 18px; align-items: start; margin-top: 24px; }

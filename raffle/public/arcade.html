@@ -25,12 +25,12 @@
 <style>
 :root{color-scheme:light;--blue:#0000ff;--ink:#00184d;--muted:#405577;--line:#d3e1ff}
 *{box-sizing:border-box}
-body{margin:0;background:#f5f8ff;color:var(--ink);font:16px/1.55 system-ui,sans-serif}
+body{margin:0;background:#f5f8ff;color:var(--ink);font:16px/1.55 var(--arcade-font-body)}
 .wrap{width:min(1120px,90%);margin:auto}
 a{color:inherit}a:focus-visible{outline:3px solid #4684ff;outline-offset:4px}
 .hero{background:linear-gradient(125deg,#00184d 0%,#102675 59%,#2020c7 100%);color:white;padding:clamp(36px,6vw,76px) 0}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);align-items:center;gap:clamp(24px,5vw,68px)}
-h1,h2,h3{font-family:Georgia,serif;line-height:1.05}
+h1,h2,h3{font-family:var(--arcade-font-heading);line-height:1.05}
 h1{font-size:clamp(52px,8vw,104px);letter-spacing:-.055em;margin:0}
 .hero p{max-width:40ch;margin:16px 0 22px;font-size:clamp(16px,2vw,20px);color:#e4ecff}
 .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}

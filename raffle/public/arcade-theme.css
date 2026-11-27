@@ -1,3 +1,5 @@
+@import url('/typography.css');
+
 :root {
   color-scheme: light;
   --arcade-blue: #0000ff;
@@ -42,7 +44,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   gap: 1px;
   text-align: center;
   color: var(--arcade-blue);
-  font: 750 14px/1.25 system-ui, sans-serif;
+  font: 750 14px/1.25 var(--arcade-font-body);
   white-space: nowrap;
   text-decoration: none;
 }

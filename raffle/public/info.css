@@ -1,6 +1,6 @@
-body { font: 16px/1.6 system-ui, sans-serif; }
+body { font: 16px/1.6 var(--arcade-font-body); }
 .info { width: min(900px, 90%); margin: auto; padding: 36px 0 56px; }
-.info h1 { font: clamp(42px, 8vw, 76px)/1 Georgia, serif; margin: 0 0 24px; }
+.info h1 { font: clamp(42px, 8vw, 76px)/1 var(--arcade-font-heading); margin: 0 0 24px; }
 .info section { margin-top: 20px; padding: 20px; background: white; border: 1px solid var(--arcade-line); border-radius: 12px; }
 .info h2 { margin: 0; font-size: 21px; }
 .info p:last-child { margin-bottom: 0; }
@@ -52,7 +52,7 @@ body { font: 16px/1.6 system-ui, sans-serif; }
 .showcase-puzzle,.showcase-treasure { --accent:#6ce0cc; }
 .showcase-ballz,.showcase-pass,.showcase-ballz-bingo { --accent:#f7c96b; }
 .showcase-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); width:min(100%,16rem); gap:4px; }
-.showcase-grid span { display:grid; place-items:center; aspect-ratio:1; min-width:0; border-radius:4px; background:#18376e; color:#fff; font:700 clamp(.62rem,2vw,1rem)/1 system-ui; }
+.showcase-grid span { display:grid; place-items:center; aspect-ratio:1; min-width:0; border-radius:4px; background:#18376e; color:#fff; font:700 clamp(.62rem,2vw,1rem)/1 var(--arcade-font-body); }
 .showcase-grid span:nth-child(4n+1),.showcase-grid span:nth-child(13) { background:var(--accent); color:#07142b; }
 .showcase-treasure .showcase-grid span { border-radius:0; background:#184e52; }
 .showcase-treasure .showcase-grid span:last-child { background:var(--accent); color:#07142b; }
