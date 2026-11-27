@@ -14,6 +14,7 @@
 .practice-hero {
   padding: clamp(24px, 6vw, 64px);
   border-radius: 24px;
+  box-shadow: inset 0 1px 0 #ffffff30, 0 5px 0 #071126, 0 15px 24px #14234b2e;
   color: #fff;
   background: linear-gradient(90deg, #070f28 10%, #0b1638f5 36%, #0b16388c 75%), var(--art) center 42% / cover;
 }
@@ -21,10 +22,10 @@
 .practice-hero h1 { margin: .12em 0; font: clamp(42px, 8vw, 84px)/1 Georgia, serif; }
 .hunt .practice-hero h1 { font-size: clamp(42px, 8vw, 76px); }
 .practice-hero p { max-width: 31rem; margin: .75rem 0 0; color: #e8eeff; }
-.practice-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .85fr); gap: 18px; align-items: start; margin-top: 18px; }
+.practice-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .85fr); gap: 18px; align-items: start; margin-top: 24px; }
 .practice-board, .practice-panel { min-width: 0; padding: clamp(14px, 3vw, 26px); border-radius: 20px; }
-.practice-board { background: #0b1638; color: #f4f7ff; box-shadow: 0 16px 32px #121f4020; }
-.practice-panel { background: #fff; border: 1px solid #cfdaee; }
+.practice-board { background: linear-gradient(150deg,#192e5b,#0b1638 70%); color: #f4f7ff; border: 1px solid #304778; box-shadow: inset 0 1px 0 #ffffff24, 0 5px 0 #09122d, 0 16px 28px #121f4033; }
+.practice-panel { background: linear-gradient(#fff,#f9fbff); border: 1px solid #cfdaee; box-shadow: 0 4px 0 #e1e8f5, 0 13px 22px #192c5816; }
 .practice h2 { margin: 0; }
 .hunt h2 { font-size: 21px; }
 .practice-board p { margin: .35rem 0; color: #dce5ff; }
@@ -32,11 +33,12 @@
 .practice progress::-webkit-progress-bar { background: #314365; border-radius: 10px; }
 .practice progress::-webkit-progress-value { background: var(--accent); border-radius: 10px; }
 .practice progress::-moz-progress-bar { background: var(--accent); border-radius: 10px; }
-.practice-tiles { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 3px; margin: 0; padding: 0; list-style: none; }
+.practice-tiles { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 4px; margin: 0; padding: 7px; list-style: none; border-radius: 10px; background: #070f26; box-shadow: inset 0 2px 7px #020716; }
 .practice-tiles > * {
   position: relative; display: grid; place-items: center; min-width: 0;
   aspect-ratio: 1; border-radius: 5px; color: #cdd8ff; background: #1b2d55;
   font-size: clamp(.72rem, 2.2vw, 1rem); font-weight: 700;
+  box-shadow: inset 0 1px 0 #ffffff3b, inset 0 -3px 0 #050c2b52;
 }
 .hunt .practice-tiles > * { background-color: #efd7a3; color: #322408; }
 .practice-tiles .owned, .practice-tiles .found { background-image: var(--art); background-size: 500% 500%; }
@@ -50,9 +52,10 @@
 .practice-panel select, .practice-panel input { box-sizing: border-box; min-height: 44px; max-width: 100%; padding: 6px 9px; border-radius: 8px; border: 1px solid #9fb2d5; font: inherit; }
 .practice-panel select { width: 100%; }
 .practice-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-.practice-panel button { min-height: 44px; padding: 8px 12px; border: 1px solid #9fb2d5; border-radius: 9px; background: #eef3ff; color: #142b65; font: inherit; font-weight: 700; cursor: pointer; }
+.practice-panel button { min-height: 44px; padding: 8px 12px; border: 1px solid #9fb2d5; border-radius: 9px; background: #eef3ff; color: #142b65; font: inherit; font-weight: 700; cursor: pointer; box-shadow: inset 0 1px 0 #fff5, 0 2px 0 #182c6733; }
 .practice-panel button.primary { border-color: #2349cc; background: #2349cc; color: #fff; }
 .practice-panel button:disabled { opacity: .55; cursor: default; }
+.practice-panel button:not(:disabled):active { transform: translateY(1px); box-shadow: inset 0 1px 3px #05143b40; }
 .practice-panel button:not(:disabled):hover { filter: brightness(.92); }
 .practice-panel :is(button, input, select, a):focus-visible { outline: 3px solid #2458d9; outline-offset: 3px; }
 .practice-panel details { margin: 16px 0; }

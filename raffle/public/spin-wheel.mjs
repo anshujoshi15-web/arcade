@@ -26,13 +26,13 @@ function setup() {
     el('spin-stop').textContent = '—';
     const stop = randomStop();
     const position = (360 - (stop + .5) * 3.6) % 360;
-    const next = angle + 360 * 4 + (position - angle % 360 + 360) % 360;
+    const next = angle + 360 * 6 + (position - angle % 360 + 360) % 360;
     const finalTransform = 'rotate(' + position + 'deg)';
     try {
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const animation = disc.animate([
           {transform:'rotate(' + angle + 'deg)'}, {transform:'rotate(' + next + 'deg)'}
-        ], {duration:2050,easing:'cubic-bezier(.14,.7,.22,1)'});
+        ], {duration:5200,easing:'cubic-bezier(.12,.45,.27,1)'});
         await animation.finished.catch(() => {});
       }
       disc.style.transform = finalTransform;
