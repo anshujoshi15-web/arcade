@@ -28,6 +28,7 @@ function pageContent(file) {
 const roundFile = publicFile('round.json');
 const mainnetRound = JSON.parse(fs.readFileSync(new URL('./round.mainnet.json', import.meta.url), 'utf8'));
 const practiceGames = new Map([
+  ['/ballz-bingo', '/ballz-bingo/practice'],
   ['/play-or-pass', '/play-or-pass/practice'],
   ['/ballz-out', '/ballz-out/practice'],
   ['/weekly-bingo', '/weekly-bingo/practice'],
@@ -67,6 +68,7 @@ const routes = new Map([
   ['/play-or-pass/practice', ['text/html', publicFile('play-or-pass.html')]],
   ['/play-or-pass.css', ['text/css', publicFile('play-or-pass.css')]],
   ['/play-or-pass.mjs', ['text/javascript', publicFile('play-or-pass.mjs')]],
+  ['/ballz-bingo/practice', ['text/html', publicFile('ballz-bingo.html')]],
   ['/practice.css', ['text/css', publicFile('practice.css')]],
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],

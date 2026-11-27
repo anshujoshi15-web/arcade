@@ -18,12 +18,12 @@ export function newBingo(pick = randomIndex) {
   return {card, pool:range(75), calls:[]};
 }
 
-export function markedCount(game) {
-  return game.card.filter(number => number !== null && game.calls.includes(number)).length;
+export function markedCount(game, card = game.card) {
+  return card.filter(number => number !== null && game.calls.includes(number)).length;
 }
 
 export function drawBall(game, pick = randomIndex) {
-  if (!game.pool.length || markedCount(game) === 24) return null;
+  if (!game.pool.length || markedCount(game) === 24 || game.rivals?.some(card => markedCount(game, card) === 24)) return null;
   const [ball] = game.pool.splice(pick(game.pool.length), 1);
   game.calls.push(ball);
   return ball;
@@ -35,7 +35,14 @@ function ballLabel(ball) {
 
 function setup() {
   const el = id => document.getElementById(id);
-  let game = newBingo();
+  const rivals = el('bingo-rivals');
+  const names = ['The Ballfather', 'Daub Vader', 'Bingo Baggins'];
+  const newRound = () => {
+    const round = newBingo();
+    if (rivals) round.rivals = names.map(() => newBingo().card);
+    return round;
+  };
+  let game = newRound();
   function render(latest) {
     const marked = markedCount(game);
     const rows = range(5, 0).map(index => {
@@ -56,7 +63,13 @@ function setup() {
     el('bingo-meter').value = marked;
     el('latest-ball').textContent = latest ? ballLabel(latest) : '—';
     el('draw-count').textContent = game.calls.length + ' of 75 balls called';
-    el('draw-ball').disabled = marked === 24;
+    el('draw-ball').disabled = marked === 24 || Boolean(game.rivals?.some(card => markedCount(game, card) === 24));
+    if (rivals) rivals.replaceChildren(...game.rivals.map((card, index) => {
+      const item = document.createElement('li');
+      const count = markedCount(game, card);
+      item.textContent = names[index] + ' · ' + count + ' of 24' + (count === 24 ? ' · Blackout' : '');
+      return item;
+    }));
     el('ball-history').replaceChildren(...game.calls.map(ball => {
       const item = document.createElement('li');
       item.textContent = ballLabel(ball);
@@ -67,13 +80,18 @@ function setup() {
     const ball = drawBall(game);
     if (!ball) return;
     render(ball);
+    const playerWon = markedCount(game) === 24;
+    const winners = game.rivals?.flatMap((card, index) => markedCount(game, card) === 24 ? [names[index]] : []) || [];
+    const result = playerWon && winners.length ? 'Shared blackout! You tied with ' + winners.join(' and ') + '.' :
+      playerWon ? 'Blackout! You filled the card.' :
+      winners.length ? winners.join(' and ') + ' won the practice round.' : '';
     el('bingo-status').textContent = ballLabel(ball) + '. ' +
-      (markedCount(game) === 24 ? 'Blackout! You filled the card.' :
-        game.card.includes(ball) ? 'Marked on your card.' : 'This ball does not match your card.');
+      (result || (
+        game.card.includes(ball) ? 'Marked on your card.' : 'This ball does not match your card.'));
   };
   el('new-card').disabled = false;
   el('new-card').onclick = () => {
-    game = newBingo();
+    game = newRound();
     render();
     el('bingo-status').textContent = 'New card ready. Draw a ball to start.';
   };
