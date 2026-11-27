@@ -15,7 +15,8 @@ export const gameRules = {
     rows:[['6,000 paid cards',eth(1980)],['10,000 paid cards',eth(3300)]],
     headings:['Paid card count','Player pool'],
     notes:[paidEntrySplit, 'The first full 75-ball bingo card wins the player pool. Each 5 × 5 NFT card has a free center. Cards that finish on the same ball split the pool equally.',
-      'The scheduled Bingo draw is Sunday at 7 p.m. Mountain Time (02:00 UTC Monday during MST, 01:00 UTC Monday during MDT). In standard time this is one hour after a 01:00 UTC Monday Raffle sales checkpoint. During daylight time the two coincide if the Raffle checkpoint remains at 01:00 UTC. Below 6,000 paid cards the round is postponed. Sales stay open, cards stay valid, and the full pot carries forward. Purchases are final.']
+      'The scheduled Bingo draw is Sunday at 7 p.m. Mountain Time (02:00 UTC Monday during MST, 01:00 UTC Monday during MDT). In standard time this is one hour after a 01:00 UTC Monday Raffle sales checkpoint. During daylight time the two coincide if the Raffle checkpoint remains at 01:00 UTC. If sales are below 6,000 paid cards at the first Sunday close, the round can roll over for up to four weeks past that close. During postponement, sales stay open, cards stay valid, and the full pot carries forward.',
+      'If the round is still below 6,000 paid cards at the four-week limit, entries close. The House can end the round before the draw. If the House cancels or closes the round without a draw, it manually refunds original buyers in full in USDC and voids free and bonus cards. Postponement alone does not trigger refunds.']
   },
   '/treasure-hunt': {
     name:'Treasure Hunt',

@@ -164,7 +164,7 @@ async function refresh(){
 }
 async function act(send){if(busy)return;busy=true;try{$('status').textContent='Waiting for wallet and confirmation…';let tx=await send();await tx.wait();historyLoaded=false;$('status').textContent='Confirmed '+tx.hash;}catch(e){report(e)}finally{busy=false;await refresh().catch(report)}}
 $('buy').onclick = () => act(async () => {
-  if (!paidEntryEnabled) throw Error('Paid entry is unavailable during the soft opening.');
+  if (!paidEntryEnabled) throw Error('Paid entry is disabled for this round.');
   const quantity = Number($('qty').value);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 25) throw Error('Enter 1–25 tickets.');
   const nominee = Number($('nominee').value);
@@ -221,7 +221,6 @@ async function useAppKitWallet(connection, readProvider) {
 }
 if (paidEntryEnabled && cfg.address) {
   $('paid-entry').hidden = false;
-  $('soft-open').hidden = true;
 }
 if (!cfg.address) {
   $('status').textContent = cfg.error || 'No raffle round is open yet. Check back for the next round.';
