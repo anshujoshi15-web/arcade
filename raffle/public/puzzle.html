@@ -1,15 +1,33 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Puzzle Print Preview · House Arcade</title>
 <link rel="stylesheet" href="/wallet-button.css">
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f5f8ff;color:#00184d;font:16px/1.5 system-ui,sans-serif}main{max-width:1080px;margin:auto;padding:20px 5%}a{color:#0000cc}h1{font:clamp(42px,8vw,84px)/1 Georgia;margin:14px 0}h2{margin-top:0}.layout{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;margin-top:26px}.board{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;aspect-ratio:1;grid-template-rows:repeat(5,minmax(0,1fr))}.piece{position:relative;display:grid;place-items:center;color:#34517c;background-color:#e7efff;border:1px solid #c4d5ff;font-weight:bold}.piece b{position:absolute;right:3px;bottom:3px;padding:0 4px;background:#050f28e8;color:white;border-radius:4px;font-size:.75rem}.piece.owned{background-image:url('/puzzle-art.jpg');background-size:500% 500%}.panel{padding:18px;background:#fff;border:1px solid #d3e1ff;border-radius:12px}input,select,button{font:inherit;padding:8px;border-radius:6px}button{background:#0000ff;color:#fff;border:0;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:default}label{display:block;margin-top:12px}button{margin:8px 4px 0 0}.preview-intro{background:#081737;color:#fff;padding:clamp(16px,4vw,36px);border-radius:16px}.preview-intro small{color:#8ee5d4}progress{width:100%;accent-color:#0000ff}a[hidden]{display:none}#status{min-height:3em}small{color:#34517c}@media(max-width:680px){.layout{grid-template-columns:1fr}}
-</style><link rel="stylesheet" href="/arcade-theme.css"></head><body>
-<header class="arcade-header"><div class="arcade-chrome"><a href="/" class="arcade-brand">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/">Games</a><a href="/raffle">House Raffle</a><a href="/puzzle-print" aria-current="page">Puzzle Print</a><a href="/help">Help</a></nav><div class="wallet-actions"><button type="button" class="wallet-button" id="connect" data-wallet-header disabled>Connect wallet</button><span class="wallet-feedback" id="wallet-feedback" role="status"></span></div></div></header><main>
-<section class="preview-intro"><small>Free practice</small><h1>Puzzle Print</h1><p>Draw from a shuffled pool, trade duplicate tiles, and uncover the complete pearlescent print.</p></section>
-<div class="layout"><div><div class="board" id="board" aria-label="Puzzle collection"></div><p id="collection"></p><progress id="print-progress" max="25" value="0" aria-label="Unique print pieces collected"></progress></div>
-<section class="panel"><h2>Collect pieces</h2><p id="pool"></p><label for="quantity">How many pieces?</label><input id="quantity" type="number" min="1" max="25" value="5">
-<button id="draw">Draw practice pieces</button><button id="free">Claim weekly free piece</button>
-<label for="trade">Trade a duplicate for a missing piece</label><select id="trade"></select><button id="swap">Trade piece</button>
-<label for="charity">Practice charity nomination</label><select id="charity"><option>Community Food Fund</option><option>Habitat Recovery Fund</option><option>Children’s Learning Fund</option></select><button id="nominate">Nominate</button>
-<button id="claim">Claim completed print</button><p id="status" role="status"></p><p><a id="completed-print" href="/puzzle-art.jpg" download="puzzle-print-practice.jpg" hidden>Download completed practice print</a></p><button id="reset-puzzle" type="button">Start over</button></section></div>
-<p>Draws, trades, nominations and claims are simulated. Progress saves in this browser. <a href="/puzzle-print#planned-rules">Read the planned public rules</a>.</p>
+<link rel="stylesheet" href="/practice.css"><link rel="stylesheet" href="/arcade-theme.css"></head><body>
+<header class="arcade-header"><div class="arcade-chrome"><a href="/" class="arcade-brand">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/">Games</a><a href="/raffle">House Raffle</a><a href="/puzzle-print" aria-current="page">Puzzle Print</a><a href="/help">Help</a></nav><div class="wallet-actions"><button type="button" class="wallet-button" id="connect" data-wallet-header disabled>Connect wallet</button><span class="wallet-feedback" id="wallet-feedback" role="status"></span></div></div></header><main class="practice puzzle">
+  <section class="practice-hero">
+    <small>Free practice</small><h1>Puzzle Print</h1>
+    <p>Draw tiles, trade duplicates, and watch the pearlescent print come to life.</p>
+  </section>
+  <div class="practice-grid">
+    <section class="practice-board" aria-labelledby="print-title">
+      <h2 id="print-title">Your print</h2>
+      <p id="collection"></p>
+      <progress id="print-progress" max="25" value="0" aria-label="Unique print pieces collected"></progress>
+      <div class="practice-tiles" id="board" aria-label="Puzzle collection"></div>
+    </section>
+    <section class="practice-panel">
+      <h2>Collect pieces</h2><p id="pool"></p>
+      <label for="quantity">Pieces to draw</label><input id="quantity" type="number" min="1" max="25" value="5">
+      <div class="practice-actions"><button class="primary" id="draw" type="button">Draw pieces</button><button id="free" type="button">Weekly free piece</button></div>
+      <label for="trade">Choose a missing piece</label><select id="trade"></select>
+      <div class="practice-actions"><button id="swap" type="button">Trade a duplicate</button><button id="claim" type="button">Claim completed print</button></div>
+      <p id="status" class="practice-status" role="status"></p>
+      <p><a class="practice-complete" id="completed-print" href="/puzzle-art.jpg" download="puzzle-print-practice.jpg" hidden>Download your print</a></p>
+      <details>
+        <summary>Practice charity nomination</summary>
+        <label for="charity">Choose a recipient</label><select id="charity"><option>Community Food Fund</option><option>Habitat Recovery Fund</option><option>Children’s Learning Fund</option></select>
+        <div class="practice-actions"><button id="nominate" type="button">Nominate</button></div>
+      </details>
+      <button id="reset-puzzle" type="button">Start over</button>
+    </section>
+  </div>
+  <p class="practice-note">Draws, trades, nominations and claims are simulated. Progress saves in this browser. <a href="/puzzle-print#planned-rules">Read the planned rules</a>.</p>
 </main><!-- arcade-footer --><script type="module" src="/puzzle.js"></script><script type="module" src="/wallet-button.js"></script></body></html>

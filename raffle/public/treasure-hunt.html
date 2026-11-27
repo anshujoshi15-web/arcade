@@ -1,28 +1,34 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Treasure Hunt Preview · House Arcade</title>
-<link rel="stylesheet" href="/arcade-theme.css"><link rel="stylesheet" href="/info.css"><link rel="stylesheet" href="/wallet-button.css"><link rel="stylesheet" href="/treasure-hunt.css"></head>
+<link rel="stylesheet" href="/arcade-theme.css"><link rel="stylesheet" href="/info.css"><link rel="stylesheet" href="/wallet-button.css"><link rel="stylesheet" href="/practice.css"></head>
 <body>
 <header class="arcade-header"><div class="arcade-chrome"><a class="arcade-brand" href="/">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/#games">Games</a><a href="/raffle">House Raffle</a><a href="/help">Help</a></nav><div class="wallet-actions"><button class="wallet-button" id="connect" type="button" data-wallet-header disabled>Connect wallet</button><span id="wallet-feedback" class="wallet-feedback" role="status"></span></div></div></header>
-<main class="info hunt">
-  <header><p>Free practice</p><h1>Treasure Hunt</h1><p>Draw from a shuffled pool, trade spare pieces, and complete the island map to reveal the hidden gold X.</p></header>
-  <section aria-labelledby="map-title">
-    <h2 id="map-title">Your treasure map</h2>
-    <p id="collection-summary"></p>
-    <p>Pieces left in the practice pool <strong id="pieces-left"></strong></p>
-    <progress id="map-progress" max="20" value="0" aria-label="Unique map pieces found"></progress>
-    <ol id="map-pieces" class="hunt-map" aria-label="Map collection"></ol>
-    <div class="hunt-actions">
-      <button class="wallet-button" id="draw-piece" type="button">Draw a map piece</button>
-      <button class="wallet-button" id="trade-piece" type="button">Trade a duplicate (practice)</button>
-      <button class="wallet-button" id="claim-map" type="button">Claim treasure</button>
-    </div>
-    <p id="hunt-status" role="status"></p>
-    <p id="completion-map" hidden><strong>Completed map · Token 21 preview</strong></p>
-    <p>Draws and simulated trades use no funds. Progress is stored in this browser.</p>
-    <button id="reset-hunt" class="hunt-reset" type="button">Start over</button>
+<main class="practice hunt">
+  <section class="practice-hero">
+    <small>Free practice</small><h1>Treasure Hunt</h1>
+    <p>Follow the island’s trails one map piece at a time. Complete the map to reveal the hidden gold X.</p>
   </section>
-  <p><a href="/treasure-hunt#planned-rules">Read the planned public rules</a></p>
+  <div class="practice-grid">
+    <section class="practice-board" aria-labelledby="map-title">
+      <h2 id="map-title">Your treasure map</h2>
+      <p id="collection-summary"></p>
+      <progress id="map-progress" max="20" value="0" aria-label="Unique map pieces found"></progress>
+      <ol id="map-pieces" class="practice-tiles" aria-label="Map collection"></ol>
+    </section>
+    <section class="practice-panel"><h2>Explore the island</h2>
+      <p>Pieces left in the practice pool <strong id="pieces-left"></strong></p>
+      <div class="practice-actions">
+        <button class="primary" id="draw-piece" type="button">Draw a map piece</button>
+        <button id="trade-piece" type="button">Trade a duplicate</button>
+        <button id="claim-map" type="button">Claim treasure</button>
+      </div>
+      <p id="hunt-status" class="practice-status" role="status"></p>
+      <p id="completion-map" class="practice-complete" hidden>Completed map · Token 21 preview</p>
+      <button id="reset-hunt" type="button">Start over</button>
+    </section>
+  </div>
+  <p class="practice-note">Draws and trades are simulated. Progress saves in this browser. <a href="/treasure-hunt#planned-rules">Read the planned rules</a>.</p>
 </main>
 <!-- arcade-footer -->
 <script type="module" src="/wallet-button.js"></script><script type="module" src="/treasure-hunt.mjs"></script>

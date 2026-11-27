@@ -51,7 +51,7 @@ const routes = new Map([
   ['/puzzle-art.jpg', ['image/jpeg', publicFile('puzzle-art.jpg')]],
   ['/treasure-hunt.mjs', ['text/javascript', publicFile('treasure-hunt.mjs')]],
   ['/treasure-map.jpg', ['image/jpeg', publicFile('treasure-map.jpg')]],
-  ['/treasure-hunt.css', ['text/css', publicFile('treasure-hunt.css')]],
+  ['/practice.css', ['text/css', publicFile('practice.css')]],
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],
   ['/rules', ['text/html', publicFile('rules.html')]],

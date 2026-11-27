@@ -70,12 +70,13 @@ function setup() {
   }
   persist();
 
-  function render() {
+  function render(revealed = []) {
     const absent = missing(game);
     el('board').replaceChildren(...types.map(id => {
       const item = document.createElement('div');
       const count = game.held[id];
       item.className = count || game.claimed ? 'piece owned' : 'piece';
+      if (revealed.includes(id)) item.classList.add('just-found');
       if (count || game.claimed) {
         item.style.backgroundPosition = ((id - 1) % 5) * 25 + '% ' + Math.floor((id - 1) / 5) * 25 + '%';
         if (!game.claimed) {
@@ -108,10 +109,10 @@ function setup() {
     el('completed-print').hidden = !game.claimed;
   }
 
-  function save(message) {
+  function save(message, revealed) {
     if (!persist()) message += ' Progress is available for this session only.';
     el('status').textContent = message;
-    render();
+    render(revealed);
   }
   function play(count, free) {
     const drawn = draw(game, count, free);
@@ -120,14 +121,14 @@ function setup() {
       render();
       return;
     }
-    save('Drawn pieces: ' + drawn.join(', ') + '.');
+    save('Drawn pieces: ' + drawn.join(', ') + '.', drawn);
   }
   el('draw').onclick = () => play(el('quantity').valueAsNumber, false);
   el('free').onclick = () => play(1, true);
   el('swap').onclick = () => {
     const incoming = Number(el('trade').value);
     const outgoing = trade(game, incoming);
-    if (outgoing) save('Traded a duplicate of piece ' + outgoing + ' for piece ' + incoming + '.');
+    if (outgoing) save('Traded a duplicate of piece ' + outgoing + ' for piece ' + incoming + '.', [incoming]);
   };
   el('nominate').onclick = () => {
     if (!game.entered || game.nomination) return;
