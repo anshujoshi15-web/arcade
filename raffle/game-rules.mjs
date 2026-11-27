@@ -32,8 +32,14 @@ export const gameRules = {
     entry:'2 USDC per piece. There are 20 map designs with 1,000 copies each. Up to 25 per purchase, 50 held per wallet, and one claim per wallet.',
     rows:[6000,3200,2000,1200,800].map((value,index)=>[String(index+1),eth(value)]).concat([['Total',eth(13200)]]),
     headings:['Claim order','Prize at paid sellout'],
-    notes:['Trade duplicates to collect all 20 parts and uncover the hidden spot. The pieces burn on claim. The pool and hidden spot are committed before entries open.',
-      'Claims open after 9,091 paid pieces, when the prize pool can cover the $6,000 first-place prize at 0.66 USDC per paid piece. Later places unlock as funded. At a fully paid sellout, 40,000 USDC of gross corresponds to 13,600 for the donation, 13,200 for the House, and 13,200 in ETH value for prizes.']
+    notes:[
+      'One 20,000-piece pool is shuffled before launch. Each paid or free draw takes the next tile without checking what the player owns. Duplicate pieces can be traded. The hidden gold X appears only after all 20 tiles are assembled.',
+      'The planned launch uses Base ERC-1155 token IDs 1–20 for numbered pieces. A successful claim burns one of each piece and issues the completed map as token ID 21. The first five eligible claims are ranked in claim order.',
+      'Under the funding schedule in the game brief, 100% of the first 5,600 paid pieces funds the prize reserve. At 2 USDC per piece, that is 11,200 USDC, enough to cover the first three sellout prizes. Later sales fund the remaining prize, donation and House allocations. Each later prize unlocks when funded.',
+      'At a fully paid sellout, 40,000 USDC of gross funds 13,600 for donations, 13,200 for the House, and 13,200 in ETH prize value. Free pieces come from the same pool and add no revenue.',
+      'The planned hunt publishes commitments to the shuffled order and hidden cell before sales, with the underlying values revealed at settlement. Each participating wallet may nominate one charity.',
+      'If the funding gate is missed and sales stall for 180 days, the House may close the hunt and refund paid buyers in full.'
+    ]
   },
   '/ballz-out': {
     ...nbaa,

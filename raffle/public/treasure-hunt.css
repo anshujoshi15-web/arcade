@@ -4,7 +4,7 @@
 .hunt h1 { margin: 8px 0 12px; }
 .hunt progress { width: min(100%, 32rem); accent-color: #0000ff; }
 .hunt-map { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 4px; max-width: 32rem; list-style: none; padding: 8px; background: #081737; border-radius: 12px; }
-.hunt-map li { position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0; color: #dce9ff; background: #193562; border-radius: 5px; font-weight: 800; }
+.hunt-map li { position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0; color: #382400; background: repeating-linear-gradient(135deg,#e4c58c 0 9px,#e7cd9e 9px 11px); border-radius: 5px; font-weight: 800; }
 .hunt-map .found {
   color: white;
   background-color: #14585d;
@@ -26,3 +26,5 @@
 .hunt-map small { position: absolute; right: 4px; bottom: 1px; }
 .hunt-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .hunt-reset { font: inherit; color: #0000cc; padding: 6px 0; background: transparent; border: 0; text-decoration: underline; cursor: pointer; }
+
+.hunt [hidden] { display: none; }

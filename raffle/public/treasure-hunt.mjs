@@ -3,37 +3,41 @@ const copiesPerDesign = 1000;
 const holdingLimit = 50;
 const storageKey = 'house-arcade:treasure-hunt:1';
 
-export function newHunt() {
-  return {pool:Array(designs).fill(copiesPerDesign), held:Array(designs).fill(0), claimed:false};
+function shuffledDeck(counts, pick) {
+  const deck = counts.flatMap((count, index) => Array(count).fill(index + 1));
+  for (let index = deck.length - 1; index > 0; index--) {
+    const other = pick(index + 1);
+    [deck[index], deck[other]] = [deck[other], deck[index]];
+  }
+  return deck;
 }
 
-export function summarize({held, claimed}) {
+export function newHunt(pick = randomIndex) {
+  return {deck:shuffledDeck(Array(designs).fill(copiesPerDesign), pick), held:Array(designs).fill(0),
+    claimed:false, spot:pick(designs) + 1};
+}
+
+export function summarize({held, claimed, deck}) {
   const unique = held.filter(Boolean).length;
   const total = held.reduce((sum, count) => sum + count, 0);
-  return {unique, total, canDraw:!claimed && unique < designs && total < holdingLimit,
+  return {unique, total, canDraw:!claimed && unique < designs && total < holdingLimit && deck.length > 0,
     canTrade:!claimed && unique < designs && total > unique, canClaim:!claimed && unique === designs};
 }
 
-export function drawPiece(hunt, pick) {
+export function drawPiece(hunt) {
   if (!summarize(hunt).canDraw) return null;
-  const missing = hunt.held.flatMap((count, index) => count === 0 && hunt.pool[index] > 0 ? [index] : []);
-  if (!missing.length) return null;
-  const index = missing[pick(missing.length)];
-  hunt.pool[index]--;
-  hunt.held[index]++;
-  return index + 1;
+  const piece = hunt.deck.pop();
+  hunt.held[piece - 1]++;
+  return piece;
 }
 
-export function tradePiece(hunt, pick) {
+export function tradePiece(hunt, pick = randomIndex) {
   if (!summarize(hunt).canTrade) return null;
-  const missing = hunt.held.flatMap((count, index) => count === 0 && hunt.pool[index] > 0 ? [index] : []);
-  if (!missing.length) return null;
+  const missing = hunt.held.flatMap((count, index) => count === 0 ? [index] : []);
   const outgoing = hunt.held.findIndex(count => count > 1);
   const incoming = missing[pick(missing.length)];
   hunt.held[outgoing]--;
-  hunt.pool[outgoing]++;
   hunt.held[incoming]++;
-  hunt.pool[incoming]--;
   return {outgoing:outgoing + 1, incoming:incoming + 1};
 }
 
@@ -56,9 +60,14 @@ function loadHunt() {
     const saved = JSON.parse(localStorage.getItem(storageKey));
     const validCounts = counts => Array.isArray(counts) && counts.length === designs &&
       counts.every(count => Number.isInteger(count) && count >= 0 && count <= copiesPerDesign);
-    if (validCounts(saved?.pool) && validCounts(saved?.held) && typeof saved.claimed === 'boolean' &&
-        summarize(saved).total <= holdingLimit &&
-        saved.held.every((count, index) => count + saved.pool[index] + Number(saved.claimed) === copiesPerDesign)) return saved;
+    if (!validCounts(saved?.held) || typeof saved.claimed !== 'boolean' ||
+        saved.held.reduce((sum, count) => sum + count, 0) > holdingLimit) return newHunt();
+    if (Array.isArray(saved.deck) && saved.deck.length <= designs * copiesPerDesign &&
+        saved.deck.every(piece => Number.isInteger(piece) && piece >= 1 && piece <= designs) &&
+        Number.isInteger(saved.spot) && saved.spot >= 1 && saved.spot <= designs) return saved;
+    if (validCounts(saved.pool)) return {held:saved.held, claimed:saved.claimed,
+      deck:shuffledDeck(saved.pool, randomIndex), spot:14};
+
   } catch {
     // A fresh collection is available when storage is disabled or corrupted.
   }
@@ -68,10 +77,12 @@ function loadHunt() {
 function setup() {
   const el = id => document.getElementById(id);
   let hunt = loadHunt();
+  persist();
   function render(message, revealedPiece) {
     const state = summarize(hunt);
     el('collection-summary').textContent = hunt.claimed ? 'Treasure claimed' :
       state.unique + ' of 20 designs found · ' + state.total + ' of 50 pieces held';
+    el('pieces-left').textContent = hunt.deck.length.toLocaleString('en-US') + ' of 20,000';
     el('map-progress').value = hunt.claimed ? designs : state.unique;
     el('map-pieces').replaceChildren(...hunt.held.map((count, index) => {
       const item = document.createElement('li');
@@ -93,16 +104,20 @@ function setup() {
     el('draw-piece').disabled = !state.canDraw;
     el('trade-piece').hidden = !state.canTrade;
     el('claim-map').disabled = !state.canClaim;
-    el('hunt-status').textContent = message || (hunt.claimed ? 'You found the treasure at piece 14.' :
+    el('completion-map').hidden = !hunt.claimed;
+    el('hunt-status').textContent = message || (hunt.claimed ? 'You found the treasure at piece ' + hunt.spot + '.' :
       state.canClaim ? 'Map complete. Claim your practice treasure.' : 'Draw a piece to continue exploring.');
   }
+  function persist() {
+    try { localStorage.setItem(storageKey, JSON.stringify(hunt)); return true; }
+    catch { return false; }
+  }
   function save(message, revealedPiece) {
-    try { localStorage.setItem(storageKey, JSON.stringify(hunt)); }
-    catch { message += ' Progress is available for this session only.'; }
+    if (!persist()) message += ' Progress is available for this session only.';
     render(message, revealedPiece);
   }
   el('draw-piece').onclick = () => {
-    const piece = drawPiece(hunt, randomIndex);
+    const piece = drawPiece(hunt);
     if (piece) save('Found map piece ' + piece + '.' +
       (summarize(hunt).canClaim ? ' Your map is complete. Claim the treasure.' : ''), piece);
   };
@@ -111,7 +126,7 @@ function setup() {
     if (trade) save('Traded a duplicate of piece ' + trade.outgoing + ' for piece ' + trade.incoming + '.', trade.incoming);
   };
   el('claim-map').onclick = () => {
-    if (claimTreasure(hunt)) save('Treasure found at piece 14. Your complete set was used for this practice claim.');
+    if (claimTreasure(hunt)) save('Treasure found at piece ' + hunt.spot + '. Your complete set was used for this practice claim.');
   };
   el('reset-hunt').onclick = () => {
     if (!window.confirm('Start over and replace this browser’s practice collection?')) return;
