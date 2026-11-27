@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ballz Out Practice · House Arcade</title>
+<link rel="stylesheet" href="/arcade-theme.css"><link rel="stylesheet" href="/wallet-button.css"><link rel="stylesheet" href="/practice.css"><link rel="stylesheet" href="/ballz-out.css">
+</head><body>
+<header class="arcade-header"><div class="arcade-chrome"><a class="arcade-brand" href="/">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/#games">Games</a><a href="/raffle">House Raffle</a><a href="/ballz-out" aria-current="page">Ballz Out</a><a href="/help">Help</a></nav><div class="wallet-actions"><button class="wallet-button" id="connect" type="button" data-wallet-header disabled>Connect wallet</button><span id="wallet-feedback" class="wallet-feedback" role="status"></span></div></div></header>
+<main class="practice ballz-practice">
+  <section class="practice-hero"><small>Free practice</small><h1>Ballz Out</h1><p>Call Blue or Gold. Get it right and climb. Cash out after a win, or risk your practice points on another 50/50 call.</p></section>
+  <div class="practice-grid">
+    <section class="practice-board" aria-labelledby="ladder-title">
+      <h2 id="ladder-title">Double-or-nothing ladder</h2>
+      <ol class="ballz-ladder" id="ladder"></ol>
+    </section>
+    <section class="practice-panel">
+      <h2>Your next call</h2>
+      <div class="ballz-orb" id="orb" aria-hidden="true"></div>
+      <p class="practice-status" id="ballz-result" role="status">Call Blue or Gold to start.</p>
+      <p>Current ladder <strong id="ladder-points">0 points</strong> · Banked <strong id="banked-points">0 points</strong></p>
+      <div class="practice-actions">
+        <button class="primary" id="call-blue" type="button" disabled>Call Blue</button>
+        <button id="call-gold" type="button" disabled>Call Gold</button>
+        <button id="cash-out" type="button" disabled>Cash out</button>
+        <button id="new-run" type="button" hidden>New run</button>
+      </div>
+    </section>
+  </div>
+  <p class="practice-note">No wallet needed. Practice points have no payout value. <a href="/ballz-out#planned-rules">Read the planned rules</a>.</p>
+</main>
+<!-- arcade-footer -->
+<script type="module" src="/wallet-button.js"></script><script type="module" src="/ballz-out.mjs"></script>
+</body></html>
