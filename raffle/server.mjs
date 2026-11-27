@@ -42,6 +42,7 @@ const routes = new Map([
   ['/webmcp.js', ['text/javascript', publicFile('webmcp.js')]],
   ['/arcade-agent-data.mjs', ['text/javascript', publicFile('arcade-agent-data.mjs')]],
   ...['arcade-logo.png', 'arcade-favicon.png', 'arcade-share.png'].map(name => ['/' + name, ['image/png', publicFile(name)]]),
+  ['/treasure-map.jpg', ['image/jpeg', publicFile('treasure-map.jpg')]],
   ['/treasure-hunt.css', ['text/css', publicFile('treasure-hunt.css')]],
   ['/raffle-page.css', ['text/css', publicFile('raffle-page.css')]],
   ['/utc-time.js', ['text/javascript', publicFile('utc-time.js')]],

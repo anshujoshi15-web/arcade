@@ -5,19 +5,19 @@
 <body>
 <header class="arcade-header"><div class="arcade-chrome"><a class="arcade-brand" href="/">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/#games">Games</a><a href="/raffle">House Raffle</a><a href="/admin">Admin</a></nav><div class="wallet-actions"><button class="wallet-button" id="connect" type="button" data-wallet-header disabled>Connect wallet</button><span id="wallet-feedback" class="wallet-feedback" role="status"></span></div></div></header>
 <main class="info hunt">
-  <header><p>House preview</p><h1>Treasure Hunt</h1><p>Draw map pieces, swap duplicates, and assemble all 20 designs to uncover the hidden spot.</p></header>
+  <header><p>House preview</p><h1>Treasure Hunt</h1><p>Every draw uncovers a missing piece. Reveal all 20 pieces to find the treasure.</p></header>
   <section aria-labelledby="map-title">
     <h2 id="map-title">Your treasure map</h2>
     <p id="collection-summary"></p>
     <progress id="map-progress" max="20" value="0" aria-label="Unique map pieces found"></progress>
     <ol id="map-pieces" class="hunt-map" aria-label="Map collection"></ol>
     <div class="hunt-actions">
-      <button class="wallet-button" id="draw-piece" type="button">Draw a piece</button>
+      <button class="wallet-button" id="draw-piece" type="button">Draw a missing piece</button>
       <button class="wallet-button" id="trade-piece" type="button">Trade a duplicate</button>
       <button class="wallet-button" id="claim-map" type="button">Claim treasure</button>
     </div>
     <p id="hunt-status" role="status"></p>
-    <p>Practice draws and trades use no funds. Progress is stored in this browser.</p>
+    <p>Practice draws use no funds. Progress is stored in this browser.</p>
     <button id="reset-hunt" class="hunt-reset" type="button">Start over</button>
   </section>
   <p><a href="/treasure-hunt#planned-rules">Read the planned public rules</a></p>

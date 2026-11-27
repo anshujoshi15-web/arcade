@@ -16,8 +16,9 @@ export function summarize({held, claimed}) {
 
 export function drawPiece(hunt, pick) {
   if (!summarize(hunt).canDraw) return null;
-  let draw = pick(hunt.pool.reduce((sum, count) => sum + count, 0));
-  const index = hunt.pool.findIndex(count => (draw -= count) < 0);
+  const missing = hunt.held.flatMap((count, index) => count === 0 && hunt.pool[index] > 0 ? [index] : []);
+  if (!missing.length) return null;
+  const index = missing[pick(missing.length)];
   hunt.pool[index]--;
   hunt.held[index]++;
   return index + 1;
@@ -67,7 +68,7 @@ function loadHunt() {
 function setup() {
   const el = id => document.getElementById(id);
   let hunt = loadHunt();
-  function render(message) {
+  function render(message, revealedPiece) {
     const state = summarize(hunt);
     el('collection-summary').textContent = hunt.claimed ? 'Treasure claimed' :
       state.unique + ' of 20 designs found · ' + state.total + ' of 50 pieces held';
@@ -76,7 +77,10 @@ function setup() {
       const item = document.createElement('li');
       const revealed = count > 0 || hunt.claimed;
       item.className = revealed ? 'found' : '';
+      if (index + 1 === revealedPiece) item.classList.add('just-found');
       if (index === 13 && hunt.claimed) item.className += ' treasure';
+      item.style.setProperty('--map-x', (index % 5) * 25 + '%');
+      item.style.setProperty('--map-y', Math.floor(index / 5) * 100 / 3 + '%');
       item.textContent = hunt.claimed && index === 13 ? '✦' : revealed ? String(index + 1).padStart(2,'0') : '?';
       item.setAttribute('aria-label', 'Piece ' + (index + 1) + (hunt.claimed ? ' revealed' : ', ' + count + ' held'));
       if (count > 1 && !hunt.claimed) {
@@ -87,23 +91,24 @@ function setup() {
       return item;
     }));
     el('draw-piece').disabled = !state.canDraw;
-    el('trade-piece').disabled = !state.canTrade;
+    el('trade-piece').hidden = !state.canTrade;
     el('claim-map').disabled = !state.canClaim;
     el('hunt-status').textContent = message || (hunt.claimed ? 'You found the treasure at piece 14.' :
       state.canClaim ? 'Map complete. Claim your practice treasure.' : 'Draw a piece to continue exploring.');
   }
-  function save(message) {
+  function save(message, revealedPiece) {
     try { localStorage.setItem(storageKey, JSON.stringify(hunt)); }
     catch { message += ' Progress is available for this session only.'; }
-    render(message);
+    render(message, revealedPiece);
   }
   el('draw-piece').onclick = () => {
     const piece = drawPiece(hunt, randomIndex);
-    if (piece) save('Found map piece ' + piece + '.');
+    if (piece) save('Found map piece ' + piece + '.' +
+      (summarize(hunt).canClaim ? ' Your map is complete. Claim the treasure.' : ''), piece);
   };
   el('trade-piece').onclick = () => {
     const trade = tradePiece(hunt, randomIndex);
-    if (trade) save('Traded a duplicate of piece ' + trade.outgoing + ' for piece ' + trade.incoming + '.');
+    if (trade) save('Traded a duplicate of piece ' + trade.outgoing + ' for piece ' + trade.incoming + '.', trade.incoming);
   };
   el('claim-map').onclick = () => {
     if (claimTreasure(hunt)) save('Treasure found at piece 14. Your complete set was used for this practice claim.');

@@ -5,8 +5,24 @@
 .hunt progress { width: min(100%, 32rem); accent-color: #0000ff; }
 .hunt-map { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 4px; max-width: 32rem; list-style: none; padding: 8px; background: #081737; border-radius: 12px; }
 .hunt-map li { position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0; color: #dce9ff; background: #193562; border-radius: 5px; font-weight: 800; }
-.hunt-map .found { color: #073343; background: repeating-linear-gradient(135deg,#6ce0cc 0 9px,#8eecd9 9px 11px); }
-.hunt-map .treasure { color: #382400; background: #f7c96b; }
+.hunt-map .found {
+  color: white;
+  background-color: #14585d;
+  background-image: url('/treasure-map.jpg');
+  background-size: 500% 400%;
+  background-position: var(--map-x) var(--map-y);
+  text-shadow: 0 1px 4px #081737, 0 1px 8px #081737;
+}
+.hunt-map .just-found { animation: reveal-map-piece .32s ease-out; }
+.hunt-map .treasure {
+  color: #ffe09b;
+  outline: 2px solid #f7c96b;
+  outline-offset: -3px;
+  font-size: clamp(1.25rem, 5vw, 2.5rem);
+}
+@keyframes reveal-map-piece { from { opacity: .55; transform: scale(.93); } }
+@media (prefers-reduced-motion: reduce) { .hunt-map .just-found { animation: none; } }
+.hunt-actions [hidden] { display: none; }
 .hunt-map small { position: absolute; right: 4px; bottom: 1px; }
 .hunt-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .hunt-reset { font: inherit; color: #0000cc; padding: 6px 0; background: transparent; border: 0; text-decoration: underline; cursor: pointer; }
