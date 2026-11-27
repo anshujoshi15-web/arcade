@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Play or Pass Practice · House Arcade</title>
+<link rel="stylesheet" href="/arcade-theme.css"><link rel="stylesheet" href="/wallet-button.css"><link rel="stylesheet" href="/practice.css"><link rel="stylesheet" href="/play-or-pass.css">
+</head><body>
+<header class="arcade-header"><div class="arcade-chrome"><a class="arcade-brand" href="/">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/#games">Games</a><a href="/raffle">House Raffle</a><a href="/play-or-pass" aria-current="page">Play or Pass</a><a href="/help">Help</a></nav><div class="wallet-actions"><button class="wallet-button" id="connect" type="button" data-wallet-header disabled>Connect wallet</button><span id="wallet-feedback" class="wallet-feedback" role="status"></span></div></div></header>
+<main class="practice pass-practice">
+  <section class="practice-hero"><small>Free practice</small><h1>Play or Pass</h1><p>One number. Two sides. Pick the range before the Arcade calls it.</p></section>
+  <div class="practice-grid">
+    <section class="practice-board" aria-labelledby="draw-title">
+      <h2 id="draw-title">The draw</h2>
+      <div class="pass-display" id="pass-display" aria-hidden="true">—</div>
+      <div class="pass-ranges" aria-hidden="true"><span>PLAY · 00–49</span><span>PASS · 50–99</span></div>
+    </section>
+    <section class="practice-panel">
+      <h2>Make the call</h2>
+      <p>Both sides have 50 numbers. A correct call earns one practice point.</p>
+      <div class="practice-actions">
+        <button class="primary" id="pick-play" type="button" disabled>Play · 00–49</button>
+        <button id="pick-pass" type="button" disabled>Pass · 50–99</button>
+      </div>
+      <p id="pass-result" class="practice-status" role="status">Pick a side to start.</p>
+      <dl class="pass-score"><div><dt>Rounds</dt><dd id="pass-rounds">0</dd></div><div><dt>Points</dt><dd id="pass-points">0</dd></div><div><dt>Win streak</dt><dd id="pass-streak">0</dd></div></dl>
+    </section>
+  </div>
+  <p class="practice-note">No wallet or payment required. Practice points have no payout value. <a href="/play-or-pass#planned-rules">Read the planned rules</a>.</p>
+</main>
+<!-- arcade-footer -->
+<script type="module" src="/wallet-button.js"></script><script type="module" src="/play-or-pass.mjs"></script>
+</body></html>

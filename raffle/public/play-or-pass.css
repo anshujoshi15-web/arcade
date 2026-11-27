@@ -1,0 +1,19 @@
+.practice.pass-practice { --accent: #f8cf7b; --art: url('/nbaa-cover.jpg'); }
+.pass-display {
+  display: grid; place-items: center; width: min(100%, 15rem); margin: 1rem auto;
+  aspect-ratio: 1.25; border: 2px solid #5976b6; border-radius: 18px;
+  color: #fff; background: radial-gradient(ellipse at 30% 15%,#375694,#101b3c 74%);
+  box-shadow: inset 0 2px 0 #fff4, 0 6px 0 #071027, 0 12px 20px #050a20;
+  font-weight: 800; font-size: clamp(3rem, 13vw, 6rem); font-variant-numeric: tabular-nums;
+}
+.pass-display[data-side="pass"] { color: #ffe2a2; border-color: #d59e46; }
+.pass-display[data-side="play"] { color: #b7dbff; border-color: #70a6ff; }
+.pass-ranges, .pass-score { display: grid; gap: 8px; text-align: center; }
+.pass-ranges { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.pass-ranges span, .pass-score div { padding: 8px; border-radius: 8px; }
+.pass-ranges span { background: #253d72; }
+.pass-ranges span:last-child { background: #57431f; }
+.pass-score { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.pass-score div { background: #edf3ff; }
+.pass-score dd { margin: 0; font-size: 1.3rem; font-weight: 700; }
+.pass-practice #pick-pass { color: #382300; background: #f8cf7b; border-color: #bd9147; }
