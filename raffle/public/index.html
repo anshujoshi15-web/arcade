@@ -34,14 +34,14 @@
     <p role="status" id="status">Loading round…</p>
     <div id="game" hidden>
       <section class="round-metrics" aria-label="Round statistics">
-        <div><span>Tickets available</span><strong id="available"></strong></div>
+        <div><span>Tickets remaining</span><strong id="available"></strong><small>10,000 total tickets per round, including free and bonus entries</small></div>
         <div class="live-pool"><span>Live prize pool</span><strong id="pool"></strong><small>USD value paid in Base ETH</small><small>Each paid ticket adds $0.33 in prize value.</small></div>
         <div><span id="time-label">Draw time</span><strong id="countdown"></strong><small id="when"></small></div>
       </section>
       <section class="raffle-card draw-progress">
-        <div><h2>Draw qualification</h2><p id="paid-progress-label">0 of 6,000 paid tickets</p></div>
+        <div><h2>6,000 paid tickets required for the draw</h2><p id="paid-progress-label"></p></div>
         <progress id="paid-progress" max="6000" value="0" aria-label="Paid tickets toward draw threshold"></progress>
-        <p class="muted">Entries opened <strong id="opens-at"></strong></p><p class="muted" id="pool-updated"></p>
+        <p class="muted">Sales checkpoint <strong id="sales-checkpoint"></strong></p><p class="muted">Scheduled draw <strong id="scheduled-draw"></strong></p><p class="muted">Entries opened <strong id="opens-at"></strong></p><p class="muted" id="pool-updated"></p>
       </section>
       <p id="round-notice" class="notice" role="status"></p>
       <div class="raffle-columns">
@@ -55,7 +55,7 @@
             <div class="buy-line"><input id="qty" type="number" value="1" min="1" max="25"><button id="buy" class="primary" disabled>Approve USDC and buy</button></div>
           </div>
           <div class="entry-actions"><button id="free" class="secondary" disabled>Claim free ticket</button><button id="bonus" class="secondary" hidden>Claim streak ticket</button></div>
-          <p id="eligibility" class="muted"></p>
+          <p id="entry-status" class="muted" role="status"><strong>Wallet entry status</strong> <span id="eligibility">Connect your wallet to check paid and free entry.</span></p>
         </section>
         <section class="raffle-card">
           <h2>Prize ladder</h2>
@@ -80,7 +80,8 @@
       </section>
       <section class="raffle-card"><h2>Draw results</h2><ol id="winners"></ol><p id="receipt"></p></section>
       <section class="raffle-card"><h2>Hall of Winners</h2><div id="history"></div></section>
-      <div class="raffle-card"><details><summary>Round rules, eligibility and odds</summary><p>Each round offers 10,000 serials. A purchase can contain 1–25 tickets, and each wallet can receive up to 100 entries. Free and bonus tickets use the same serial pool, with up to 4,000 combined so 6,000 slots remain available for paid entry. Five distinct wallets win. A single ticket in a full round has a 1 in 10,000 chance at first place.</p><p>A draw requires 6,000 paid entries. Below that threshold, sales stay open and tickets and the full pot carry forward. Refunds are available only if the House cancels or formally closes the round without a draw. In that case, the House refunds original buyers in full in USDC. Gold, Early and streak marks are collectible traits and carry the same draw weight as other serials.</p><p>Each entrant’s first nomination counts once. Tied charities follow their published order in the nomination menu. The charity receives 34% of paid entries, the House receives 33%, and the five prizes total 33%. Winners have 30 days to claim. Unclaimed prizes go to the winning charity.</p><p>Entry is for adults meeting the round’s age and location requirements. Check your wallet’s entry status above. A ticket has no promised resale value.</p></details></div>
+    </div>
+    <section class="raffle-card" id="raffle-rules"><h2>Raffle rules, eligibility and odds</h2><p>Each round offers 10,000 serials. A purchase can contain 1–25 tickets, and each wallet can receive up to 100 entries. Free and bonus tickets use the same serial pool, with up to 4,000 combined so 6,000 slots remain available for paid entry. Five distinct wallets win. A single ticket in a full round has a 1 in 10,000 chance at first place.</p><p>If the round has fewer than 6,000 paid tickets at its first Sunday sales close, sales stay open and tickets and prize funds carry forward for up to four weeks after that first Sunday close. If the round is still below the threshold at the four-week limit, entries close and the House must formally end the round. The House can cancel at any time before it requests the draw. If the House cancels or formally ends the round without a draw, original buyers receive full USDC refunds and free entries are void. Postponement alone does not trigger refunds. Gold, Early and streak marks are collectible traits and carry the same draw weight as other serials.</p><p>Each entrant’s first nomination counts once. Tied charities follow their published order in the nomination menu. The charity receives 34% of paid entries, the House receives 33%, and the five prizes total 33%. Winners have 30 days to claim. Unclaimed prizes go to the winning charity.</p><p>Entry is for adults meeting the round’s age and location requirements. <a href="#entry-status">Check your wallet’s entry status</a>. A ticket has no promised resale value.</p></section>
     </div>
   </div>
 </main>

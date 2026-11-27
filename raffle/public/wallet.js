@@ -114,6 +114,9 @@ async function refresh(){
   $('paid-progress').value = Math.min(Number(sold), 6000);
   $('paid-progress-label').textContent = sold.toLocaleString('en-US') + (sold >= 6000n ? ' paid tickets · threshold met' : ' of 6,000 paid tickets');
   $('pool-updated').textContent = 'Updated ' + formatUtc(Date.now() / 1000);
+  $('sales-checkpoint').textContent = formatUtc(salesClose);
+  $('scheduled-draw').textContent = cancelled ? 'Cancelled' : expired ? 'Threshold missed · awaiting formal closure' :
+    formatUtc(drawTime) + (awaitingThreshold ? ' · subject to the paid-ticket threshold' : '');
   $('opens-at').textContent = formatUtc(c.opens);
   $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':'Chain '+cfg.chainId;
   awaitingThreshold=sold<6000n;
@@ -130,20 +133,29 @@ async function refresh(){
   }}
   let now=BigInt(Math.floor(Date.now()/1000));let eligible=account && await contract.eligibleUntil(account)>=now;
   const open = !closed && now >= c.opens;
-  const canEnter = eligible && open;
+  const wallet = account;
+  const atWalletLimit = wallet && (await Promise.all([contract.issued(wallet), contract.balanceOf(wallet)]))
+    .some(count => count >= 100n);
+  if (wallet !== account) return;
+  const canEnter = eligible && open && !atWalletLimit;
   const isOperator = account && [c.house, c.registrar].some(address => address.toLowerCase() === account.toLowerCase());
-  const canBuy = account && open && (eligible || (publicPaidEntry && !isOperator));
-  $('eligibility').textContent = !account ? 'Connect a wallet to enter.' :
-    eligible ? 'Wallet verified for entry.' :
+  const canBuy = account && open && !atWalletLimit && (eligible || (publicPaidEntry && !isOperator));
+  const freeUsed = canEnter && freeCapacity && await contract.usedFree(account);
+  const paidStatus = !paidEntryEnabled ? 'unavailable' : canBuy ? 'available' : 'requires wallet approval';
+  const freeStatus = !eligible ? 'requires wallet approval' : !freeCapacity ? 'entry limit reached' :
+    freeUsed ? 'already claimed this week' : 'available';
+  $('eligibility').textContent = cancelled ? 'Round cancelled. Free entries are void.' :
+    !open ? (closed ? 'Round closed to entries.' : 'Entries have not opened yet.') :
+    !account ? 'Connect your wallet to check paid and free entry.' :
     isOperator ? 'House and registrar wallets cannot enter.' :
-    publicPaidEntry ? 'Paid tickets are open to players. Free entry needs a wallet eligibility attestation.' :
-    'This round requires wallet approval before entry.';
+    atWalletLimit ? 'This wallet has reached the 100-ticket limit.' :
+    'Paid entry: ' + paidStatus + '. Free entry: ' + freeStatus + '.';
   $('buy').disabled = !paidEntryEnabled || busy || !canBuy;
-  $('free').disabled = busy || !canEnter || !freeCapacity || (account && await contract.usedFree(account));
+  $('free').disabled = busy || !canEnter || !freeCapacity || freeUsed;
   let prior=await contract.previous();
   $('bonus').hidden=!(account && canEnter && freeCapacity && prior!==zero && await new Contract(prior,abi,provider).streak(account)===4n && !await contract.usedBonus(account));
   if(!historyLoaded)await loadHistory();
-  $('round-notice').textContent=cancelled ? 'Round ended by the House. Full USDC refunds will be sent to original buyers.' : expired ? 'The four-week limit has been reached. Entries are closed and the round is awaiting formal closure by the House.' : postponed && !closed && sold<6000n
+  $('round-notice').textContent=cancelled ? 'Round ended by the House. Free entries are void. Full USDC refunds will be sent to original buyers.' : expired ? 'The four-week limit has been reached. Entries are closed and the round is awaiting formal closure by the House.' : postponed && !closed && sold<6000n
     ? 'Round postponed. Tickets and the full prize pot carry forward. ' + (6000n-sold).toLocaleString() + ' more paid tickets needed. Next sales checkpoint: ' + formatUtc(salesClose) + '.'
     : '';
   await showOwnedTickets();
@@ -221,6 +233,7 @@ if (!cfg.address) {
     contract = new Contract(cfg.address, abi, provider);
     await refresh();
     $('status').textContent = 'Round loaded.';
+    if (location.hash === '#entry-status') $('entry-status').scrollIntoView();
     setupWalletButton({
       local: Boolean(cfg.local),
       onConnect: cfg.local ? () => connect() : undefined,
