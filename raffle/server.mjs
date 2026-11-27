@@ -1,6 +1,7 @@
 import { listSupportReports, submitSupportReport } from './support.mjs';
 import { homeMarkdown, llmsText, sitemap, structuredData, serverCard } from './agent-discovery.mjs';
 import { origin, contentSignal } from './public/arcade-agent-data.mjs';
+import { gameShowcase } from './game-showcase.mjs';
 import { gameRules, upcomingRules } from './game-rules.mjs';
 import { adminAuth, isAdmin } from './admin-auth.mjs';
 import { enroll } from './local-enroll.mjs';
@@ -114,6 +115,7 @@ export function handleRequest(req, res) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.end(pageContent(publicFile('coming-soon.html'))
       .replaceAll('<!-- game-name -->', game.name)
+      .replace('<!-- game-showcase -->', () => gameShowcase(path, game))
       .replace('<!-- game-rules -->', () => upcomingRules(game)));
     return;
   }

@@ -55,3 +55,12 @@ summary { cursor: pointer; font-weight: 700; }
 .owned-tickets { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,220px),1fr)); gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
 .owned-tickets li { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 0 10px; border: 1px solid #d3e1ff; border-radius: 8px; }
 .owned-tickets a { display: inline-flex; align-items: center; min-height: 44px; }
+
+.raffle-hero .standard-ticket-preview {
+  display: block;
+  width: 54%;
+  height: auto;
+  margin: -8% 0 0 auto;
+  position: relative;
+  filter: drop-shadow(0 8px 14px #00184d55);
+}

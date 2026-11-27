@@ -72,9 +72,7 @@ export const gameRules = {
 
 export function upcomingRules(game) {
   const rows = game.rows.map(([key, value]) => '<tr><th scope="row">' + key + '</th><td>' + value + '</td></tr>').join('');
-  return (game.series ? '<p>' + game.series + '</p><img class="game-cover" src="' + game.artwork +
-    '" width="1600" height="1600" alt="No Ballz At All cover artwork"><p>NBAA is the series’ Cronos token.</p>' : '') +
-    '<section><h2>Planned game rules</h2><p>' + game.entry + '</p>' +
+  return '<section id="planned-rules"><h2>Planned game rules</h2><p>' + game.entry + '</p>' +
     '<p>' + (game.freeEntry || 'One free entry per wallet per week.') +
     ' No purchase is necessary. Players must be 18 or older.</p>' +
     '<table class="upcoming-prizes"><thead><tr>' +
@@ -82,5 +80,7 @@ export function upcomingRules(game) {
     '</tr></thead><tbody>' + rows + '</tbody></table>' +
     game.notes.map(note => '<p>' + note + '</p>').join('') +
     '<p>Main prizes are shown in USD value and paid in ' + (game.prizeCurrency || 'ETH') + '. ' + (game.bonus || 'Bonuses use a House token of the winner’s choice.') + '</p>' +
-    '<p><a href="/rules">Read the Arcade General Rules</a></p></section>';
+    '<p><a href="/rules">Read the Arcade General Rules</a></p></section>' +
+    (game.artwork ? '<section><h2>About NBAA</h2><p>NBAA is the series’ Cronos token.</p><img class="game-cover" src="' +
+      game.artwork + '" width="1600" height="1600" loading="lazy" alt="No Ballz At All cover artwork"></section>' : '');
 }
