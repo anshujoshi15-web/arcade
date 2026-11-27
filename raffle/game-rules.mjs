@@ -11,10 +11,13 @@ export const gameRules = {
   },
   '/weekly-bingo': {
     name:'Weekly Bingo',
+    prizeCurrency:'Base ETH',
     entry:'1 USDC on Base per card. Up to 10,000 cards per round, 25 per purchase, and 100 per wallet.',
-    rows:[['6,000 paid cards',eth(1980)],['10,000 paid cards',eth(3300)]],
-    headings:['Paid card count','Player pool'],
-    notes:[paidEntrySplit, 'The first full 75-ball bingo card wins the player pool. Each 5 × 5 NFT card has a free center. Cards that finish on the same ball split the pool equally.',
+    rows:[6000, 8000, 10000].map(cards => [
+      cards.toLocaleString('en-US') + ' paid cards', eth(cards * 33 / 100, 'Base ETH')
+    ]),
+    headings:['Paid card sales','Entire prize pool'],
+    notes:[paidEntrySplit, 'The first card to cover all 24 numbers wins the entire prize pool in Base ETH. Each 5 × 5 NFT card has a free center. If several cards finish on the same ball, those cards split the entire pool equally. The pool is 33% of actual paid sales.',
       'The scheduled Bingo draw is Sunday at 7 p.m. Mountain Time (02:00 UTC Monday during MST, 01:00 UTC Monday during MDT). In standard time this is one hour after a 01:00 UTC Monday Raffle sales checkpoint. During daylight time the two coincide if the Raffle checkpoint remains at 01:00 UTC. If sales are below 6,000 paid cards at the first Sunday close, the round can roll over for up to four weeks past that close. During postponement, sales stay open, cards stay valid, and the full pot carries forward.',
       'If the round is still below 6,000 paid cards at the four-week limit, entries close. The House can end the round before the draw. If the House cancels or closes the round without a draw, it manually refunds original buyers in full in USDC and voids free and bonus cards. Postponement alone does not trigger refunds.']
   },
