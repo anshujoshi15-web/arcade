@@ -62,6 +62,63 @@ function loadGame() {
   return newGame();
 }
 
+// Trace each seam in board coordinates so adjoining pieces share the same curve.
+function seam(x, y, dx, dy, tab) {
+  const point = (along, depth = 0) =>
+    [x + dx * along - Math.abs(dy) * depth * tab, y + dy * along + Math.abs(dx) * depth * tab].join(' ');
+  if (!tab) return 'L ' + point(100);
+  return 'L ' + point(39) + ' C ' + point(46) + ' ' + point(37, 15) + ' ' + point(50, 15) +
+    ' C ' + point(63, 15) + ' ' + point(54) + ' ' + point(61) + ' L ' + point(100);
+}
+
+export function jigsawPath(id) {
+  const column = (id - 1) % 5;
+  const row = Math.floor((id - 1) / 5);
+  const polarity = (x, y) => (x + y) % 2 ? -1 : 1;
+  return 'M 0 0 ' +
+    seam(0, 0, 1, 0, row ? polarity(column, row) : 0) + ' ' +
+    seam(100, 0, 0, 1, column < 4 ? polarity(column + 1, row) : 0) + ' ' +
+    seam(100, 100, -1, 0, row < 4 ? polarity(column, row + 1) : 0) + ' ' +
+    seam(0, 100, 0, -1, column ? polarity(column, row) : 0) + ' Z';
+}
+
+function svgElement(tag, attributes) {
+  const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
+  return element;
+}
+
+function renderPiece(id, count, claimed, revealed) {
+  const x = ((id - 1) % 5) * 100;
+  const y = Math.floor((id - 1) / 5) * 100;
+  const shown = count > 0 || claimed;
+  const path = jigsawPath(id);
+  const clipId = 'print-piece-' + id;
+  const item = svgElement('g', {
+    transform:'translate(' + x + ' ' + y + ')',
+    class:shown ? 'jigsaw-piece owned' : 'jigsaw-piece',
+    role:'img',
+    'aria-label':'Piece ' + id + (claimed ? ', completed' : ', ' + count + ' held')
+  });
+  const art = svgElement('g', {class:revealed ? 'just-found' : ''});
+  if (shown) {
+    const clip = svgElement('clipPath', {id:clipId});
+    clip.append(svgElement('path', {d:path}));
+    art.append(clip, svgElement('image', {
+      href:'/puzzle-art.jpg', x:-x, y:-y, width:500, height:500,
+      preserveAspectRatio:'xMidYMid slice', 'clip-path':'url(#' + clipId + ')'
+    }));
+  }
+  art.append(svgElement('path', {d:path, class:'jigsaw-edge'}));
+  if (!claimed) {
+    const number = svgElement('text', {x:50, y:55, 'text-anchor':'middle', 'aria-hidden':'true'});
+    number.textContent = count > 1 ? id + ' ×' + count : id;
+    art.append(number);
+  }
+  item.append(art);
+  return item;
+}
+
 function setup() {
   const el = id => document.getElementById(id);
   let game = loadGame();
@@ -73,22 +130,9 @@ function setup() {
 
   function render(revealed = []) {
     const absent = missing(game);
-    el('board').replaceChildren(...types.map(id => {
-      const item = document.createElement('div');
-      const count = game.held[id];
-      item.className = count || game.claimed ? 'piece owned' : 'piece';
-      if (revealed.includes(id)) item.classList.add('just-found');
-      if (count || game.claimed) {
-        item.style.backgroundPosition = ((id - 1) % 5) * 25 + '% ' + Math.floor((id - 1) / 5) * 25 + '%';
-        if (!game.claimed) {
-          const badge = document.createElement('b');
-          badge.textContent = count > 1 ? id + ' ×' + count : id;
-          item.append(badge);
-        }
-      } else item.textContent = id;
-      item.setAttribute('aria-label', 'Piece ' + id + (game.claimed ? ', completed' : ', ' + count + ' held'));
-      return item;
-    }));
+    el('board').classList.toggle('completed', game.claimed);
+    el('board').replaceChildren(...types.map(id =>
+      renderPiece(id, game.held[id], game.claimed, revealed.includes(id))));
     el('collection').textContent = game.claimed ? 'Completed print claimed' :
       (25 - absent.length) + ' of 25 unique pieces · ' + total(game) + ' of 50 held';
     el('print-progress').value = game.claimed ? 25 : 25 - absent.length;

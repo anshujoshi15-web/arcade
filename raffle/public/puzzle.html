@@ -4,14 +4,14 @@
 <header class="arcade-header"><div class="arcade-chrome"><a href="/" class="arcade-brand">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/">Games</a><a href="/raffle">House Raffle</a><a href="/puzzle-print" aria-current="page">Puzzle Print</a><a href="/help">Help</a></nav><div class="wallet-actions"><button type="button" class="wallet-button" id="connect" data-wallet-header disabled>Connect wallet</button><span class="wallet-feedback" id="wallet-feedback" role="status"></span></div></div></header><main class="practice puzzle">
   <section class="practice-hero">
     <small>Free practice</small><h1>Puzzle Print</h1>
-    <p>Draw tiles, trade duplicates, and watch the pearlescent print come to life.</p>
+    <p>Collect interlocking pieces, trade duplicates, and reveal the pearlescent print.</p>
   </section>
   <div class="practice-grid">
     <section class="practice-board" aria-labelledby="print-title">
       <h2 id="print-title">Your print</h2>
       <p id="collection"></p>
       <progress id="print-progress" max="25" value="0" aria-label="Unique print pieces collected"></progress>
-      <div class="practice-tiles" id="board" aria-label="Puzzle collection"></div>
+      <svg class="jigsaw-board" id="board" viewBox="0 0 500 500" role="group" aria-label="Jigsaw collection"></svg>
     </section>
     <section class="practice-panel">
       <h2>Collect pieces</h2><p id="pool"></p>
