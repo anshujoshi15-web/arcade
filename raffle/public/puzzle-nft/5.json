@@ -1,0 +1,20 @@
+{
+  "name": "Puzzle Print — Piece 05",
+  "description": "One of the 25 interlocking pieces of the House Arcade Puzzle Print artwork.",
+  "image": "https://arcade.thehouseofjoshi.com/puzzle-nft/5.png",
+  "external_url": "https://arcade.thehouseofjoshi.com/puzzle-print",
+  "attributes": [
+    {
+      "trait_type": "Piece",
+      "value": 5
+    },
+    {
+      "trait_type": "Row",
+      "value": 1
+    },
+    {
+      "trait_type": "Column",
+      "value": 5
+    }
+  ]
+}

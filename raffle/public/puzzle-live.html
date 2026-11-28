@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Puzzle Print on Base · House Arcade</title>
+<link rel="stylesheet" href="/arcade-theme.css"><link rel="stylesheet" href="/wallet-button.css"><link rel="stylesheet" href="/practice.css"><link rel="stylesheet" href="/info.css">
+</head><body>
+<header class="arcade-header"><div class="arcade-chrome"><a class="arcade-brand" href="/">House Arcade</a><nav class="arcade-nav" aria-label="Main navigation"><a href="/#games">Games</a><a href="/puzzle-print">Free practice</a><a href="/puzzle-print/rules">Rules</a></nav><div class="wallet-actions"><button class="wallet-button" id="connect" type="button" disabled>Connect wallet</button><span id="wallet-feedback" class="wallet-feedback" role="status"></span></div></div></header>
+<main class="practice">
+<section class="practice-hero"><small>Base · ERC-1155</small><h1>Puzzle Print</h1><p>Collect all 25 pieces and claim a completed print.</p></section>
+<p id="live-status" role="status">Loading Puzzle Print…</p>
+<div id="live-round" hidden>
+<div class="practice-grid">
+<section class="practice-board"><h2>Your print</h2><p id="live-count"></p><div id="live-tiles" class="practice-tiles"></div></section>
+<section class="practice-panel">
+<h2>Round status</h2><p id="live-funding"></p><p id="live-window"></p><p><a id="live-contract">View contract on BaseScan</a></p>
+<label for="live-quantity">Pieces to buy (2 USDC each)</label><input id="live-quantity" type="number" min="1" max="25" value="1">
+<div class="practice-actions"><button id="live-buy" class="primary" disabled>Buy pieces</button><button id="live-free" disabled>Weekly free piece</button></div>
+<label for="live-request">Draw request ID</label><input id="live-request" inputmode="numeric">
+<div class="practice-actions"><button id="live-process" disabled>Process draw queue</button><button id="live-collect" disabled>Collect my draw</button></div>
+<label for="live-nominee">Donation nominee</label><select id="live-nominee"></select>
+<div class="practice-actions"><button id="live-vote" disabled>Nominate</button><button id="live-claim" disabled>Claim completed print</button><button id="live-refund" disabled>Claim refund</button></div>
+<div class="practice-actions"><button id="live-close" disabled>Finalize round or open refunds</button><button id="live-refresh">Refresh</button></div>
+</section>
+</div>
+<div class="practice-grid">
+<section class="practice-panel"><h2>Trade duplicates</h2>
+<label for="live-offered">Piece you offer</label><input id="live-offered" type="number" min="1" max="25">
+<label for="live-wanted">Piece you want</label><input id="live-wanted" type="number" min="1" max="25">
+<div class="practice-actions"><button id="live-offer" disabled>Post trade</button></div>
+<label for="live-trade-id">Trade ID</label><input id="live-trade-id" inputmode="numeric">
+<div class="practice-actions"><button id="live-accept" disabled>Accept trade</button><button id="live-cancel" disabled>Cancel my trade</button></div>
+<h3>Open trades</h3><ul id="live-offers"></ul>
+</section>
+<section class="practice-panel"><h2>Winner and donation receipts</h2><p id="live-donation"></p><ol id="live-winners"></ol></section>
+</div></div>
+</main><!-- arcade-footer -->
+<script type="module" src="/puzzle-live.mjs"></script></body></html>

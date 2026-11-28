@@ -1,0 +1,12 @@
+{
+  "name": "Puzzle Print — Completed Artwork",
+  "description": "The finished pearlescent artwork awarded on a Puzzle Print claim.",
+  "image": "https://arcade.thehouseofjoshi.com/puzzle-nft/master.jpg",
+  "external_url": "https://arcade.thehouseofjoshi.com/puzzle-print",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Completed print"
+    }
+  ]
+}

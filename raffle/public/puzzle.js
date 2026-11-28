@@ -194,6 +194,9 @@ function setup() {
     save('New print started.');
   };
   render();
+  void fetch('/puzzle-print/config').then(response => response.json()).then(config => {
+    el('paid-puzzle-link').hidden = !config.address;
+  }).catch(() => {});
 }
 
 if (typeof document !== 'undefined') setup();

@@ -42,6 +42,8 @@ const routes = new Map([
   ['/arcade-agent-data.mjs', ['text/javascript', publicFile('arcade-agent-data.mjs')]],
   ...['arcade-logo.png', 'arcade-favicon.png', 'arcade-share.png'].map(name => ['/' + name, ['image/png', publicFile(name)]]),
   ['/puzzle-print', ['text/html', publicFile('puzzle.html')]],
+  ['/puzzle-print/live', ['text/html', publicFile('puzzle-live.html')]],
+  ['/puzzle-live.mjs', ['text/javascript', publicFile('puzzle-live.mjs')]],
   ['/treasure-hunt', ['text/html', publicFile('treasure-hunt.html')]],
   ['/puzzle.js', ['text/javascript', publicFile('puzzle.js')]],
   ['/puzzle-art.jpg', ['image/jpeg', publicFile('puzzle-art.jpg')]],
@@ -160,6 +162,32 @@ export function handleRequest(req, res) {
   }
   if (hosted && (path === '/house-raffle.html' || path === '/how-it-works.html')) {
     res.writeHead(302, {Location: path === '/house-raffle.html' ? '/raffle' : '/how-it-works'}).end();
+    return;
+  }
+  const puzzleAsset = path.match(/^\/puzzle-nft\/(master\.jpg|(?:[1-9]|1\d|2[0-6])\.json|(?:[1-9]|1\d|2[0-5])\.png)$/);
+  if (puzzleAsset) {
+    const name = puzzleAsset[1];
+    const type = name.endsWith('.json') ? 'application/json' : name.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    res.writeHead(200, {'Content-Type':type, 'Cache-Control':'public, max-age=86400'});
+    res.end(fs.readFileSync(publicFile('puzzle-nft/' + name)));
+    return;
+  }
+  if (path === '/puzzle-print/config' || path === '/puzzle-print/abi') {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store');
+    if (path.endsWith('/abi')) {
+      res.end(JSON.stringify(JSON.parse(fs.readFileSync(new URL('./PuzzlePrint.json', import.meta.url))).abi));
+      return;
+    }
+    try {
+      const cfg = JSON.parse(process.env.PUBLIC_PUZZLE || '{}');
+      if (!cfg.address) { res.end('{}'); return; }
+      if (!/^0x[0-9a-f]{40}$/i.test(cfg.address) || /^0x0{40}$/i.test(cfg.address) ||
+          new URL(cfg.rpc).protocol !== 'https:') throw new Error('Invalid Puzzle Print config');
+      res.end(JSON.stringify({address:cfg.address, rpc:cfg.rpc, paidSalesEnabled:cfg.paidSalesEnabled === true}));
+    } catch {
+      res.writeHead(503).end(JSON.stringify({error:'Puzzle Print configuration is unavailable.'}));
+    }
     return;
   }
   if (path === '/abi.json' || path === '/round.json') {
