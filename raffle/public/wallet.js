@@ -32,10 +32,15 @@ async function loadHistory(){
     let receipt=document.createElement('p');receipt.textContent='Raffle ticket contract '+addr;if(cfg.chainId===8453){let a=document.createElement('a');a.href='https://basescan.org/address/'+addr+'#tokentxns';a.textContent=' View transfers';receipt.append(a)}sections.push(receipt);
     addr=await past.previous();
   }
-  box.replaceChildren(...sections);if(!sections.length)box.textContent='This is the first linked round.';
+  box.replaceChildren(...sections);if(!sections.length)box.textContent='No previous winners to display yet.';
   historyLoaded=true;
 }
-function report(error){$('status').textContent=error.shortMessage||error.message;}
+function report(error) {
+  const message = error.shortMessage || error.message || '';
+  const rpcFailure = ['UNKNOWN_ERROR', 'NETWORK_ERROR', 'SERVER_ERROR', 'TIMEOUT'].includes(error.code) ||
+    /could not coalesce error/i.test(message);
+  $('status').textContent = rpcFailure ? 'Base data is temporarily unavailable. Please try again shortly.' : message;
+}
 async function connect(authorizedAddress){
   if(cfg.local && !window.ethereum){
     provider=new JsonRpcProvider(cfg.rpc);signer=await provider.getSigner(1);account=await signer.getAddress();
@@ -112,6 +117,7 @@ function showAddress(id, label, address, fragment = '') {
 
 async function refresh(){
   const [donation,c,sold,minted,closed,deadline,places,drawTime,salesClose,postponed,freeCapacity,cancelled,expired,publicPaidEntry]=await Promise.all([contract.donationWallet().catch(()=>null),contract.config(),contract.sold(),contract.minted(),contract.closed(),contract.deadline(),contract.places(),contract.drawTime(),contract.salesClose(),contract.postponements(),contract.remainingFreeCapacity(),contract.cancelled().catch(()=>false),contract.expired().catch(()=>false),contract.publicPaidEntry().catch(()=>false)]);
+  awaitingThreshold = sold < 6000n;
   $('paid-progress').value = Math.min(Number(sold), 6000);
   $('paid-progress-label').textContent = sold.toLocaleString('en-US') + (sold >= 6000n ? ' paid tickets · threshold met' : ' of 6,000 paid tickets');
   $('pool-updated').textContent = 'Updated ' + formatUtc(Date.now() / 1000);
@@ -120,7 +126,6 @@ async function refresh(){
     formatUtc(drawTime) + (awaitingThreshold ? ' · subject to the paid-ticket threshold' : '');
   $('opens-at').textContent = formatUtc(c.opens);
   $('game').hidden=false;$('edition').textContent='Round '+c.edition;$('network').textContent=cfg.local?'Local blockchain · practice funds':cfg.chainId===8453?'Base':'Chain '+cfg.chainId;
-  awaitingThreshold=sold<6000n;
   targetTime=Number(awaitingThreshold?salesClose:drawTime);drawFinished=deadline>0n;
   $('time-label').textContent=awaitingThreshold?'Next sales checkpoint':minted===10000n&&!drawFinished?'Sold out · draw can start':'Draw time';
   if(minted===10000n&&!drawFinished){targetTime=0;$('countdown').textContent=''}
@@ -161,7 +166,7 @@ async function refresh(){
     : '';
   await showOwnedTickets();
   const list=[];for(let i=0;i<Number(places);i++){let id=await contract.winners(i),owner=await contract.claimant(id);let li=document.createElement('li');li.textContent='#'+id+' · '+owner+' · '+fmt(await contract.award(id));if(owner===account && deadline>=now && !await contract.claimed(id)){let b=document.createElement('button');b.textContent='Register ETH prize claim';b.onclick=()=>act(()=>contract.claim(id),'jackpot');li.append(' ',b)}list.push(li)}
-  $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+formatUtc(deadline):closed?'Entries closed.':'Draw pending.';
+  $('winners').replaceChildren(...list);$('receipt').textContent=deadline?'Charity recipient '+await contract.charity()+' · Claims close '+formatUtc(deadline):closed?'Entries closed.':'No draw results yet.';
 }
 async function act(send, successSound = 'ticket') {
   if (busy) return;
@@ -246,11 +251,22 @@ if (!cfg.address) {
   setupWalletButton();
 } else {
   try {
-    provider = new JsonRpcProvider(cfg.rpc);
+    provider = new JsonRpcProvider(cfg.rpc, undefined, {batchMaxCount:5});
     if (Number((await provider.getNetwork()).chainId) !== cfg.chainId) throw Error('Round RPC network mismatch.');
     contract = new Contract(cfg.address, abi, provider);
-    await refresh();
-    $('status').textContent = 'Round loaded.';
+    const updateRound = async () => {
+      try {
+        await refresh();
+        const current = $('status').textContent;
+        if (current === 'Loading round…' || current.startsWith('Base data is temporarily unavailable.')) {
+          $('status').textContent = 'Round loaded.';
+        }
+      } catch (error) {
+        console.warn('Unable to refresh raffle round', error);
+        $('status').textContent = 'Base data is temporarily unavailable. Please try again shortly.';
+      }
+    };
+    await updateRound();
     if (location.hash === '#entry-status') $('entry-status').scrollIntoView();
     setupWalletButton({
       local: Boolean(cfg.local),
@@ -258,7 +274,7 @@ if (!cfg.address) {
       onWalletChange: cfg.local ? undefined : connection => useAppKitWallet(connection, provider),
       disconnectedLabel: cfg.local && !window.ethereum ? 'Use practice wallet' : 'Connect wallet'
     });
-    setInterval(() => { if (!busy && !document.hidden) refresh().catch(report); }, 15000);
+    setInterval(() => { if (!busy && !document.hidden) void updateRound(); }, 15000);
   } catch (error) {
     report(error);
     setupWalletButton();

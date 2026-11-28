@@ -1,19 +1,19 @@
-const eth = (value, currency = 'ETH') => '$' + value.toLocaleString('en-US', {maximumFractionDigits:2}) + ' in ' + currency;
+const eth = (value, currency = 'Base ETH') => '$' + value.toLocaleString('en-US', {maximumFractionDigits:2}) + ' in ' + currency;
 const paidEntrySplit = 'Each 1 USDC paid entry is split into 0.34 USDC (34%) for donations, 0.33 USDC (33%) for the House, and 0.33 USDC (33%) for player prizes. Free entries add no funds to the split.';
 const nbaa = {
   artwork:'/nbaa-cover.jpg',
   series:'NBAA · No Ballz At All',
   freeEntry:'One free play per wallet each week. Free-play prizes are awarded in House tokens.',
-  bonus:'House-token bonus choices include EVO, Kaboom, King Joshi, Queen Joshi, KIND, and NBAA.'
+  bonus:'Planned House-token bonus choices include EVO, Kaboom, King Joshi, Queen Joshi, KIND, and NBAA. NBAA is a Cronos token. Any NBAA bonus would be delivered separately on Cronos, subject to published payout instructions.'
 };
 export const gameRules = {
   '/spin-wheel': {
     name:'Spin Wheel',
     entry:'1 USDC on Base per spin. Up to 25 per purchase, 100 per wallet per day, and 500 per week.',
-    rows:[['0–73','No win'],['74–88','$1 in ETH / 1 bonus token'],['89–92','$2 in ETH / 2 bonus tokens'],['93','$5 in ETH / 5 bonus tokens'],['94–99','Weekly jackpot entry']],
+    rows:[['0–73','No win'],['74–88','$1 in Base ETH / 1 bonus token'],['89–92','$2 in Base ETH / 2 bonus tokens'],['93','$5 in Base ETH / 5 bonus tokens'],['94–99','Weekly jackpot entry']],
     headings:['Wheel stops','Paid result / free result'],
     notes:[paidEntrySplit, 'All 100 stops have equal weight. On-chain randomness determines the result. Free spins can earn jackpot entries and pay instant bonuses in the winner’s chosen House token.',
-      'The weekly jackpot accrues $0.05 in ETH value per paid spin, plus rollover. A Sunday draw needs 2,000 paid spins and at least one jackpot entry. If either is missing, the jackpot carries forward.']
+      'The weekly jackpot accrues $0.05 in Base ETH value per paid spin, plus rollover. The jackpot draw is scheduled for Sunday at 8 p.m. Mountain Time (03:00 UTC Monday during MST, 02:00 UTC Monday during MDT). It needs 2,000 paid spins and at least one jackpot entry. If either is missing, the jackpot carries forward.']
   },
   '/weekly-bingo': {
     name:'Weekly Bingo',
@@ -35,35 +35,40 @@ export const gameRules = {
     notes:[
       'One 20,000-piece pool is shuffled before launch. Each paid or free draw takes the next tile without checking what the player owns. Duplicate pieces can be traded. The hidden gold X appears only after all 20 tiles are assembled.',
       'The planned launch uses Base ERC-1155 token IDs 1–20 for numbered pieces. A successful claim burns one of each piece and issues the completed map as token ID 21. The first five eligible claims are ranked in claim order.',
-      'Under the funding schedule in the game brief, 100% of the first 5,600 paid pieces funds the prize reserve. At 2 USDC per piece, that is 11,200 USDC, enough to cover the first three sellout prizes. Later sales fund the remaining prize, donation and House allocations. Each later prize unlocks when funded.',
-      'At a fully paid sellout, 40,000 USDC of gross funds 13,600 for donations, 13,200 for the House, and 13,200 in ETH prize value. Free pieces come from the same pool and add no revenue.',
+      'Treasure Hunt has a funding-order exception: the first 5,600 paid pieces fund only the prize reserve. That is 11,200 USDC at 2 USDC per piece, covering the first three sellout prizes. The 34% donation and 33% House allocations begin funding from later sales. The 34/33/33 split describes the fully paid sellout totals; it does not apply to each purchase under this exception. Each later prize unlocks when funded.',
+      'At a fully paid sellout, 40,000 USDC of gross funds 13,600 for donations, 13,200 for the House, and 13,200 in Base ETH prize value. Free pieces come from the same pool and add no revenue.',
       'The planned hunt publishes commitments to the shuffled order and hidden cell before sales, with the underlying values revealed at settlement. Each participating wallet may nominate one charity.',
-      'If the funding gate is missed and sales stall for 180 days, the House may close the hunt and refund paid buyers in full.'
+      'If the hunt is below the 5,600-paid-piece funding gate and sales stall for 180 days, the House may close the hunt and refund paid buyers in full.'
     ]
   },
   '/ballz-out': {
     ...nbaa,
     name:'Ballz Out',
     entry:'Planned price: 1 USDC per play. Make a 50/50 call on each step of a five-step double-or-nothing ladder.',
-    headings:['Choice','Result'],
-    rows:[['Correct call','Advance one step'],['Cash out','Take the current ladder prize after a successful step'],['Incorrect call','Lose the ladder prize for that play']],
-    notes:[paidEntrySplit, 'Each step opens only when the player prize reserve can cover it.']
+    headings:['Step','Free practice cash-out'],
+    rows:[2,4,8,16,32].map((points, index) => ['Step ' + (index + 1), points + ' practice points']),
+    notes:[paidEntrySplit, 'A correct call advances one step. After a win, cash out or risk the ladder on the next call. A miss loses the current ladder prize.',
+      'Practice points have no payout value. The five paid-play prize amounts and the funding requirement for each step must be published before paid play opens.']
   },
   '/play-or-pass': {
     ...nbaa,
     name:'Play or Pass',
     entry:'Planned price: 1 USDC per play. Pick PLAY or PASS before a single draw from 0 to 99.',
-    headings:['Choice','How it works'],
-    rows:[['PLAY','Choose before the draw'],['PASS','Choose before the draw']],
-    notes:[paidEntrySplit, 'The two choices are designed to have the same long-run payout. The number ranges and payout table will be published before launch.']
+    headings:['Choice','Winning range in free practice'],
+    rows:[['PLAY','00–49 · one practice point on a hit'],['PASS','50–99 · one practice point on a hit']],
+    notes:[paidEntrySplit, 'Each practice choice covers 50 of the 100 possible numbers. A miss scores zero. The two paid choices are designed for the same long-run payout. The paid-play ranges and prize amounts must be published before launch.']
   },
   '/ballz-bingo': {
     ...nbaa,
     name:'Ballz Bingo',
+    freeEntry:'One free card per wallet each week. Free-card prize eligibility will be published before paid rounds open.',
     entry:'Planned price: 1 USDC per card. Balls are drawn one at a time until the first card fills.',
     headings:['Round state','Result'],
     rows:[['Below 6,000 paid cards','Round postpones and the pot carries forward'],['First full card','Wins the entire player pool plus the NBAA bonus pool']],
-    notes:[paidEntrySplit, 'The NBAA bonus pool grows with each paid card.']
+    notes:[paidEntrySplit,
+      'Arcade rivals are part of free practice. In a planned prize round, players compete against other entrants’ cards.',
+      'The planned postponement limit is four weeks after the first Sunday sales close. If the House ends the round without a draw, original buyers receive full manual USDC refunds and free cards are void. Postponement alone does not trigger refunds.',
+      'The NBAA bonus pool is intended to grow as paid cards sell. The draw time, NBAA contribution rate and funding source, and whether free cards qualify for the main pool or token prizes will be published before paid rounds open.']
   },
   '/puzzle-print': {
     name:'Puzzle Print',
@@ -85,7 +90,7 @@ export function upcomingRules(game) {
     game.headings.map(label => '<th scope="col">' + label + '</th>').join('') +
     '</tr></thead><tbody>' + rows + '</tbody></table>' +
     game.notes.map(note => '<p>' + note + '</p>').join('') +
-    '<p>Main prizes are shown in USD value and paid in ' + (game.prizeCurrency || 'ETH') + '. ' + (game.bonus || 'Bonuses use a House token of the winner’s choice.') + '</p>' +
+    '<p>Main prizes are shown in USD value and paid in ' + (game.prizeCurrency || 'Base ETH') + '. ' + (game.bonus || 'Bonuses use a House token of the winner’s choice.') + '</p>' +
     '<p><a href="/rules">Read the Arcade General Rules</a></p></section>' +
     (game.artwork ? '<section><h2>About NBAA</h2><p>NBAA is the series’ Cronos token.</p><img class="game-cover" src="' +
       game.artwork + '" width="1600" height="1600" loading="lazy" alt="No Ballz At All cover artwork"></section>' : '');
